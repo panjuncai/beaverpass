@@ -9,7 +9,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { supabase, user, isLoading } = useSupabase();
+  const { supabase, user } = useSupabase();
   const router = useRouter();
 
   const handleLogout = async () => {

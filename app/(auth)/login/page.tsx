@@ -6,13 +6,11 @@ export const metadata: Metadata = {
   description: '登录到您的BeaverPass账户',
 };
 
-export default function LoginPage({
-  searchParams,
-}: {
-  searchParams: { registered?: string };
-}) {
-  const showRegisteredMessage = searchParams.registered === 'true';
-
+type PageProps = {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  };
+export default async function LoginPage({ searchParams }: PageProps) {
+  const showRegisteredMessage = await searchParams.then((params) => params.registered === 'true');
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-4 py-12 bg-gray-50">
       {showRegisteredMessage && (
