@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BeaverPass - 安全的密码管理器
 
-## Getting Started
+BeaverPass是一个安全的密码管理器，帮助用户生成、存储和管理强密码，保护在线账户安全。
 
-First, run the development server:
+## 技术栈
+
+- **前端框架**: Next.js (App Router)
+- **API**: tRPC
+- **认证**: Supabase Auth
+- **数据库**: Supabase PostgreSQL
+- **样式**: Tailwind CSS
+- **部署**: Vercel
+
+## 功能
+
+- 用户认证（邮箱登录和社交登录）
+- 密码管理
+- 安全笔记
+- 密码生成器
+- 跨设备同步
+
+## 开始使用
+
+### 前提条件
+
+- Node.js 18+
+- npm 或 yarn
+- Supabase账户
+
+### 安装
+
+1. 克隆仓库
+
+```bash
+git clone https://github.com/yourusername/beaverpass.git
+cd beaverpass
+```
+
+2. 安装依赖
+
+```bash
+npm install
+# 或
+yarn install
+```
+
+3. 配置环境变量
+
+复制`.env.local.example`文件并重命名为`.env.local`，然后填写您的Supabase凭据：
+
+```
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
+```
+
+4. 运行开发服务器
 
 ```bash
 npm run dev
-# or
+# 或
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. 在浏览器中打开 [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 部署到Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fyourusername%2Fbeaverpass)
 
-## Learn More
+1. 在Vercel上创建一个新项目
+2. 导入您的GitHub仓库
+3. 添加环境变量（与`.env.local`相同）
+4. 部署
 
-To learn more about Next.js, take a look at the following resources:
+## 许可证
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
