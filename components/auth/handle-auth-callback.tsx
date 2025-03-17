@@ -19,8 +19,8 @@ export default function HandleAuthCallback() {
         const { data: { session } } = await supabase.auth.getSession();
         
         if (session) {
-          // 登录成功，重定向到dashboard
-          router.push('/dashboard');
+          // 登录成功，重定向到search
+          router.push('/search');
         }
       };
       

@@ -18,6 +18,6 @@ export async function GET(request: Request) {
     }
   }
   
-  // 默认重定向到dashboard
-  return NextResponse.redirect(new URL('/dashboard', requestUrl.origin));
+  // 默认重定向到search
+  return NextResponse.redirect(new URL('/search', requestUrl.origin));
 } 

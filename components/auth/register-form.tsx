@@ -31,12 +31,12 @@ export function RegisterForm() {
     onSuccess: (data) => {
       // 检查用户是否处于"确认中"状态，这表示需要邮箱验证
       if (data.user?.identities && data.user.identities.length > 0) {
-        // 如果用户已经确认 (社交登录) 或不需要确认，直接重定向到dashboard
+        // 如果用户已经确认 (社交登录) 或不需要确认，直接重定向到search
         if (!data.user.email_confirmed_at && !data.user.confirmed_at) {
           // 需要邮箱验证，重定向到登录页面
           router.push('/login?verification=required');
         } else {
-          // 已确认或不需要确认，直接重定向到dashboard
+          // 已确认或不需要确认，直接重定向到search
           router.push('/search');
         }
       } else {

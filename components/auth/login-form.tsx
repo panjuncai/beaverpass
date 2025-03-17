@@ -26,7 +26,7 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         // 如果已登录，进行重定向
-        router.push(redirectTo || '/dashboard');
+        router.push(redirectTo || '/search');
       }
     };
     
@@ -48,7 +48,7 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
   // 使用tRPC登录
   const loginMutation = trpc.auth.login.useMutation({
     onSuccess: () => {
-      router.push(redirectTo || '/dashboard');
+      router.push(redirectTo || '/search');
       router.refresh();
     },
     onError: (error) => {
