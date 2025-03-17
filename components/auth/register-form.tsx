@@ -37,7 +37,7 @@ export function RegisterForm() {
           router.push('/login?verification=required');
         } else {
           // 已确认或不需要确认，直接重定向到dashboard
-          router.push('/dashboard');
+          router.push('/search');
         }
       } else {
         // 默认重定向到登录页面

@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'BeaverPass - 安全的密码管理器',
-  description: '使用BeaverPass安全地管理您的密码和凭据',
+  title: 'BeaverPass',
+  description: 'BeaverPass - Your Best Secondhand Goods Store',
 };
 
 export default function HomePage() {
