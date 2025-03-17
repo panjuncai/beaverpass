@@ -30,7 +30,7 @@ export const publicProcedure = t.procedure;
 // 创建受保护的过程（需要登录）
 export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
   if (!ctx.session || !ctx.session.user) {
-    throw new TRPCError({ code: 'UNAUTHORIZED', message: '您需要登录才能访问此资源' });
+    throw new TRPCError({ code: 'UNAUTHORIZED', message: 'You need to login to access this resource' });
   }
   
   return next({

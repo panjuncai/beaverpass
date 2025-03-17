@@ -3,22 +3,10 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { useRouter } from 'next/navigation';
 import { trpc } from '@/lib/trpc/client';
 import Link from 'next/link';
-
-// 注册表单验证
-const registerSchema = z.object({
-  email: z.string().email('请输入有效的电子邮件地址'),
-  password: z.string().min(6, '密码至少需要6个字符'),
-  confirmPassword: z.string().min(6, '密码至少需要6个字符'),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: '密码和确认密码不匹配',
-  path: ['confirmPassword'],
-});
-
-type RegisterFormValues = z.infer<typeof registerSchema>;
+import { registerSchema, RegisterFormValues } from '@/lib/validations/auth';
 
 export function RegisterForm() {
   const router = useRouter();
@@ -40,8 +28,21 @@ export function RegisterForm() {
 
   // 使用tRPC注册
   const registerMutation = trpc.auth.register.useMutation({
-    onSuccess: () => {
-      router.push('/login?registered=true');
+    onSuccess: (data) => {
+      // 检查用户是否处于"确认中"状态，这表示需要邮箱验证
+      if (data.user?.identities && data.user.identities.length > 0) {
+        // 如果用户已经确认 (社交登录) 或不需要确认，直接重定向到dashboard
+        if (!data.user.email_confirmed_at && !data.user.confirmed_at) {
+          // 需要邮箱验证，重定向到登录页面
+          router.push('/login?verification=required');
+        } else {
+          // 已确认或不需要确认，直接重定向到dashboard
+          router.push('/dashboard');
+        }
+      } else {
+        // 默认重定向到登录页面
+        router.push('/login?registered=true');
+      }
     },
     onError: (error) => {
       setError(error.message);
@@ -64,8 +65,8 @@ export function RegisterForm() {
   return (
     <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
       <div className="text-center">
-        <h1 className="text-2xl font-bold">注册</h1>
-        <p className="mt-2 text-gray-600">创建您的BeaverPass账户</p>
+        <h1 className="text-2xl font-bold">Sign Up</h1>
+        <p className="mt-2 text-gray-600">Create your BeaverPass account</p>
       </div>
 
       {error && (
@@ -77,7 +78,7 @@ export function RegisterForm() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-            电子邮件
+            Email
           </label>
           <input
             id="email"
@@ -93,7 +94,7 @@ export function RegisterForm() {
 
         <div>
           <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-            密码
+            Password
           </label>
           <input
             id="password"
@@ -109,7 +110,7 @@ export function RegisterForm() {
 
         <div>
           <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-            确认密码
+            Confirm Password
           </label>
           <input
             id="confirmPassword"
@@ -128,15 +129,15 @@ export function RegisterForm() {
           className="w-full px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
           disabled={isLoading}
         >
-          {isLoading ? '注册中...' : '注册'}
+          {isLoading ? 'Signing up...' : 'Sign Up'}
         </button>
       </form>
 
       <div className="text-center text-sm">
         <p className="text-gray-600">
-          已有账户？{' '}
+          Already have an account?{' '}
           <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
-            登录
+            Login
           </Link>
         </p>
       </div>

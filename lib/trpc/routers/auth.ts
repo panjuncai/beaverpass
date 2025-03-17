@@ -1,22 +1,6 @@
-import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
 import { publicProcedure, router } from '..';
-
-// 登录表单验证
-const loginSchema = z.object({
-  email: z.string().email('请输入有效的电子邮件地址'),
-  password: z.string().min(6, '密码至少需要6个字符'),
-});
-
-// 注册表单验证
-const registerSchema = z.object({
-  email: z.string().email('请输入有效的电子邮件地址'),
-  password: z.string().min(6, '密码至少需要6个字符'),
-  confirmPassword: z.string().min(6, '密码至少需要6个字符'),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: '密码和确认密码不匹配',
-  path: ['confirmPassword'],
-});
+import { loginSchema, registerSchema } from '@/lib/validations/auth';
 
 export const authRouter = router({
   // 邮箱登录
@@ -32,7 +16,7 @@ export const authRouter = router({
         if (error) {
           throw new TRPCError({
             code: 'UNAUTHORIZED',
-            message: error.message || '登录失败，请检查您的凭据',
+            message: error.message || 'Login failed, please check your credentials',
           });
         }
 
@@ -43,7 +27,7 @@ export const authRouter = router({
         }
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: '登录时出现错误',
+          message: 'Login failed',
         });
       }
     }),
@@ -56,12 +40,16 @@ export const authRouter = router({
         const { data, error } = await ctx.supabase.auth.signUp({
           email: input.email,
           password: input.password,
+          options: {
+            // 开启邮箱确认
+            emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
+          }
         });
 
         if (error) {
           throw new TRPCError({
             code: 'BAD_REQUEST',
-            message: error.message || '注册失败',
+            message: error.message || 'Sign up failed',
           });
         }
 
@@ -72,7 +60,7 @@ export const authRouter = router({
         }
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: '注册时出现错误',
+          message: 'Registration failed',
         });
       }
     }),
@@ -84,7 +72,7 @@ export const authRouter = router({
     if (error) {
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
-        message: error.message || '登出时出现错误',
+        message: error.message || 'Logout failed',
       });
     }
     

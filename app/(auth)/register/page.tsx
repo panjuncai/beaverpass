@@ -2,8 +2,8 @@ import { RegisterForm } from '@/components/auth/register-form';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: '注册 | BeaverPass',
-  description: '创建您的BeaverPass账户',
+  title: 'Sign Up | BeaverPass',
+  description: 'Create your BeaverPass account',
 };
 
 export default function RegisterPage() {

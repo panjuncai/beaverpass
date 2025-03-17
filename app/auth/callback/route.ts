@@ -10,8 +10,14 @@ export async function GET(request: Request) {
     
     // 交换授权码获取会话
     await supabase.auth.exchangeCodeForSession(code);
+    
+    // 检查是否有指定的重定向URL
+    const redirectTo = requestUrl.searchParams.get('redirectTo');
+    if (redirectTo) {
+      return NextResponse.redirect(new URL(redirectTo, requestUrl.origin));
+    }
   }
   
-  // 重定向到主页
-  return NextResponse.redirect(new URL('/', requestUrl.origin));
+  // 默认重定向到dashboard
+  return NextResponse.redirect(new URL('/dashboard', requestUrl.origin));
 } 

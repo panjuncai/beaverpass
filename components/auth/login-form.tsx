@@ -1,27 +1,37 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { useRouter } from 'next/navigation';
 import { trpc } from '@/lib/trpc/client';
 import { useSupabase } from '../providers/supabase-provider';
 import Link from 'next/link';
+import { loginSchema, LoginFormValues } from '@/lib/validations/auth';
 
-// 登录表单验证
-const loginSchema = z.object({
-  email: z.string().email('请输入有效的电子邮件地址'),
-  password: z.string().min(6, '密码至少需要6个字符'),
-});
+interface LoginFormProps {
+  redirectTo?: string;
+}
 
-type LoginFormValues = z.infer<typeof loginSchema>;
-
-export function LoginForm() {
+export function LoginForm({ redirectTo }: LoginFormProps) {
   const router = useRouter();
   const { supabase } = useSupabase();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  // 检查用户是否已登录，无论URL中是否有访问令牌
+  useEffect(() => {
+    const checkSession = async () => {
+      // 检查用户是否已登录
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        // 如果已登录，进行重定向
+        router.push(redirectTo || '/dashboard');
+      }
+    };
+    
+    checkSession();
+  }, [redirectTo, router, supabase.auth]);
 
   const {
     register,
@@ -38,7 +48,7 @@ export function LoginForm() {
   // 使用tRPC登录
   const loginMutation = trpc.auth.login.useMutation({
     onSuccess: () => {
-      router.push('/');
+      router.push(redirectTo || '/dashboard');
       router.refresh();
     },
     onError: (error) => {
@@ -65,10 +75,14 @@ export function LoginForm() {
     setError(null);
     
     try {
+      // 准备查询参数，以便回调后可以重定向到正确的位置
+      const queryParams = redirectTo ? { redirectTo } : undefined;
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams, // 添加查询参数
         },
       });
       
@@ -88,10 +102,14 @@ export function LoginForm() {
     setError(null);
     
     try {
+      // 准备查询参数，以便回调后可以重定向到正确的位置
+      const queryParams = redirectTo ? { redirectTo } : undefined;
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams, // 添加查询参数
         },
       });
       
