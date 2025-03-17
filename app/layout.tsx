@@ -4,7 +4,11 @@ import { Providers } from '@/components/providers';
 
 export const metadata: Metadata = {
   title: 'BeaverPass',
-  description: '安全的密码管理器',
+  description: 'BeaverPass - Your Best Secondhand Goods Store',
+  icons: {
+    icon: '/browser_logo.svg',
+    apple: '/browser_logo.svg',
+  },
 };
 
 export default function RootLayout({
