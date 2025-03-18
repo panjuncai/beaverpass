@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { trpc } from '@/lib/trpc/client';
+// import { trpc } from '@/lib/trpc/client';
 import { useSupabase } from '../providers/supabase-provider';
 import Link from 'next/link';
 import { loginSchema, LoginFormValues } from '@/lib/validations/auth';
+import Loading from '@/components/loading/loading';
 
 interface LoginFormProps {
   redirectTo?: string;
@@ -22,6 +23,7 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
   // 检查用户是否已登录，无论URL中是否有访问令牌
   useEffect(() => {
     const checkSession = async () => {
+      console.log('checkSession');
       // 检查用户是否已登录
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
@@ -45,17 +47,16 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
     },
   });
 
-  // 使用tRPC登录
-  const loginMutation = trpc.auth.login.useMutation({
-    onSuccess: () => {
-      router.push(redirectTo || '/search');
-      router.refresh();
-    },
-    onError: (error) => {
-      setError(error.message);
+  const loginHandle = async (input: LoginFormValues) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: input.email,
+      password: input.password,
+    });
+    if (error) {
       setIsLoading(false);
-    },
-  });
+      throw error;
+    }
+  };
 
   // 处理表单提交
   const onSubmit = async (data: LoginFormValues) => {
@@ -63,9 +64,16 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
     setError(null);
     
     try {
-      await loginMutation.mutateAsync(data);
-    } catch {
-      // 错误已在onError回调中处理
+      await loginHandle(data);
+      console.log('登录成功');
+      console.log('redirectTo', redirectTo);
+      router.push(redirectTo || '/search');
+      setIsLoading(false);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : '登录失败';
+      console.log('登录失败',errorMessage);
+      setError(errorMessage);
+      setIsLoading(false);
     }
   };
 
@@ -88,6 +96,13 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
       
       if (error) {
         throw error;
+      }
+
+      // 等待认证完成
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        console.log('Google 登录成功');
+        await router.push(redirectTo || '/search');
       }
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : '使用Google登录时出错';
@@ -123,11 +138,14 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
     }
   };
 
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
       <div className="text-center">
-        <h1 className="text-2xl font-bold">登录</h1>
-        <p className="mt-2 text-gray-600">欢迎回来！请登录您的账户</p>
+        <h1 className="text-2xl font-bold">BeaverPass</h1>
       </div>
 
       {error && (
@@ -139,13 +157,13 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-            电子邮件
+            Email
           </label>
           <input
             id="email"
             type="email"
             {...register('email')}
-            className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
             disabled={isLoading}
           />
           {errors.email && (
@@ -155,13 +173,13 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
 
         <div>
           <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-            密码
+            Password
           </label>
           <input
             id="password"
             type="password"
             {...register('password')}
-            className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
             disabled={isLoading}
           />
           {errors.password && (
@@ -171,10 +189,10 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
 
         <button
           type="submit"
-          className="w-full px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+          className="w-full btn btn-primary"
           disabled={isLoading}
         >
-          {isLoading ? '登录中...' : '登录'}
+          {isLoading ? 'Signing in...' : 'Sign in'}
         </button>
       </form>
 
@@ -183,7 +201,7 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
           <div className="w-full border-t border-gray-300" />
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="px-2 text-gray-500 bg-white">或使用社交账号登录</span>
+          <span className="px-2 text-gray-500 bg-white">Or sign in with social accounts</span>
         </div>
       </div>
 
@@ -220,9 +238,9 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
 
       <div className="text-center text-sm">
         <p className="text-gray-600">
-          还没有账户？{' '}
-          <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500">
-            注册
+          Don&apos;t have an account?{' '}
+          <Link href="/register" className="font-medium text-green-600 hover:text-green-500">
+            Register
           </Link>
         </p>
       </div>

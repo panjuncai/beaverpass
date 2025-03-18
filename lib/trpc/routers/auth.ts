@@ -1,14 +1,16 @@
 import { TRPCError } from '@trpc/server';
 import { publicProcedure, router } from '..';
 import { loginSchema, registerSchema } from '@/lib/validations/auth';
+import { createSupabaseClient } from '@/lib/supabase';
 
 export const authRouter = router({
   // 邮箱登录
   login: publicProcedure
     .input(loginSchema)
-    .mutation(async ({ ctx, input }) => {
+    .mutation(async ({ input }) => {
       try {
-        const { data, error } = await ctx.supabase.auth.signInWithPassword({
+        const supabase = createSupabaseClient();
+        const { data, error } = await supabase.auth.signInWithPassword({
           email: input.email,
           password: input.password,
         });
@@ -35,9 +37,10 @@ export const authRouter = router({
   // 注册
   register: publicProcedure
     .input(registerSchema)
-    .mutation(async ({ ctx, input }) => {
+    .mutation(async ({ input }) => {
       try {
-        const { data, error } = await ctx.supabase.auth.signUp({
+        const supabase = createSupabaseClient();
+        const { data, error } = await supabase.auth.signUp({
           email: input.email,
           password: input.password,
           options: {
@@ -66,21 +69,28 @@ export const authRouter = router({
     }),
 
   // 登出
-  logout: publicProcedure.mutation(async ({ ctx }) => {
-    const { error } = await ctx.supabase.auth.signOut();
-    
-    if (error) {
+  logout: publicProcedure.mutation(async () => {
+    try {
+      const supabase = createSupabaseClient();
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: error.message || 'Logout failed',
+        });
+      }
+      
+      return { success: true };
+    } catch (error) {
+      if (error instanceof TRPCError) {
+        throw error;
+      }
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
-        message: error.message || 'Logout failed',
+        message: 'Logout failed',
       });
     }
-    
-    return { success: true };
   }),
 
-  // 获取当前用户
-  getUser: publicProcedure.query(async ({ ctx }) => {
-    return { user: ctx.session?.user || null };
-  }),
 }); 

@@ -24,8 +24,10 @@ export default async function LoginPage({ searchParams }: PageProps) {
   const { data: { session } } = await supabase.auth.getSession();
   
   // 如果用户已登录，且不是从search重定向来的（防止循环重定向）
-  if (session && redirectTo !== '/search') {
-    redirect('/search');
+  if (session) {
+    console.log('用户已登录，跳转到上一个被记录的页面');
+    const destination=redirectTo || '/search';
+    redirect(destination);
   }
   
   return (

@@ -22,6 +22,13 @@
     --border: oklch(0.92 0.004 286.32);
     --input: oklch(0.92 0.004 286.32);
     --ring: oklch(0.705 0.015 286.067);
+    
+    /* DaisyUI 颜色变量 */
+    --color-primary: #593719;
+    --color-primary-content: #ffffff;
+    --color-secondary: #f6d860;
+    --color-accent: #97bc56;
+    --color-success: #7EAC2D;
   }
 
   .dark {
@@ -43,6 +50,10 @@
     --border: oklch(1 0 0 / 10%);
     --input: oklch(1 0 0 / 15%);
     --ring: oklch(0.552 0.016 285.938);
+    
+    /* DaisyUI 深色主题颜色变量 */
+    --color-primary: #593719;
+    --color-primary-content: #ffffff;
   }
 
   body {

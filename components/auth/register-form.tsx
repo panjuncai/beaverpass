@@ -126,7 +126,7 @@ export function RegisterForm() {
 
         <button
           type="submit"
-          className="w-full px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+          className="w-full btn btn-primary"
           disabled={isLoading}
         >
           {isLoading ? 'Signing up...' : 'Sign Up'}
@@ -136,7 +136,7 @@ export function RegisterForm() {
       <div className="text-center text-sm">
         <p className="text-gray-600">
           Already have an account?{' '}
-          <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
+          <Link href="/login" className="font-medium text-green-600 hover:text-green-500">
             Login
           </Link>
         </p>

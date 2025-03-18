@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+
 const config = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -63,7 +64,8 @@ const config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+  ],
 };
 
 export default config; 

@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
 
 // 创建Supabase客户端
 export const createSupabaseClient = () => {
@@ -9,8 +10,19 @@ export const createSupabaseClient = () => {
     throw new Error('缺少Supabase环境变量');
   }
   
-  return createClient(supabaseUrl, supabaseKey);
+  return createBrowserClient(supabaseUrl, supabaseKey,{
+    cookieOptions: {
+      name: 'supabase-auth-token', // cookie 名称
+      domain: process.env.NODE_ENV === 'production' ? 'beaverpass-client.vercel.app' : 'localhost',
+      path: '/',
+      sameSite: 'lax', // 推荐lax
+      secure: process.env.NODE_ENV === 'production', // 本地开发false，生产true
+      maxAge: 60 * 60 * 24 * 7, // 7天
+    },
+    cookieEncoding: 'base64url',
+  });
 };
+
 
 // 创建服务器端Supabase客户端
 export const createServerSupabaseClient = () => {
