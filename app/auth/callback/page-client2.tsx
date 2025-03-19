@@ -14,23 +14,23 @@ export default function AuthCallback() {
       const code = searchParams?.get('code');
       const redirectTo = searchParams?.get('redirectTo') || '/search';
       console.log('code is............', code);
+      console.log('redirectTo is............', redirectTo);
       if (code) {
         const { error } = await supabase.auth.exchangeCodeForSession(code);
-
-        if (error) {
-          console.error('OAuth 登录失败:', error.message);
-          return;
+        if (!error) {
+          console.log('Google 登录成功,完成session创建');
+          router.push('/search');
+        } else {
+          console.error('Exchange code error:', error);
+          router.push('/login');
         }
-
-        // 登录成功，cookie 自动保存
-        router.push(redirectTo || '/search');
       } else {
         router.push('/login');
       }
     };
     
     exchangeCode();
-  }, [searchParams, router]);
+  }, [searchParams, router,supabase]);
 
   return <div>Please wait...</div>;
 }

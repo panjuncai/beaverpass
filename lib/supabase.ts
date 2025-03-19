@@ -10,17 +10,7 @@ export const createSupabaseClient = () => {
     throw new Error('缺少Supabase环境变量');
   }
   
-  return createBrowserClient(supabaseUrl, supabaseKey,{
-    cookieOptions: {
-      name: 'supabase-auth-token', // cookie 名称
-      domain: process.env.NODE_ENV === 'production' ? 'beaverpass-client.vercel.app' : 'localhost',
-      path: '/',
-      sameSite: 'lax', // 推荐lax
-      secure: process.env.NODE_ENV === 'production', // 本地开发false，生产true
-      maxAge: 60 * 60 * 24 * 7, // 7天
-    },
-    cookieEncoding: 'base64url',
-  });
+  return createBrowserClient(supabaseUrl, supabaseKey);
 };
 
 
