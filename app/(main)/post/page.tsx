@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import PostForm from '@/components/post/post-form';
+import { CreatePostForm } from '@/components/post/post-form';
 
 export const metadata: Metadata = {
   title: 'Post | BeaverPass',
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function PostPage() {
   return (
     <div className="container px-4 py-8 mx-auto">
-      <PostForm />
+      <CreatePostForm />
     </div>
   );
 } 

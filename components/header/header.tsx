@@ -6,7 +6,6 @@ export default function Header(props: {
   handleLogout: () => void;
 }) {
   const { data: user } = trpc.auth.getUser.useQuery();
-  console.log('右上角图标....user....', user);
   return (
     <header className="navbar shadow-sm">
       <div className="navbar-start"></div>
