@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 // import { trpc } from '@/lib/trpc/client';
-import { useSupabase } from '../providers/supabase-provider';
+import { useSupabase } from '@/components/providers/supabase-provider';
 import Link from 'next/link';
 import { loginSchema, LoginFormValues } from '@/lib/validations/auth';
 import Loading from '@/components/loading/loading';
@@ -23,12 +23,11 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
   // 检查用户是否已登录，无论URL中是否有访问令牌
   useEffect(() => {
     const checkSession = async () => {
-      console.log('checkSession');
       // 检查用户是否已登录
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        // 如果已登录，进行重定向
-        router.push(redirectTo || '/search');
+        console.log('checkSession登录成功');
+        await router.push(redirectTo || '/search');
       }
     };
     
@@ -85,7 +84,7 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
     try {
       // 准备查询参数，以便回调后可以重定向到正确的位置
       const queryParams = redirectTo ? { redirectTo } : undefined;
-      
+      // console.log('queryParams', queryParams);
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -96,13 +95,6 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
       
       if (error) {
         throw error;
-      }
-
-      // 等待认证完成
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        console.log('Google 登录成功');
-        await router.push(redirectTo || '/search');
       }
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : '使用Google登录时出错';
