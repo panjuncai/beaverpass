@@ -10,14 +10,15 @@ export default function HandleAuthCallback() {
   
   useEffect(() => {
     // 检查URL中是否包含access_token（哈希片段中）
+    console.log('window.location.hash', window.location.hash);
     const hasAccessToken = window.location.hash && window.location.hash.includes('access_token');
-    
+    console.log('hasAccessToken', hasAccessToken);
     if (hasAccessToken) {
       // 如果URL中包含access_token，Supabase客户端会自动处理它
       // 我们只需检查会话是否存在，然后重定向
       const checkSession = async () => {
         const { data: { session } } = await supabase.auth.getSession();
-        
+        console.log('session', session);
         if (session) {
           // 登录成功，重定向到search
           router.push('/search');
