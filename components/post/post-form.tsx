@@ -1,5 +1,4 @@
-'use client';
-// import { useSupabase } from '@/components/providers/supabase-provider';
+// 'use client';
 import { trpc } from "@/lib/trpc/client";
 export default function PostForm() {
   const { data: user } = trpc.auth.getUser.useQuery();

@@ -5,10 +5,10 @@ import { createClient } from '@/utils/supabase/server';
 // 创建上下文类型
 export const createTRPCContext = async (opts: { headers: Headers }) => {
     const supabase = await createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
     return {
     headers: opts.headers,
-    session,
+    user,
   };
 };
 
@@ -23,15 +23,14 @@ export const publicProcedure = t.procedure;
 
 // 创建受保护的过程（需要登录）
 export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user) {
+  if (!ctx.user) {
     throw new TRPCError({ code: 'UNAUTHORIZED', message: 'You need to login to access this resource' });
   }
   
   return next({
     ctx: {
       ...ctx,
-      session: { ...ctx.session },
-      user: ctx.session.user,
+      user: ctx.user,
     },
   });
 }); 

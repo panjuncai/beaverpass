@@ -1,7 +1,5 @@
 import { LoginForm } from '@/components/auth/login-form';
 import { Metadata } from 'next';
-// import { createServerSupabaseClient } from '@/lib/supabase';
-// import {trpc} from '@/lib/trpc/client';
 import {createClient} from '@/utils/supabase/server'
 import { redirect } from 'next/navigation';
 
