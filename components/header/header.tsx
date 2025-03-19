@@ -1,11 +1,12 @@
-import { User } from "@supabase/supabase-js";
 import Image from "next/image";
+import { trpc } from "@/lib/trpc/client";
 export default function Header(props: {
-  user: User | null;
   handleLogin: () => void;
   handleRegister: () => void;
   handleLogout: () => void;
 }) {
+  const { data: user } = trpc.auth.getUser.useQuery();
+  console.log('右上角图标....user....', user);
   return (
     <header className="navbar shadow-sm">
       <div className="navbar-start"></div>
@@ -24,7 +25,7 @@ export default function Header(props: {
             <details>
               <summary>Options</summary>
               <ul className="bg-base-100 rounded-t-none p-2">
-                {props.user ? (
+                {user ? (
                   <>
                     <li>
                       <a onClick={props.handleLogout}>Logout</a>

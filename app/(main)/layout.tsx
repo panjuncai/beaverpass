@@ -10,7 +10,7 @@ export default function SearchLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { supabase,user } = useSupabase();
+  const { supabase } = useSupabase();
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -29,7 +29,7 @@ export default function SearchLayout({
 
   return (
     <div className="flex flex-col h-screen">
-      <Header handleLogout={handleLogout} user={user} handleLogin={handleLogin} handleRegister={handleRegister} />
+      <Header handleLogout={handleLogout} handleLogin={handleLogin} handleRegister={handleRegister} />
       <main className="flex-1 overflow-y-auto scroll-behavior-smooth -webkit-overflow-scrolling-touch">{children}</main>
       <Footer />
     </div>

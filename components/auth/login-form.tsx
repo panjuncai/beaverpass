@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-// import { trpc } from '@/lib/trpc/client';
 import { useSupabase } from '@/components/providers/supabase-provider';
+// import { createClient } from '@/utils/supabase/client';
+import OneTapComponent from '@/components/google-login/google-login';
+import { trpc } from '@/lib/trpc/client';
 import Link from 'next/link';
 import { loginSchema, LoginFormValues } from '@/lib/validations/auth';
 import Loading from '@/components/loading/loading';
@@ -17,22 +19,24 @@ interface LoginFormProps {
 export function LoginForm({ redirectTo }: LoginFormProps) {
   const router = useRouter();
   const { supabase } = useSupabase();
+  const [showOneTap, setShowOneTap] = useState(false);
+  // const supabase = createClient();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // 检查用户是否已登录，无论URL中是否有访问令牌
-  useEffect(() => {
-    const checkSession = async () => {
-      // 检查用户是否已登录
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        console.log('checkSession登录成功');
-        await router.push(redirectTo || '/search');
-      }
-    };
+  // // 检查用户是否已登录，无论URL中是否有访问令牌
+  // useEffect(() => {
+  //   const checkSession = async () => {
+  //     // 检查用户是否已登录
+  //     const { data: { session } } = await supabase.auth.getSession();
+  //     if (session) {
+  //       console.log('checkSession登录成功');
+  //       await router.push(redirectTo || '/search');
+  //     }
+  //   };
     
-    checkSession();
-  }, [redirectTo, router, supabase.auth]);
+  //   checkSession();
+  // }, [redirectTo, router, supabase.auth]);
 
   const {
     register,
@@ -46,16 +50,17 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
     },
   });
 
-  const loginHandle = async (input: LoginFormValues) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email: input.email,
-      password: input.password,
-    });
-    if (error) {
+   // 使用tRPC登录
+   const loginMutation = trpc.auth.login.useMutation({
+    onSuccess: () => {
+      router.push(redirectTo || '/search');
+      router.refresh();
+    },
+    onError: (error) => {
+      setError(error.message);
       setIsLoading(false);
-      throw error;
-    }
-  };
+    },
+  });
 
   // 处理表单提交
   const onSubmit = async (data: LoginFormValues) => {
@@ -63,8 +68,7 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
     setError(null);
     
     try {
-      await loginHandle(data);
-      console.log('登录成功');
+      await loginMutation.mutateAsync(data);
       console.log('redirectTo', redirectTo);
       router.push(redirectTo || '/search');
       setIsLoading(false);
@@ -78,24 +82,26 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
 
   // 处理Google登录
   const handleGoogleLogin = async () => {
-    setIsLoading(true);
+    //setIsLoading(true);
     setError(null);
     
     try {
-      // 准备查询参数，以便回调后可以重定向到正确的位置
-      const queryParams = redirectTo ? { redirectTo } : undefined;
-      // console.log('queryParams', queryParams);
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams, // 添加查询参数
-        },
-      });
+      // //准备查询参数，以便回调后可以重定向到正确的位置
+      // const queryParams = redirectTo ? { redirectTo } : undefined;
+      // const { error } = await supabase.auth.signInWithOAuth({
+      //   provider: 'google',
+      //   options: {
+      //     redirectTo: `${window.location.origin}/auth/callback`,
+      //     queryParams, // 添加查询参数
+      //   },
+      // });
       
-      if (error) {
-        throw error;
-      }
+      // if (error) {
+      //   throw error;
+      // }
+      // OneTapComponent();
+      console.log('showOneTap', showOneTap);
+      setShowOneTap(true)
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : '使用Google登录时出错';
       setError(errorMessage);
@@ -212,6 +218,7 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
           </svg>
           Google
         </button>
+        {showOneTap && <OneTapComponent />}
         <button
           type="button"
           onClick={handleGithubLogin}

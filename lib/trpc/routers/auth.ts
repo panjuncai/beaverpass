@@ -1,15 +1,15 @@
 import { TRPCError } from '@trpc/server';
 import { publicProcedure, router } from '..';
 import { loginSchema, registerSchema } from '@/lib/validations/auth';
-import { createSupabaseClient } from '@/lib/supabase';
-
+// import { createSupabaseClient } from '@/lib/supabase';
+import { createClient } from '@/utils/supabase/server';
 export const authRouter = router({
   // 邮箱登录
   login: publicProcedure
     .input(loginSchema)
     .mutation(async ({ input }) => {
       try {
-        const supabase = createSupabaseClient();
+        const supabase = await createClient();
         const { data, error } = await supabase.auth.signInWithPassword({
           email: input.email,
           password: input.password,
@@ -39,7 +39,7 @@ export const authRouter = router({
     .input(registerSchema)
     .mutation(async ({ input }) => {
       try {
-        const supabase = createSupabaseClient();
+        const supabase = await createClient();
         const { data, error } = await supabase.auth.signUp({
           email: input.email,
           password: input.password,
@@ -71,7 +71,7 @@ export const authRouter = router({
   // 登出
   logout: publicProcedure.mutation(async () => {
     try {
-      const supabase = createSupabaseClient();
+      const supabase = await createClient();
       const { error } = await supabase.auth.signOut();
       
       if (error) {
@@ -93,4 +93,10 @@ export const authRouter = router({
     }
   }),
 
+  // 获取当前用户
+  getUser: publicProcedure.query(async () => {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    return { user: user || null };
+  }),
 }); 
