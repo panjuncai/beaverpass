@@ -1,7 +1,6 @@
 import { TRPCError } from '@trpc/server';
 import { publicProcedure, router } from '..';
 import { loginSchema, registerSchema } from '@/lib/validations/auth';
-// import { createSupabaseClient } from '@/lib/supabase';
 import { createClient } from '@/utils/supabase/server';
 export const authRouter = router({
   // 邮箱登录
