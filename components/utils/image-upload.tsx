@@ -97,6 +97,8 @@ export default function ImageUpload({
               src={imageUrl}
               alt={`${viewType} View`}
               className="object-cover w-full h-full"
+              width={250}
+              height={28}
             />
             {/* Overlay text */}
             <div className="absolute bottom-0 w-full text-center bg-black bg-opacity-50 text-white text-xs py-1">
@@ -110,7 +112,7 @@ export default function ImageUpload({
         )}
       </div>
 
-      <div className="flex items-start mr-auto gap-2">
+      <div className="flex items-center justify-center mr-auto gap-2">
         {imageUrl ? (
           <>
             {/* Check mark button */}

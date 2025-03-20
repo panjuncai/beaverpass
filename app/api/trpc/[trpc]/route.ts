@@ -3,11 +3,11 @@ import { appRouter } from '@/lib/trpc/routers/_app';
 import { createTRPCContext } from '@/lib/trpc';
 
 const handler = async (req: Request) => {
-  console.log('【API路由】收到请求:', {
-    method: req.method,
-    url: req.url,
-    headers: Object.fromEntries(req.headers.entries()),
-  });
+  // console.log('【API路由】收到请求:', {
+  //   method: req.method,
+  //   url: req.url,
+  //   headers: Object.fromEntries(req.headers.entries()),
+  // });
 
   return fetchRequestHandler({
     endpoint: '/api/trpc',

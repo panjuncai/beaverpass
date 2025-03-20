@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import { CreatePostSchema, createPostSchema } from "@/lib/validations/post";
 import ImageUpload from "../utils/image-upload";
+import { useFileUpload } from "@/hooks/useFileUpload";
 
 export const CreatePostForm = () => {
   const router = useRouter();
@@ -67,7 +68,7 @@ export const CreatePostForm = () => {
   const handleImageUpload = async (viewType: string, base64String: string) => {
     try {
       // 调用 S3 上传工具上传 base64 图片
-      const fileName = `post_${session?.user?.id}_${viewType}.jpg`;
+      const fileName = `post_${new Date().getTime()}_${viewType}.jpg`;
       
       const imageUrl = await uploadBase64Image(base64String, fileName);
       
@@ -176,13 +177,12 @@ export const CreatePostForm = () => {
           className="border p-2 w-full"
         />
 
-          <div className="pl-12 space-y-6 w-full">
+          <div className="w-full">
             <ImageUpload
               viewType="FRONT"
               imageUrl={images.FRONT}
               onImageUpload={handleImageUpload}
               onImageDelete={handleImageDelete}
-              showError={showStepFourFrontError}
             />
         </div>
 
