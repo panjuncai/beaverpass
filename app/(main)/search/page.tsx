@@ -1,16 +1,13 @@
 'use client';
-// import { useSupabase } from '@/components/providers/supabase-provider';
-import { trpc } from '@/lib/trpc/client';
-
+import SearchBar from '@/components/search/search-bar';
 export default function SearchPage() {
-  // const { user,session } = useSupabase();
-  // console.log('session',session);
-  const { data: user } = trpc.auth.getUser.useQuery();
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    console.log('value', value);
+  }
   return (
-    <div className="container px-4 py-8 mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-red-900 h-300">{user?.user?.email}</h1>
-      </div>
+    <div className="grid grid-cols-1 gap-0 p-2"> 
+      <SearchBar handleSearch={handleSearch} />
     </div>
   );
 } 

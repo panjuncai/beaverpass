@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useUpload } from '@/hooks/useUpload'; // 你现有的 GraphQL 上传 Hook
+import { ALLOWED_FILE_TYPES } from '@/lib/validations/upload';
 
 export const useFileUpload = () => {
   const [isUploading, setIsUploading] = useState(false);
@@ -13,7 +14,7 @@ export const useFileUpload = () => {
     try {
       const { url, fileUrl } = await upload({
         fileName: file.name,
-        fileType: file.type,
+        fileType: file.type as typeof ALLOWED_FILE_TYPES[number],
         fileSize: file.size
       });
       // 使用预签名 URL 上传文件

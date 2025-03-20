@@ -1,5 +1,6 @@
 import {z} from 'zod'
 
+// 创建帖子的 schema
 export const createPostSchema = z.object({
     category: z.string().min(1, 'Category is required'),
     title: z.string().min(1, 'Title is required'),
@@ -10,4 +11,23 @@ export const createPostSchema = z.object({
     deliveryType: z.string().min(1, 'Delivery type is required'),
 })
 
+// 查询帖子的 schema
+export const getPostsSchema = z.object({
+    limit: z.number().min(1).max(100).optional().default(10),
+    cursor: z.string().optional(),
+    category: z.string().optional(),
+    search: z.string().optional(),
+    minPrice: z.number().optional(),
+    maxPrice: z.number().optional(),
+    sortBy: z.enum(['createdAt', 'price']).optional().default('createdAt'),
+    sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
+})
+
+// 获取单个帖子的 schema
+export const getPostByIdSchema = z.object({
+    id: z.string().uuid(),
+})
+
 export type CreatePostSchema = z.infer<typeof createPostSchema>;
+export type GetPostsSchema = z.infer<typeof getPostsSchema>;
+export type GetPostByIdSchema = z.infer<typeof getPostByIdSchema>;
