@@ -6,11 +6,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import { CreatePostSchema, createPostSchema } from "@/lib/validations/post";
+import ImageUpload from "../utils/image-upload";
 
 export const CreatePostForm = () => {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { uploadBase64Image } = useFileUpload();
+
+  // 创建一个图片状态对象，用于存储不同视图的图片
+  const [images, setImages] = useState<{
+    FRONT?: string;
+    SIDE?: string;
+    BACK?: string;
+    DAMAGE?: string;
+  }>({});
 
   const {
     register,
@@ -51,6 +61,32 @@ export const CreatePostForm = () => {
     } catch {
       // 错误已在onError回调中处理
     }
+  };
+
+  // 添加图片处理函数
+  const handleImageUpload = async (viewType: string, base64String: string) => {
+    try {
+      // 调用 S3 上传工具上传 base64 图片
+      const fileName = `post_${session?.user?.id}_${viewType}.jpg`;
+      
+      const imageUrl = await uploadBase64Image(base64String, fileName);
+      
+      // 更新图片状态
+      setImages(prev => ({
+        ...prev,
+        [viewType]: imageUrl
+      }));
+    } catch (error) {
+      console.error("Error uploading image to S3:", error);
+    }
+  };
+
+  const handleImageDelete = (viewType: string) => {
+    setImages(prev => {
+      const newImages = { ...prev };
+      delete newImages[viewType as keyof typeof newImages];
+      return newImages;
+    });
   };
 
   return (
@@ -139,6 +175,16 @@ export const CreatePostForm = () => {
           {...register("deliveryType")}
           className="border p-2 w-full"
         />
+
+          <div className="pl-12 space-y-6 w-full">
+            <ImageUpload
+              viewType="FRONT"
+              imageUrl={images.FRONT}
+              onImageUpload={handleImageUpload}
+              onImageDelete={handleImageDelete}
+              showError={showStepFourFrontError}
+            />
+        </div>
 
         <button
           type="submit"

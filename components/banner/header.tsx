@@ -1,11 +1,13 @@
 import Image from "next/image";
 import { trpc } from "@/lib/trpc/client";
+
 export default function Header(props: {
   handleLogin: () => void;
   handleRegister: () => void;
   handleLogout: () => void;
 }) {
-  const { data: user } = trpc.auth.getUser.useQuery();
+  const { data } = trpc.auth.getUser.useQuery();
+
   return (
     <header className="navbar shadow-sm">
       <div className="navbar-start"></div>
@@ -24,7 +26,7 @@ export default function Header(props: {
             <details>
               <summary>Options</summary>
               <ul className="bg-base-100 rounded-t-none p-2">
-                {user ? (
+                {data?.user ? (
                   <>
                     <li>
                       <a onClick={props.handleLogout}>Logout</a>

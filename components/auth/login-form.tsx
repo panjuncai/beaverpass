@@ -9,7 +9,7 @@ import { useSupabase } from '@/components/providers/supabase-provider';
 import { trpc } from '@/lib/trpc/client';
 import Link from 'next/link';
 import { loginSchema, LoginFormValues } from '@/lib/validations/auth';
-import Loading from '@/components/loading/loading';
+import Loading from '@/components/utils/loading';
 
 interface LoginFormProps {
   redirectTo?: string;

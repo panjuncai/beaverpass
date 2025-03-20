@@ -2,8 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { useSupabase } from '@/components/providers/supabase-provider';
-import Footer from '@/components/footer/footer';
-import Header from '@/components/header/header';
+import Footer from '@/components/banner/footer';
+import Header from '@/components/banner/header';
 
 export default function SearchLayout({
   children,
