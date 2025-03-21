@@ -14,34 +14,35 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  email     String    @unique
-  firstName String?   @map("first_name")
-  lastName  String?   @map("last_name")
-  avatar    String?
-  address   String?
-  phone     String?
-  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
-  posts     Post[]
+  id                String                @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email             String                @unique
+  firstName         String                @map("first_name")
+  lastName          String                @map("last_name")
+  avatar            String?
+  address           String?
+  phone             String?
+  createdAt         DateTime?             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime?             @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  posts             Post[]
+
   @@map("users")
 }
 
 model Post {
-  id           String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id           String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   category     String
   title        String
   description  String
   condition    String
-  amount       Decimal     @default(0) @db.Decimal(12, 2)
-  isNegotiable Boolean?    @default(false) @map("is_negotiable")
-  deliveryType String      @map("delivery_type")
-  posterId     String?     @map("poster_id") @db.Uuid
-  status       String?     @default("ACTIVE")
-  createdAt    DateTime?   @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt    DateTime?   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
-  poster       User?       @relation(fields: [posterId], references: [id], onDelete: Cascade, onUpdate: Restrict)
-  images       PostImage[] @relation("PostToImages", fields: [id], references: [postId])
+  amount       Decimal   @default(0) @db.Decimal(12, 2)
+  isNegotiable Boolean?  @default(false) @map("is_negotiable")
+  deliveryType String    @map("delivery_type")
+  posterId     String?   @map("poster_id") @db.Uuid
+  status       String?   @default("ACTIVE")
+  createdAt    DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  images       PostImage[]
+  poster       User?     @relation(fields: [posterId], references: [id], onDelete: Cascade, onUpdate: Restrict)
 
   @@index([posterId], map: "idx_posts_poster_id")
   @@map("posts")
@@ -53,7 +54,7 @@ model PostImage {
   imageUrl  String    @map("image_url")
   imageType String?   @map("image_type")
   createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
-  post      Post      @relation("PostToImages",fields: [postId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Restrict)
 
   @@index([postId], map: "idx_post_images_post_id")
   @@map("post_images")
