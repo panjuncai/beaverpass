@@ -11,7 +11,19 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --adm-safe-area-inset-top: env(safe-area-inset-top);
+  --adm-safe-area-inset-bottom: env(safe-area-inset-bottom);
 }
+
+:root:root {
+  --adm-color-primary:#b45309;
+}
+
+.adm-toast-mask .adm-toast-main-icon .adm-toast-icon {
+  display:flex;
+  justify-content: center;
+}
+
 
 @theme inline {
   --color-background: var(--background);
