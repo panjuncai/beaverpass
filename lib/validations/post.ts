@@ -1,5 +1,10 @@
 import {z} from 'zod'
 
+const imageSchema = z.object({
+  imageUrl: z.string().url(),
+  imageType: z.string(),
+});
+
 // 创建帖子的 schema
 export const createPostSchema = z.object({
     category: z.string().min(1, 'Category is required'),
@@ -9,6 +14,7 @@ export const createPostSchema = z.object({
     amount: z.coerce.number().min(0, 'Amount must be greater than 0'),
     isNegotiable: z.boolean().optional(),
     deliveryType: z.string().min(1, 'Delivery type is required'),
+    images: z.array(imageSchema),
 })
 
 // 查询帖子的 schema

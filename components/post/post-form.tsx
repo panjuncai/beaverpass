@@ -15,17 +15,11 @@ export const CreatePostForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { uploadBase64Image } = useFileUpload();
 
-  // 创建一个图片状态对象，用于存储不同视图的图片
-  const [images, setImages] = useState<{
-    FRONT?: string;
-    SIDE?: string;
-    BACK?: string;
-    DAMAGE?: string;
-  }>({});
-
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<CreatePostSchema>({
     resolver: zodResolver(createPostSchema),
@@ -37,10 +31,47 @@ export const CreatePostForm = () => {
       amount: 0,
       isNegotiable: false,
       deliveryType: "",
+      images: [],
     },
   });
 
-  // 使用tRPC创建帖子
+  // 监听 images 字段的变化
+  const images = watch("images");
+
+  // 处理图片上传
+  const handleImageUpload = async (viewType: string, base64String: string) => {
+    try {
+      const fileName = `post_${new Date().getTime()}_${viewType}.jpg`;
+      const imageUrl = await uploadBase64Image(base64String, fileName);
+      
+      // 使用 setValue 更新 images 数组，但不触发验证
+      setValue("images", [
+        ...images,
+        {
+          imageUrl,
+          imageType: viewType,
+        }
+      ], { shouldValidate: false });  // 改为 false，不立即触发验证
+      
+      // 清除可能存在的错误信息
+      setError(null);
+      
+    } catch (error) {
+      console.error("Error uploading image to S3:", error);
+      setError("Failed to upload image");
+    }
+  };
+
+  const handleImageDelete = (viewType: string) => {
+    // 使用 setValue 删除指定类型的图片，但不触发验证
+    setValue(
+      "images",
+      images.filter((img) => img.imageType !== viewType),
+      { shouldValidate: false }  // 改为 false，不立即触发验证
+    );
+  };
+
+  // 处理表单提交
   const createPostMutation = trpc.post.createPost.useMutation({
     onSuccess: (data) => {
       console.log("Post created:", data);
@@ -52,52 +83,43 @@ export const CreatePostForm = () => {
     },
   });
 
-  // 处理表单提交
   const onSubmit = async (data: CreatePostSchema) => {
+    console.log('onSubmit called with data:', data);
+    
+    if (data.images.length === 0) {
+      setError('At least one image is required');
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
     try {
       await createPostMutation.mutateAsync(data);
-    } catch {
-      // 错误已在onError回调中处理
-    }
-  };
-
-  // 添加图片处理函数
-  const handleImageUpload = async (viewType: string, base64String: string) => {
-    try {
-      // 调用 S3 上传工具上传 base64 图片
-      const fileName = `post_${new Date().getTime()}_${viewType}.jpg`;
-      
-      const imageUrl = await uploadBase64Image(base64String, fileName);
-      
-      // 更新图片状态
-      setImages(prev => ({
-        ...prev,
-        [viewType]: imageUrl
-      }));
     } catch (error) {
-      console.error("Error uploading image to S3:", error);
+      console.error('Error in onSubmit:', error);
+      setIsLoading(false);
     }
-  };
-
-  const handleImageDelete = (viewType: string) => {
-    setImages(prev => {
-      const newImages = { ...prev };
-      delete newImages[viewType as keyof typeof newImages];
-      return newImages;
-    });
   };
 
   return (
     <div className="container px-4 py-8 mx-auto">
+      {/* {Object.values(errors).length > 0 && (
+        <div className="p-3 text-sm text-red-500 bg-red-100 rounded-md">
+          {Object.values(errors).map((error) => (
+            <p key={error.message}>{error.message}</p>
+          ))}
+        </div>
+      )} */}
       {error && (
         <div className="p-3 text-sm text-red-500 bg-red-100 rounded-md">
           {error}
         </div>
       )}
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form 
+        onSubmit={handleSubmit(onSubmit)} 
+        className="space-y-4"
+      >
         <input
           id="category"
           placeholder="Category"
@@ -177,14 +199,20 @@ export const CreatePostForm = () => {
           className="border p-2 w-full"
         />
 
-          <div className="w-full">
-            <ImageUpload
-              viewType="FRONT"
-              imageUrl={images.FRONT}
-              onImageUpload={handleImageUpload}
-              onImageDelete={handleImageDelete}
-            />
+        <div className="w-full">
+          <ImageUpload
+            viewType="FRONT"
+            imageUrl={images.find(img => img.imageType === "FRONT")?.imageUrl}
+            onImageUpload={handleImageUpload}
+            onImageDelete={handleImageDelete}
+          />
         </div>
+
+        {errors.images && (
+          <p className="mt-1 text-sm text-red-500">
+            {errors.images.message}
+          </p>
+        )}
 
         <button
           type="submit"

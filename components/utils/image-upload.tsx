@@ -134,6 +134,7 @@ export default function ImageUpload({
             </button>
             {/* Delete button */}
             <button
+              type="button"
               className="btn btn-circle btn-outline btn-error btn-sm"
               onClick={handleDeleteClick}
             >
@@ -156,6 +157,7 @@ export default function ImageUpload({
         ) : (
           // Upload button
           <button
+            type="button"
             className={`btn btn-circle btn-outline btn-sm ${
               isUploading ? "loading" : ""
             }`}

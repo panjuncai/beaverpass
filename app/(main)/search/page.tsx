@@ -7,7 +7,7 @@ export default function SearchPage() {
     console.log('value', value);
   }
   return (
-    <div className="grid grid-cols-1 gap-0 p-2"> 
+    <div className="grid grid-cols-1 gap-2 p-2"> 
       <SearchBar handleSearch={handleSearch} />
       <ProductsShow />
     </div>

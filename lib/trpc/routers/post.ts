@@ -56,20 +56,44 @@ export const postRouter = router({
     .input(createPostSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const post = await ctx.prisma.post.create({
-          data: {
-            category: input.category,
-            title: input.title,
-            description: input.description,
-            condition: input.condition,
-            amount: input.amount,
-            isNegotiable: input.isNegotiable,
-            deliveryType: input.deliveryType,
-            posterId: ctx.user.id,
-          },
-          include: {
-            poster: true,
-          },
+        // 使用事务来确保帖子和图片同时保存
+        const post = await ctx.prisma.$transaction(async (tx) => {
+          // 创建帖子
+          const newPost = await tx.post.create({
+            data: {
+              category: input.category,
+              title: input.title,
+              description: input.description,
+              condition: input.condition,
+              amount: input.amount,
+              isNegotiable: input.isNegotiable,
+              deliveryType: input.deliveryType,
+              posterId: ctx.user.id,
+            },
+          });
+
+          // 创建图片记录
+          if (input.images.length > 0) {
+            await tx.postImage.createMany({
+              data: input.images.map(image => ({
+                postId: newPost.id,
+                imageUrl: image.imageUrl,
+                imageType: image.imageType,
+              })),
+            });
+          }
+
+          // 返回包含图片的完整帖子
+          return tx.post.findUnique({
+            where: { id: newPost.id },
+            include: {
+              images: true,
+              poster: true,
+            },
+          });
+        }, {
+          maxWait: 30000,
+          timeout: 30000,
         });
 
         return { success: true, post };

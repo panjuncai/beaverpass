@@ -1,4 +1,4 @@
-// import Image from "next/image";
+import Image from "next/image";
 import { trpc } from "@/lib/trpc/client";
 import { useRouter } from "next/navigation";  
 import Heart from "@/components/icons/heart";
@@ -7,12 +7,11 @@ export default function ProductsShow() {
   const router = useRouter();
 
   const { data: posts } = trpc.post.getPosts.useQuery({
-    limit: 10,
+    limit: 100,
   });
-  console.log(posts?.filter(i=>i.title.includes("5")));
   return (
   <>
-    <div className="grid grid-cols-2 gap-4 p-4 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             {posts?.map((post) => (
               <div key={post.id} className="card bg-base-100 shadow-md">
                 <figure
@@ -20,12 +19,12 @@ export default function ProductsShow() {
                     void router.push(`/posts/${post.id}`);
                   }}
                 >
-                  {/* <Image
+                  <Image
                     width={176}
                     height={176}
-                    src={post.images[0].imageUrl || ""}
+                    src={post?.images[0]?.imageUrl || ""}
                     alt={post.title}
-                  /> */}
+                  />
                 </figure>
                 <div
                   className="card-body"
