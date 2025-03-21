@@ -6,24 +6,10 @@ import Heart from "@/components/icons/heart";
 export default function ProductsShow() {
   const router = useRouter();
 
-  const { data: posts2 } = trpc.post.getPosts.useQuery({
+  const { data: posts } = trpc.post.getPosts.useQuery({
     limit: 10,
   });
-  console.log(posts2?.filter(i=>i.title.includes("5")));
-  const posts=[
-    {
-      id: "1",
-      title: "Product 1",
-      amount: 100,
-      isNegotiable: false,
-      images: [
-        {
-          id: "1",
-          imageUrl: "https://via.placeholder.com/150",
-        },
-      ],
-    },
-  ];
+  console.log(posts?.filter(i=>i.title.includes("5")));
   return (
   <>
     <div className="grid grid-cols-2 gap-4 p-4 lg:grid-cols-4">

@@ -22,7 +22,6 @@ export const postRouter = router({
           message: 'Post not found',
         });
       }
-      console.log(`post-------------: ${post}`);
       return post;
     }),
   // 获取帖子列表
@@ -51,7 +50,6 @@ export const postRouter = router({
         },
         ...(input.cursor && { cursor: { id: input.cursor }, skip: 1 }),
       });
-      console.log(`posts-------------: ${posts}`);
       return posts;
     }),
   createPost: protectedProcedure
