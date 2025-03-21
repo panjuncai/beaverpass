@@ -24,6 +24,9 @@
   justify-content: center;
 }
 
+*.hover {
+  scrollbar-color: color-mix(in oklch,currentColor 60%,transparent) transparent;
+}
 
 @theme inline {
   --color-background: var(--background);

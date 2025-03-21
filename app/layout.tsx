@@ -1,4 +1,5 @@
 import './globals.css';
+import 'antd-mobile/es/global';
 import type { Metadata } from 'next';
 import { Providers } from '@/components/providers';
 
