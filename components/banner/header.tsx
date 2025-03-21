@@ -28,11 +28,12 @@ export default function Header(props: {
       <div className="navbar-start"></div>
       <div className="navbar-center w-1/2">
         <Image
-          className="w-full"
+          className="object-contain"
           src="/logo_beta_removebg.png"
           alt="logo"
-          width={80}
-          height={300}
+          width={180}
+          height={48}
+          priority
         />
       </div>
       <div className="navbar-end">
