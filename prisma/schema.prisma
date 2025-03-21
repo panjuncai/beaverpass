@@ -24,6 +24,7 @@ model User {
   createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   posts     Post[]
+  @@map("users")
 }
 
 model Post {
@@ -40,7 +41,7 @@ model Post {
   createdAt    DateTime?   @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt    DateTime?   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   poster       User?       @relation(fields: [posterId], references: [id], onDelete: Cascade, onUpdate: Restrict)
-  images       PostImage[]
+  images       PostImage[] @relation("PostToImages", fields: [id], references: [postId])
 
   @@index([posterId], map: "idx_posts_poster_id")
   @@map("posts")
@@ -52,7 +53,7 @@ model PostImage {
   imageUrl  String    @map("image_url")
   imageType String?   @map("image_type")
   createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
-  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  post      Post      @relation("PostToImages",fields: [postId], references: [id], onDelete: Cascade, onUpdate: Restrict)
 
   @@index([postId], map: "idx_post_images_post_id")
   @@map("post_images")

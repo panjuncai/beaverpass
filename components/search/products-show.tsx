@@ -1,10 +1,14 @@
-import Image from "next/image";
+// import Image from "next/image";
 import { trpc } from "@/lib/trpc/client";
+import { useRouter } from "next/navigation";  
+import Heart from "@/components/icons/heart";
 
 export default function ProductsShow() {
+  const router = useRouter();
   const { data: posts } = trpc.post.getPosts.useQuery({
     limit: 10,
   });
+  console.log(posts?.[0]);
   return (
   <>
     <div className="grid grid-cols-2 gap-4 p-4 lg:grid-cols-4">
@@ -12,16 +16,15 @@ export default function ProductsShow() {
               <div key={post.id} className="card bg-base-100 shadow-md">
                 <figure
                   onClick={() => {
-                    void navigate(`/posts/${post.id}`);
+                    void router.push(`/posts/${post.id}`);
                   }}
                 >
-                  <Image
-                    // className="h-44 w-full"
+                  {/* <Image
                     width={176}
                     height={176}
                     src={post.images[0].imageUrl || ""}
                     alt={post.title}
-                  />
+                  /> */}
                 </figure>
                 <div
                   className="card-body"
@@ -29,7 +32,7 @@ export default function ProductsShow() {
                 >
                   <h2 className="card-title">{post.title}</h2>
                   <p>
-                    ${post.amount===0? "Free" : post.amount}{" "}
+                    ${post.amount.toString() === "0" ? "Free" : post.amount.toString()}{" "}
                     <em>{post.isNegotiable ? "Negotiable" : ""}</em>
                   </p>
                   <button className="absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center">
@@ -38,7 +41,7 @@ export default function ProductsShow() {
                     ) : (
                       <HeartFill color="#BED596" fontSize={24} />
                     )} */}
-                    <HeartOutline fontSize={24} />
+                    <Heart />
                   </button>
                 </div>
               </div>

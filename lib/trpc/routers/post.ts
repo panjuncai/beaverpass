@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { protectedProcedure, publicProcedure, router } from "..";
 import { createPostSchema, getPostByIdSchema, getPostsSchema } from "@/lib/validations/post";
 
+
 // 创建帖子
 export const postRouter = router({
   // 获取单个帖子
@@ -10,6 +11,10 @@ export const postRouter = router({
     .query(async ({ input, ctx }) => {
       const post = await ctx.prisma.post.findUnique({
         where: { id: input.id },
+        include: {
+          images: true,
+          poster: true,
+        },
       });
       if (!post) {
         throw new TRPCError({
@@ -39,6 +44,10 @@ export const postRouter = router({
         orderBy: {
           [input.sortBy]: input.sortOrder,
         },
+        include: {
+          images: true,
+          poster: true,
+        },
         ...(input.cursor && { cursor: { id: input.cursor }, skip: 1 }),
       });
       return posts;
@@ -57,6 +66,9 @@ export const postRouter = router({
             isNegotiable: input.isNegotiable,
             deliveryType: input.deliveryType,
             posterId: ctx.user.id,
+          },
+          include: {
+            poster: true,
           },
         });
 
