@@ -8,10 +8,11 @@ export default function ProductsShow() {
   const { data: posts } = trpc.post.getPosts.useQuery({
     limit: 10,
   });
+  console.log(posts?.[0]);
   return (
   <>
     <div className="grid grid-cols-2 gap-4 p-4 lg:grid-cols-4">
-            {posts?.map((post:any) => (
+            {posts?.map((post) => (
               <div key={post.id} className="card bg-base-100 shadow-md">
                 <figure
                   onClick={() => {
@@ -21,7 +22,7 @@ export default function ProductsShow() {
                   {/* <Image
                     width={176}
                     height={176}
-                    src={post.post_images[0]?.image_url || ""}
+                    src={post.images[0].imageUrl || ""}
                     alt={post.title}
                   /> */}
                 </figure>

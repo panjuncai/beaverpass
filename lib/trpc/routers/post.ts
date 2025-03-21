@@ -68,10 +68,10 @@ export const postRouter = router({
             posterId: ctx.user.id,
           },
           include: {
-            images: true,
             poster: true,
           },
         });
+
         return { success: true, post };
       } catch (error) {
         console.error('Failed to create post:', error);
