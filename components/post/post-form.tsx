@@ -1,5 +1,4 @@
 "use client";
-import { Button } from 'antd-mobile'
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -214,15 +213,15 @@ export const CreatePostForm = () => {
           </p>
         )}
 
-        <Button
-          color="primary"
+        <button
+          className="btn btn-primary w-full"
           type="submit"
           disabled={isLoading}
-          className="btn btn-primary w-full"
         >
           {isLoading ? "Posting..." : "Post"}
-        </Button>
+        </button>
       </form>
+      <div className="h-300"></div>
     </div>
   );
 };

@@ -1,13 +1,13 @@
 import Image from "next/image";
 import { trpc } from "@/lib/trpc/client";
 import { useRouter } from "next/navigation";  
-import Heart from "@/components/icons/heart";
+import { HeartOutline } from "antd-mobile-icons";
 
 export default function ProductsShow() {
   const router = useRouter();
 
   const { data: posts } = trpc.post.getPosts.useQuery({
-    limit: 100,
+    limit: 10,
   });
   return (
   <>
@@ -41,7 +41,7 @@ export default function ProductsShow() {
                     ) : (
                       <HeartFill color="#BED596" fontSize={24} />
                     )} */}
-                    <Heart />
+                    <HeartOutline fontSize={24} />
                   </button>
                 </div>
               </div>
