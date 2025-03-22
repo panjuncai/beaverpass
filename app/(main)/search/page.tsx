@@ -1,6 +1,6 @@
 'use client';
-import SearchBar from '@/components/search/search-bar';
-import ProductsShow from '@/components/search/products-show';
+import SearchBar from '@/app/(main)/search/search-bar';
+import ProductsShow from '@/app/(main)/search/search-show';
 export default function SearchPage() {
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;

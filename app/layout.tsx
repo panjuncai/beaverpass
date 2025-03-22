@@ -19,7 +19,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh">
-      <body>
+      <body className="container">
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import { CreatePostSchema, createPostSchema } from "@/lib/validations/post";
-import ImageUpload from "../utils/image-upload";
+import ImageUpload from "../../../components/utils/image-upload";
 import { useFileUpload } from "@/hooks/useFileUpload";
 
 export const CreatePostForm = () => {

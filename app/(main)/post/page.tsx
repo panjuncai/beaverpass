@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { CreatePostForm } from '@/components/post/post-form';
+import { CreatePostForm } from '@/app/(main)/post/post-form';
 
 export const metadata: Metadata = {
   title: 'Post | BeaverPass',
