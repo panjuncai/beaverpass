@@ -37,3 +37,10 @@ export const getPostByIdSchema = z.object({
 export type CreatePostSchema = z.infer<typeof createPostSchema>;
 export type GetPostsSchema = z.infer<typeof getPostsSchema>;
 export type GetPostByIdSchema = z.infer<typeof getPostByIdSchema>;
+
+
+import type { inferRouterOutputs } from '@trpc/server';
+import type { AppRouter } from '@/lib/trpc/routers/_app';
+
+type RouterOutput = inferRouterOutputs<AppRouter>;
+export type Post = RouterOutput['post']['getPostById'];

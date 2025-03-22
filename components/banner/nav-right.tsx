@@ -1,53 +1,78 @@
+"use client";
 import { trpc } from "@/lib/trpc/client";
-import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { UserOutline } from "antd-mobile-icons";
 
-export default function NavRight(props: {
-    handleLogout: () => void;
-    handleLogin: () => void;
-    handleRegister: () => void;
-}) {
-    const { data } = trpc.auth.getUser.useQuery();
-  const detailsRef = useRef<HTMLDetailsElement>(null);
+export default function NavRight() {
+  const router = useRouter();
+  const { data: userData } = trpc.auth.getUser.useQuery();
+  const logoutMutation = trpc.auth.logout.useMutation({
+    onSuccess: () => {
+      router.push("/login");
+    },
+  });
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (detailsRef.current && !detailsRef.current.contains(event.target as Node)) {
-        detailsRef.current.open = false;
-      }
-    };
+  const handleLogout = async () => {
+    try {
+      await logoutMutation.mutateAsync();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, []);
-    return (
-        <>
-        <ul className="menu menu-horizontal px-1">
-          <li className="z-50">
-            <details ref={detailsRef}>
-              <summary>Options</summary>
-              <ul className="bg-base-100 rounded-t-none p-2 z-50">
-                {data?.user ? (
-                  <>
-                    <li>
-                      <a onClick={props.handleLogout}>Logout</a>
-                    </li>
-                  </>
-                ) : (
-                  <>
-                    <li>
-                      <a onClick={props.handleLogin}>Login</a>
-                    </li>
-                    <li>
-                      <a onClick={props.handleRegister}>Register</a>
-                    </li>
-                  </>
-                )}
-              </ul>
-            </details>
-          </li>
+  return (
+    <div className="flex-none">
+      <div className="dropdown dropdown-end">
+        <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
+          <div className="w-10 rounded-full">
+            <UserOutline fontSize={36} />
+          </div>
+        </label>
+        <ul
+          tabIndex={0}
+          className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-36"
+        >
+          {userData?.user ? (
+            <>
+              <li className="w-full">
+                <button
+                  className="w-full px-4 py-2 text-left text-stone-600 hover:bg-stone-100 rounded-lg"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              </li>
+              <li className="w-full">
+                <button
+                  className="w-full px-4 py-2 text-left text-stone-600 hover:bg-stone-100 rounded-lg"
+                  onClick={() => router.push("/profile")}
+                >
+                  Profile
+                </button>
+              </li>
+            </>
+          ) : (
+            <>
+              <li className="w-full">
+                <button
+                  className="w-full px-4 py-2 text-left text-stone-600 hover:bg-stone-100 rounded-lg"
+                  onClick={() => router.push("/login")}
+                >
+                  Login
+                </button>
+              </li>
+              <li className="w-full">
+                <button
+                  className="w-full px-4 py-2 text-left text-stone-600 hover:bg-stone-100 rounded-lg"
+                  onClick={() => router.push("/register")}
+                >
+                  Register
+                </button>
+              </li>
+            </>
+          )}
         </ul>
-        </>
-    )
+      </div>
+    </div>
+  );
 }

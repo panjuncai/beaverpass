@@ -1,15 +1,11 @@
 import Image from "next/image";
 import NavRight from "./nav-right";
-export default function Header(props: {
-  handleLogin: () => void;
-  handleRegister: () => void;
-  handleLogout: () => void;
-}) {
+export default function Header() {
   
   return (
     <header className="navbar shadow-sm">
-      <div className="navbar-start"></div>
-      <div className="navbar-center w-1/2">
+      <div className="flex-none w-[24px]"></div>
+      <div className="flex-1 flex items-center justify-center">
         <Image
           className="object-contain"
           src="/logo_beta_removebg.png"
@@ -19,9 +15,7 @@ export default function Header(props: {
           priority
         />
       </div>
-      <div className="navbar-end">
-        <NavRight handleLogout={props.handleLogout} handleLogin={props.handleLogin} handleRegister={props.handleRegister} />
-      </div>
+        <NavRight />
     </header>
   );
 }
