@@ -6,14 +6,16 @@ export default function Header() {
     <header className="navbar shadow-sm">
       <div className="flex-none w-[24px]"></div>
       <div className="flex-1 flex items-center justify-center">
-        <Image
-          className="object-contain"
-          src="/logo_beta_removebg.png"
-          alt="logo"
-          width={180}
-          height={48}
-          priority
-        />
+        <div className="relative w-[180px] h-[48px]">
+          <Image
+            src="/logo_beta_removebg.png"
+            alt="logo"
+            fill
+            priority
+            className="object-contain"
+            sizes="180px"
+          />
+        </div>
       </div>
         <NavRight />
     </header>

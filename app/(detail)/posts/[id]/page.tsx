@@ -1,4 +1,4 @@
-import PostDetail from "@/app/(detail)/posts/[id]/post-detail-main";
+import PostDetail from "@/app/(detail)/posts/[id]/post-detail";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { PostContextUpdater } from "./post-context-updater";

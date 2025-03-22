@@ -13,7 +13,6 @@ export default function PostDetailMainPostDetail({
           <em>{post?.isNegotiable ? "Negotiable" : ""}</em>
         </div>
         <div className="text-sm text-green-600 text-center">
-          <div>NEW $350</div>
           <div className="badge badge-success text-white">{post?.condition}</div>
         </div>
       </div>

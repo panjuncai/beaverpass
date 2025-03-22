@@ -5,6 +5,7 @@
   default: true;
   --color-primary: "#593719";
   --color-secondary: "#f6d860";
+  --color-primary-content: "#fff";
 }
 
 

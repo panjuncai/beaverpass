@@ -1,14 +1,21 @@
+'use client'
 import Image from "next/image";
 import { trpc } from "@/lib/trpc/client";
 import { useRouter } from "next/navigation";  
 import { HeartOutline } from "antd-mobile-icons";
+import { useState } from "react";
+import Loading from "@/components/utils/loading";
 
-export default function ProductsShow() {
+export default function ProductsShow({selectedCategory,search}:{selectedCategory:string,search:string}) {
   const router = useRouter();
+  const [isLoading,setIsLoading] = useState(false)
 
-  const { data: posts } = trpc.post.getPosts.useQuery({
+  const { data: posts,isLoading:isLoadingPosts } = trpc.post.getPosts.useQuery({
     limit: 10,
+    search: search,
+    category: selectedCategory==="All" ? "" : selectedCategory,
   });
+  if(isLoading||isLoadingPosts) return <Loading />
   return (
   <>
     <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -16,15 +23,21 @@ export default function ProductsShow() {
               <div key={post.id} className="card bg-base-100 shadow-md">
                 <figure
                   onClick={() => {
+                    setIsLoading(true)
                     void router.push(`/posts/${post.id}`);
                   }}
+                  className="h-[200px] w-full"
                 >
-                  <Image
-                    width={176}
-                    height={176}
-                    src={post?.images[0]?.imageUrl || ""}
-                    alt={post.title}
-                  />
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={post?.images[0]?.imageUrl || ""}
+                      alt={post.title}
+                      className="object-cover"
+                      fill
+                      priority={posts?.indexOf(post) < 4}
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                    />
+                  </div>
                 </figure>
                 <div
                   className="card-body"

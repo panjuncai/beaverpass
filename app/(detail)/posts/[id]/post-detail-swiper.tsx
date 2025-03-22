@@ -20,7 +20,9 @@ export default function PostDetailMainSwiper({ post }: { post: SerializedPost | 
   ));
   return (
     <div className="carousel w-full h-60 rounded-xl">
-      <Swiper loop autoplay>
+      <Swiper loop autoplay indicatorProps={{
+              color: 'white',
+            }}>
         {items}
       </Swiper>
     </div>

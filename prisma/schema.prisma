@@ -24,6 +24,8 @@ model User {
   createdAt         DateTime?             @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt         DateTime?             @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   posts             Post[]
+  buyerOrders       Order[]               @relation("BuyerOrders")
+  sellerOrders      Order[]               @relation("SellerOrders")
 
   @@map("users")
 }
@@ -41,6 +43,7 @@ model Post {
   status       String?   @default("ACTIVE")
   createdAt    DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt    DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  orders       Order[]
   images       PostImage[]
   poster       User?     @relation(fields: [posterId], references: [id], onDelete: Cascade, onUpdate: Restrict)
 
@@ -58,4 +61,31 @@ model PostImage {
 
   @@index([postId], map: "idx_post_images_post_id")
   @@map("post_images")
+}
+
+model Order {
+  id                   String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  buyerId              String     @map("buyer_id") @db.Uuid
+  sellerId             String     @map("seller_id") @db.Uuid
+  postId               String     @map("post_id") @db.Uuid
+  shippingAddress      String     @map("shipping_address")
+  shippingReceiver     String     @map("shipping_receiver")
+  shippingPhone        String     @map("shipping_phone")
+  paymentMethod        String     @map("payment_method")
+  paymentTransactionId String?    @map("payment_transaction_id")
+  paymentFee           Decimal?   @default(0) @map("payment_fee") @db.Decimal(12, 2)
+  deliveryFee          Decimal?   @default(0) @map("delivery_fee") @db.Decimal(12, 2)
+  serviceFee           Decimal?   @default(0) @map("service_fee") @db.Decimal(12, 2)
+  tax                  Decimal?   @default(0) @map("tax") @db.Decimal(12, 2)
+  total                Decimal    @map("total") @db.Decimal(12, 2)
+  status               String?    @default("PENDING_PAYMENT")
+  createdAt            DateTime?  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime?  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  buyer                User       @relation("BuyerOrders", fields: [buyerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  post                 Post       @relation(fields: [postId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  seller               User       @relation("SellerOrders", fields: [sellerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@index([buyerId], map: "idx_orders_buyer_id")
+  @@index([sellerId], map: "idx_orders_seller_id")
+  @@map("orders")
 }

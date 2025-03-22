@@ -53,7 +53,7 @@ export default function PostDetailMainSeller({
   };
   return (
     <div className="mt-4 flex gap-4 shadow-sm p-2">
-      <Avatar src={post?.poster?.avatar || 'https://images.unsplash.com/photo-1548532928-b34e3be62fc6?ixlib=rb-1.2.1&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&ixid=eyJhcHBfaWQiOjE3Nzg0fQ'} style={{ '--size': '64px' }}  />
+      <Avatar src={post?.poster?.avatar || '/default-avatar.png'} style={{ '--size': '64px' }}  />
       <div className="flex-1 flex flex-col">
         <div className="flex gap-2 items-center">
           <span className="text-lg font-bold">{post?.poster?.firstName}</span>
