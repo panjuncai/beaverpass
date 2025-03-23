@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
-import { CreatePostSchema, createPostSchema } from "@/lib/validations/post";
+import { CreatePostInput, createPostSchema } from "@/lib/validations/post";
 import ImageUpload from "../../../components/utils/image-upload";
 import { useFileUpload } from "@/hooks/useFileUpload";
 
@@ -20,7 +20,7 @@ export const CreatePostForm = () => {
     setValue,
     watch,
     formState: { errors },
-  } = useForm<CreatePostSchema>({
+  } = useForm<CreatePostInput>({
     resolver: zodResolver(createPostSchema),
     defaultValues: {
       category: "",
@@ -82,7 +82,7 @@ export const CreatePostForm = () => {
     },
   });
 
-  const onSubmit = async (data: CreatePostSchema) => {
+  const onSubmit = async (data: CreatePostInput) => {
     console.log('onSubmit called with data:', data);
     
     if (data.images.length === 0) {

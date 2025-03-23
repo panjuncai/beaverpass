@@ -1,4 +1,5 @@
-import {z} from 'zod'
+import { z } from 'zod'
+import type { PostQueryParams } from '@/lib/types/post'
 
 const imageSchema = z.object({
   imageUrl: z.string().url(),
@@ -27,20 +28,12 @@ export const getPostsSchema = z.object({
     maxPrice: z.number().optional(),
     sortBy: z.enum(['createdAt', 'price']).optional().default('createdAt'),
     sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
-})
+}) satisfies z.ZodType<PostQueryParams>
 
 // 获取单个帖子的 schema
 export const getPostByIdSchema = z.object({
     id: z.string().uuid(),
 })
 
-export type CreatePostSchema = z.infer<typeof createPostSchema>;
-export type GetPostsSchema = z.infer<typeof getPostsSchema>;
-export type GetPostByIdSchema = z.infer<typeof getPostByIdSchema>;
-
-
-import type { inferRouterOutputs } from '@trpc/server';
-import type { AppRouter } from '@/lib/trpc/routers/_app';
-
-type RouterOutput = inferRouterOutputs<AppRouter>;
-export type Post = RouterOutput['post']['getPostById'];
+export type CreatePostInput = z.infer<typeof createPostSchema>;
+export type GetPostByIdInput = z.infer<typeof getPostByIdSchema>;
