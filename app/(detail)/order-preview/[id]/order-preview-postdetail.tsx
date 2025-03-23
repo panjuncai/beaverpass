@@ -1,5 +1,5 @@
 'use client'
-import { SerializedPost } from "@/contexts/post-context";
+import { SerializedPost } from "@/lib/types/post";
 import Image from "next/image";
 
 export default function OrderPreviewPostDetail({ post }: { post: SerializedPost }) {

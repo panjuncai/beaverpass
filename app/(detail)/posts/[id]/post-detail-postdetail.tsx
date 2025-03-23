@@ -1,4 +1,4 @@
-import { SerializedPost } from "@/contexts/post-context";
+import { SerializedPost } from "@/lib/types/post";
 
 export default function PostDetailMainPostDetail({
   post,

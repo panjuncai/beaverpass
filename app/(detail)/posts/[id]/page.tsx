@@ -1,7 +1,7 @@
 import PostDetail from "@/app/(detail)/posts/[id]/post-detail";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import { PostContextUpdater } from "./post-context-updater";
+import { PostStoreUpdater } from "./post-store-updater";
 
 interface PageProps {
   params: Promise<{ id: string }> | undefined;
@@ -35,7 +35,7 @@ export default async function PostDetailPage({ params }: PageProps) {
 
   return (
     <>
-      <PostContextUpdater post={serializedPost} />
+      <PostStoreUpdater post={serializedPost} />
       <PostDetail />
     </>
   );

@@ -1,5 +1,5 @@
 'use client';
-import { SerializedPost } from "@/contexts/post-context";
+import { SerializedPost } from "@/lib/types/post";
 import Verified from "@/components/icons/verified";
 import { Avatar, Rate } from "antd-mobile";
 import { trpc } from "@/lib/trpc/client";

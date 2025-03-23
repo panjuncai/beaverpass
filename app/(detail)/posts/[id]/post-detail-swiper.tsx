@@ -1,5 +1,5 @@
 "use client";
-import { type SerializedPost } from "@/contexts/post-context";
+import { SerializedPost } from "@/lib/types/post";
 import { Swiper } from "antd-mobile";
 
 import Image from "next/image";

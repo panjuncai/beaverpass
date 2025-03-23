@@ -1,16 +1,17 @@
 'use client'
 import {trpc} from '@/lib/trpc/client'
-import { usePost } from '@/contexts/post-context'
 import { useRouter } from 'next/navigation'
 import Loading from '@/components/utils/loading'
 import { useRef } from 'react'
+import { usePostStore } from '@/lib/store/post-store'
 
 export default function PostDetailBuy() {
     const {data:userData,isLoading}=trpc.auth.getUser.useQuery()
     const currentUser=userData?.user
-    const {post}=usePost()
     const router=useRouter()
     const dialogRef = useRef<HTMLDialogElement>(null)
+    const post = usePostStore(state => state.currentPost)
+    const setPreviewPost = usePostStore(state => state.setPreviewPost)
 
     if(isLoading) return <Loading />
   return (
@@ -43,22 +44,9 @@ export default function PostDetailBuy() {
                   dialogRef.current?.showModal()
                   return;
                 }
-                if (post && post.images?.[0]?.imageUrl) {
-                  const queryParams = new URLSearchParams({
-                    title: post.title,
-                    amount: post.amount.toString(),
-                    posterId: post.posterId || '',
-                    category: post.category,
-                    condition: post.condition,
-                    deliveryType: post.deliveryType,
-                    status: post.status || 'Available',
-                    posterEmail: post.poster?.email || '',
-                    posterFirstName: post.poster?.firstName || '',
-                    posterLastName: post.poster?.lastName || '',
-                    frontImage: post.images[0].imageUrl,
-                    description: post.description
-                  }).toString();
-                  void router.push(`/order-preview/${post.id}?${queryParams}`);
+                if (post) {
+                  setPreviewPost(post)
+                  void router.push(`/order-preview/${post.id}`)
                 }
               }}
             >
