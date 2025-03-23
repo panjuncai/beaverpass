@@ -1,9 +1,9 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import {createClient} from "@/utils/supabase/client"
+import { createContext, useContext, useEffect } from 'react';
 import { type SupabaseClient, type User, type Session } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/lib/store/auth-store';
 
 type SupabaseContextType = {
   supabase: SupabaseClient;
@@ -15,22 +15,22 @@ type SupabaseContextType = {
 const SupabaseContext = createContext<SupabaseContextType | undefined>(undefined);
 
 export function SupabaseProvider({ children }: { children: React.ReactNode }) {
-  const [supabase] = useState(() =>createClient());
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const { 
+    supabase, 
+    user, 
+    session, 
+    isLoading,
+    setSession,
+    setUser,
+    initialize 
+  } = useAuthStore();
 
   useEffect(() => {
-    const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
-      setUser(session?.user ?? null);
-      setIsLoading(false);
-    };
+    initialize();
+  }, [initialize]);
 
-    getSession();
-
+  useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setSession(session);
@@ -42,7 +42,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [supabase, router]);
+  }, [supabase, router, setSession, setUser]);
 
   return (
     <SupabaseContext.Provider value={{ supabase, user, session, isLoading }}>
