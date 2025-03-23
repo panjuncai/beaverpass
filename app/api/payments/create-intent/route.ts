@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
+import {createClient} from "@/utils/supabase/server"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2023-08-16",
@@ -8,12 +9,14 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(req: Request) {
   try {
-    const { userId } = auth();
-    if (!userId) {
+    const supabase = await createClient()
+    const { data: { session } } = await supabase.auth.getSession()
+    
+    if (!session?.user?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { orderId } = await req.json();
+    const { orderId} = await req.json();
 
     const order = await prisma.order.findUnique({
       where: { id: orderId },
@@ -24,7 +27,7 @@ export async function POST(req: Request) {
       return new NextResponse("Order not found", { status: 404 });
     }
 
-    if (order.buyerId !== userId) {
+    if (order.buyerId !== session.user.id) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 

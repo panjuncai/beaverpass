@@ -11,10 +11,7 @@ export const OrderStatus = {
   
   // 支付方式枚举
   export const PaymentMethod = {
-    CREDIT_CARD: "CREDIT_CARD",          // 信用卡
-    DEBIT_CARD: "DEBIT_CARD",           // 借记卡
-    PAYPAL: "PAYPAL",                    // PayPal
-    VENMO: "VENMO"                       // Venmo
+    STRIPE: "STRIPE"
   } as const;
 
   // 消息类型枚举

@@ -1,12 +1,16 @@
 'use client'
-import { SerializedPost } from "@/lib/types/post";
 import Image from "next/image";
+import { SerializedPost } from "@/lib/types/post";
+import Loading from "@/components/utils/loading";
+interface OrderPreviewPostDetailProps {
+  post: SerializedPost;
+}
 
-export default function OrderPreviewPostDetail({ post }: { post: SerializedPost }) {
+export default function OrderPreviewPostDetail({ post }: OrderPreviewPostDetailProps) {
   const imageUrl = post?.images?.[0]?.imageUrl;
   
   if (!imageUrl) {
-    return <div>Loading...</div>;
+    return <Loading />
   }
 
   return (

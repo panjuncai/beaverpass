@@ -5,7 +5,7 @@ export const createOrderSchema = z.object({
   shippingAddress: z.string().min(1, "Address is required"),
   shippingReceiver: z.string().min(1, "Receiver is required"),
   shippingPhone: z.string().min(1, "Phone is required"),
-  paymentMethod: z.string().min(1, "Please select a payment method"),
+  paymentMethod: z.string().min(1, "Payment method is required"),
   postId: z.string().uuid("Invalid post ID"),
   sellerId: z.string().uuid("Invalid seller ID"),
   total: z.number().positive("Total must be greater than 0"),
