@@ -1,17 +1,12 @@
-import { Dispatch, SetStateAction } from 'react';
-
-interface ShippingInfo {
-  address: string;
-  phone: string;
-  receiver: string;
-}
+import { UseFormRegister, FieldErrors } from 'react-hook-form';
+import { CreateOrderInput } from '@/lib/validations/order';
 
 interface OrderDeliveryProps {
-  shippingInfo: ShippingInfo;
-  setShippingInfo: Dispatch<SetStateAction<ShippingInfo>>;
+  register: UseFormRegister<CreateOrderInput>;
+  errors: FieldErrors<CreateOrderInput>;
 }
 
-export default function OrderDelivery({ shippingInfo, setShippingInfo }: OrderDeliveryProps) {
+export default function OrderDelivery({ register, errors }: OrderDeliveryProps) {
   return (
     <div className="card bg-base-100 shadow">
       <div className="card-body">
@@ -20,23 +15,31 @@ export default function OrderDelivery({ shippingInfo, setShippingInfo }: OrderDe
           type="text"
           placeholder="Address"
           className="input input-bordered w-full"
-          value={shippingInfo.address}
-          onChange={(e) => setShippingInfo(prev => ({ ...prev, address: e.target.value }))}
+          {...register("shippingAddress")}
         />
+        {errors.shippingAddress && (
+          <p className="text-red-500 text-sm mt-1">{errors.shippingAddress.message}</p>
+        )}
+        
         <input
           type="text"
           placeholder="Phone"
           className="input input-bordered w-full"
-          value={shippingInfo.phone}
-          onChange={(e) => setShippingInfo(prev => ({ ...prev, phone: e.target.value }))}
+          {...register("shippingPhone")}
         />
+        {errors.shippingPhone && (
+          <p className="text-red-500 text-sm mt-1">{errors.shippingPhone.message}</p>
+        )}
+        
         <input
           type="text"
           placeholder="Receiver Name"
           className="input input-bordered w-full"
-          value={shippingInfo.receiver}
-          onChange={(e) => setShippingInfo(prev => ({ ...prev, receiver: e.target.value }))}
+          {...register("shippingReceiver")}
         />
+        {errors.shippingReceiver && (
+          <p className="text-red-500 text-sm mt-1">{errors.shippingReceiver.message}</p>
+        )}
       </div>
     </div>
   );

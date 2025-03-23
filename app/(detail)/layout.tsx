@@ -9,7 +9,7 @@ export default function DetailLayout({
 }) {
   const post = usePostStore(state => state.currentPost)
   return (
-    <div className="min-h-screen bg-base-200">
+    <div className="flex flex-col h-screen">
       <DetailHeader
         isShowBack={true}
         pageTitle={post?.title || ""}

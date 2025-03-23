@@ -11,7 +11,9 @@ import PaymentForm from "./payment-form";
 import MessageModal from "@/components/modals/message-modal";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { trpc } from "@/lib/trpc/client";
-import { Modal } from "antd-mobile";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CreateOrderInput, createOrderSchema } from "@/lib/validations/order";
 import { PaymentMethod } from "@/lib/types/enum";
 
 // 替换为您的 Stripe 公钥
@@ -25,13 +27,29 @@ export default function OrderPage() {
   const [clientSecret, setClientSecret] = useState<string>("");
   const router = useRouter();
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const [shippingInfo, setShippingInfo] = useState({
-    address: "",
-    phone: "",
-    receiver: "",
+  const [error, setError] = useState<string | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<CreateOrderInput>({
+    resolver: zodResolver(createOrderSchema),
+    defaultValues: {
+      shippingAddress: "",
+      shippingPhone: "",
+      shippingReceiver: "",
+      paymentMethod: PaymentMethod.STRIPE,
+    }
   });
 
-  const createOrderMutation = trpc.order.createOrder.useMutation();
+  console.log('Form errors:', errors);
+
+  const createOrderMutation = trpc.order.createOrder.useMutation({
+    onError: (error) => {
+      setError(error.message);
+    },
+  });
 
   useEffect(() => {
     if (!previewPost) {
@@ -64,50 +82,37 @@ export default function OrderPage() {
     fees.tax +
     fees.paymentFee;
 
-  const handleCreateOrder = async () => {
+  const onSubmit = async (data: CreateOrderInput) => {
+    console.log('onSubmit called with data:', data);
     if (!loginUser?.id) {
       dialogRef.current?.showModal();
       return;
     }
 
-    if (!previewPost) {
-      Modal.show({
-        content: "Post not found",
-        closeOnMaskClick: true,
-      });
-      return;
-    }
-
-    if (
-      !shippingInfo.address ||
-      !shippingInfo.phone ||
-      !shippingInfo.receiver
-    ) {
-      Modal.show({
-        content: "Please fill in all shipping information",
-        closeOnMaskClick: true,
-      });
+    if (!previewPost || !previewPost.posterId) {
+      setError("Invalid post data");
       return;
     }
 
     try {
-      // 创建订单
-      const order = await createOrderMutation.mutateAsync({
+      setError(null);
+      // 构建完整的订单数据
+      const orderData = {
+        ...data,
         postId: previewPost.id,
-        sellerId: previewPost.posterId!,
+        sellerId: previewPost.posterId,
         total: fees.total,
         deliveryFee: fees.deliveryFee,
         serviceFee: fees.serviceFee,
         tax: fees.tax,
         paymentFee: fees.paymentFee,
-        shippingAddress: shippingInfo.address,
-        shippingPhone: shippingInfo.phone,
-        shippingReceiver: shippingInfo.receiver,
         paymentMethod: PaymentMethod.STRIPE,
-      });
+      };
+      
+      console.log('Submitting order with data:', orderData);
+      const order = await createOrderMutation.mutateAsync(orderData);
 
-      // 创建支付意向
-      const { data } = await fetch("/api/payments/create-intent", {
+      const { data: paymentData } = await fetch("/api/payments/create-intent", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -115,34 +120,28 @@ export default function OrderPage() {
         body: JSON.stringify({ orderId: order.id }),
       }).then((res) => res.json());
 
-      setClientSecret(data.clientSecret);
+      setClientSecret(paymentData.clientSecret);
     } catch (error) {
       console.error("Error creating order:", error);
-      Modal.show({
-        content: "Failed to create order",
-        closeOnMaskClick: true,
-      });
+      setError("Failed to create order");
     }
   };
 
   const handlePaymentSuccess = () => {
-    Modal.show({
-      content: "Payment successful!",
-      closeOnMaskClick: true,
-    });
     router.push("/deals");
   };
 
   const handlePaymentError = (error: string) => {
-    Modal.show({
-      content: error,
-      closeOnMaskClick: true,
-    });
+    setError(error);
   };
 
   const handleClosePayment = () => {
     setClientSecret("");
   };
+
+  // const handleFormSubmit = (e: React.FormEvent) => {
+  //   console.log('Form submit event triggered');
+  // };
 
   return (
     <>
@@ -152,34 +151,47 @@ export default function OrderPage() {
         dialogRef={dialogRef}
         redirectUrl="/login"
       />
-      <div className="p-4 space-y-6">
-        <OrderPostDetail post={previewPost} />
-        <OrderDelivery
-          shippingInfo={shippingInfo}
-          setShippingInfo={setShippingInfo}
-        />
-        <OrderFeedetail fees={fees} />
-        {clientSecret && (
-          <Elements stripe={stripePromise} options={{ clientSecret }}>
-            <PaymentForm
-              amount={fees.total}
-              onSuccess={handlePaymentSuccess}
-              onError={handlePaymentError}
-              onClose={handleClosePayment}
-            />
-          </Elements>
+      <form 
+        onSubmit={(e) => {
+          e.preventDefault();
+          console.log('Raw form submit');
+          handleSubmit((data) => {
+            console.log('Form data:', data);
+            void onSubmit(data);
+          })(e);
+        }}
+        className="p-4 space-y-6"
+      >
+        {error && (
+          <div className="alert alert-error">
+            <p>{error}</p>
+          </div>
         )}
+        <OrderPostDetail post={previewPost} />
+        <OrderDelivery register={register} errors={errors} />
+        <OrderFeedetail fees={fees} />
         <div className="h-20"></div>
-      </div>
-      <div className="fixed bottom-4 left-0 right-0 flex justify-center">
+        <div className="fixed bottom-4 left-0 right-0 flex justify-center">
           <button
+            type="submit"
             className="btn btn-primary btn-xl w-4/5 rounded-full shadow-md"
-            onClick={() => void handleCreateOrder()}
-            disabled={createOrderMutation.isLoading}
+            disabled={isSubmitting}
+            onClick={() => console.log('Button clicked')}
           >
-            {createOrderMutation.isLoading ? "Processing..." : "Confirm Order"}
+            {isSubmitting ? "Processing..." : "Confirm Order"}
           </button>
         </div>
+      </form>
+      {clientSecret && (
+        <Elements stripe={stripePromise} options={{ clientSecret }}>
+          <PaymentForm
+            amount={fees.total}
+            onSuccess={handlePaymentSuccess}
+            onError={handlePaymentError}
+            onClose={handleClosePayment}
+          />
+        </Elements>
+      )}
     </>
   );
 }

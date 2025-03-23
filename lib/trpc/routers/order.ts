@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { protectedProcedure, publicProcedure, router } from "..";
 import { createOrderSchema, getOrdersSchema } from "@/lib/validations/order";
+import { z } from "zod";
 
 export const orderRouter = router({
   // 获取订单列表
@@ -34,10 +35,19 @@ export const orderRouter = router({
   // 创建订单
   createOrder: protectedProcedure.input(createOrderSchema).mutation(async ({ ctx, input }) => {
     try {
-      // 使用普通的 create 操作替代事务
+      const { sellerId, postId, total, ...rest } = input;
+      if (!sellerId || !postId || total === undefined) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Missing required fields",
+        });
+      }
       const order = await ctx.prisma.order.create({
         data: {
-          ...input,
+          ...rest,
+          sellerId,
+          postId,
+          total,
           buyerId: ctx.loginUser.id,
         },
       });
@@ -50,4 +60,50 @@ export const orderRouter = router({
       });
     }
   }),
+  // 更新订单状态
+  updateOrderStatus: protectedProcedure
+    .input(
+      z.object({
+        paymentIntentId: z.string(),
+        status: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const order = await ctx.prisma.order.findFirst({
+          where: {
+            paymentTransactionId: input.paymentIntentId,
+          },
+        });
+
+        if (!order) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Order not found",
+          });
+        }
+
+        // 验证订单所有者
+        if (order.buyerId !== ctx.loginUser.id) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Not authorized to update this order",
+          });
+        }
+
+        // 更新订单状态
+        const updatedOrder = await ctx.prisma.order.update({
+          where: { id: order.id },
+          data: { status: input.status },
+        });
+
+        return updatedOrder;
+      } catch (error) {
+        console.error("Failed to update order status:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error instanceof Error ? error.message : "Failed to update order status",
+        });
+      }
+    }),
 });

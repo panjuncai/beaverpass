@@ -1,15 +1,15 @@
 import { z } from 'zod';
 import type { OrderQueryParams } from '@/lib/types/order';
+import { PaymentMethod } from '@/lib/types/enum';
 
 export const createOrderSchema = z.object({
   shippingAddress: z.string().min(1, "Address is required"),
   shippingReceiver: z.string().min(1, "Receiver is required"),
   shippingPhone: z.string().min(1, "Phone is required"),
-  paymentMethod: z.string().min(1, "Payment method is required"),
-  postId: z.string().uuid("Invalid post ID"),
-  sellerId: z.string().uuid("Invalid seller ID"),
-  total: z.number().positive("Total must be greater than 0"),
-  // 以下字段有默认值，可选
+  paymentMethod: z.nativeEnum(PaymentMethod),
+  postId: z.string().uuid("Invalid post ID").optional(),
+  sellerId: z.string().uuid("Invalid seller ID").optional(),
+  total: z.number().positive("Total must be greater than 0").optional(),
   paymentTransactionId: z.string().optional(),
   paymentFee: z.number().default(0),
   deliveryFee: z.number().default(0),

@@ -30,7 +30,7 @@ export function OrderForm({ postId, sellerId, total }: OrderFormProps) {
       postId,
       sellerId,
       total,
-      paymentMethod: PaymentMethod.CREDIT_CARD,
+      paymentMethod: PaymentMethod.STRIPE,
       status: 'PENDING_PAYMENT',
       paymentFee: 0,
       deliveryFee: 0,

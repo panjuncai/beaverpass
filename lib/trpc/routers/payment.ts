@@ -4,7 +4,7 @@ import { createPaymentIntentSchema } from "@/lib/validations/payment";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2023-10-16",
+  apiVersion: "2023-08-16",
 });
 
 export const paymentRouter = router({
@@ -25,7 +25,7 @@ export const paymentRouter = router({
         }
 
         const paymentIntent = await stripe.paymentIntents.create({
-          amount: Math.round(order.total * 100), // Stripe expects amount in cents
+          amount: Math.round(Number(order.total) * 100), // Stripe expects amount in cents
           currency: "cad",
           automatic_payment_methods: {
             enabled: true,
