@@ -19,17 +19,12 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
         url: '/api/trpc',
         async headers() {
           const token = session?.access_token;
-          console.log('Creating headers with token:', token);
           return {
             'x-trpc-source': 'client',
             'authorization': token ? `Bearer ${token}` : '',
           };
         },
         fetch(url, options) {
-          console.log('Making request:', {
-            url,
-            headers: options?.headers
-          });
           return fetch(url, {
             ...options,
             credentials: 'include',
