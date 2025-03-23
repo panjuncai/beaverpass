@@ -1,13 +1,13 @@
 import { z } from 'zod';
 
 export const createOrderSchema = z.object({
-  shippingAddress: z.string().min(1, "收货地址不能为空"),
-  shippingReceiver: z.string().min(1, "收货人不能为空"),
-  shippingPhone: z.string().min(1, "联系电话不能为空"),
-  paymentMethod: z.string().min(1, "请选择支付方式"),
-  postId: z.string().uuid("无效的商品ID"),
-  sellerId: z.string().uuid("无效的卖家ID"),
-  total: z.number().positive("总金额必须大于0"),
+  shippingAddress: z.string().min(1, "Address is required"),
+  shippingReceiver: z.string().min(1, "Receiver is required"),
+  shippingPhone: z.string().min(1, "Phone is required"),
+  paymentMethod: z.string().min(1, "Please select a payment method"),
+  postId: z.string().uuid("Invalid post ID"),
+  sellerId: z.string().uuid("Invalid seller ID"),
+  total: z.number().positive("Total must be greater than 0"),
   // 以下字段有默认值，可选
   paymentTransactionId: z.string().optional(),
   paymentFee: z.number().default(0),
