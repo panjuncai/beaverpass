@@ -7,7 +7,7 @@ import { useAuthStore } from '@/lib/store/auth-store';
 
 type SupabaseContextType = {
   supabase: SupabaseClient;
-  user: User | null;
+  loginUser: User | null;
   session: Session | null;
   isLoading: boolean;
 };
@@ -18,11 +18,11 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { 
     supabase, 
-    user, 
+    loginUser, 
     session, 
     isLoading,
     setSession,
-    setUser,
+    setLoginUser,
     initialize 
   } = useAuthStore();
 
@@ -34,7 +34,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setSession(session);
-        setUser(session?.user ?? null);
+        setLoginUser(session?.user ?? null);
         router.refresh();
       }
     );
@@ -42,10 +42,10 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [supabase, router, setSession, setUser]);
+  }, [supabase, router, setSession, setLoginUser]);
 
   return (
-    <SupabaseContext.Provider value={{ supabase, user, session, isLoading }}>
+    <SupabaseContext.Provider value={{ supabase, loginUser, session, isLoading }}>
       {children}
     </SupabaseContext.Provider>
   );

@@ -92,9 +92,4 @@ export const authRouter = router({
     }
   }),
 
-  // 获取当前用户
-  getUser: publicProcedure.query(async ({ ctx }) => {
-    const user = ctx.user;
-    return { user: user || null };
-  }),
 }); 

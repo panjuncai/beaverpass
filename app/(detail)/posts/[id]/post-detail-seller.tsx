@@ -2,7 +2,7 @@
 import { SerializedPost } from "@/lib/types/post";
 import Verified from "@/components/icons/verified";
 import { Avatar, Rate } from "antd-mobile";
-import { trpc } from "@/lib/trpc/client";
+import { useAuthStore } from "@/lib/store/auth-store";
 // import { useRouter } from "next/navigation";
 export default function PostDetailMainSeller({
   post,
@@ -10,8 +10,7 @@ export default function PostDetailMainSeller({
   post: SerializedPost | null;
 }) {
   //   const router = useRouter();
-  const { data: userData } = trpc.auth.getUser.useQuery();
-  const currentUser = userData?.user;
+  const { loginUser } = useAuthStore();
 
   const handleChatClick = () => {
     // if (existingRoom) {
@@ -72,7 +71,7 @@ export default function PostDetailMainSeller({
           </div>
           <button
             className="btn btn-sm btn-primary"
-            disabled={currentUser?.id === post?.poster?.id}
+            disabled={loginUser?.id === post?.poster?.id}
             onClick={() => void handleChatClick()}
           >
             Chat

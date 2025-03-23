@@ -1,11 +1,11 @@
 "use client";
-import { trpc } from "@/lib/trpc/client";
 import { useRouter } from "next/navigation";
 import { UserOutline } from "antd-mobile-icons";
-
+import { useAuthStore } from "@/lib/store/auth-store";
+import { trpc } from "@/lib/trpc/client";
 export default function NavRight() {
   const router = useRouter();
-  const { data: userData } = trpc.auth.getUser.useQuery();
+  const { loginUser } = useAuthStore();
   const logoutMutation = trpc.auth.logout.useMutation({
     onSuccess: () => {
       router.push("/login");
@@ -32,7 +32,7 @@ export default function NavRight() {
           tabIndex={0}
           className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-36"
         >
-          {userData?.user ? (
+          {loginUser ? (
             <>
               <li className="w-full">
                 <button
