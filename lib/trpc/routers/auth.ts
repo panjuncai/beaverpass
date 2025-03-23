@@ -2,6 +2,8 @@ import { TRPCError } from '@trpc/server';
 import { publicProcedure, router } from '..';
 import { loginSchema, registerSchema } from '@/lib/validations/auth';
 import { createClient } from '@/utils/supabase/server';
+import { userCache } from '..';  // 导入缓存实例
+
 export const authRouter = router({
   // 邮箱登录
   login: publicProcedure
@@ -19,6 +21,11 @@ export const authRouter = router({
             code: 'UNAUTHORIZED',
             message: error.message || 'Login failed, please check your credentials',
           });
+        }
+
+        if (data.user && data.session) {
+          // 使用 access_token 作为缓存的 key
+          userCache.set(data.session.access_token, data.user);
         }
 
         return { success: true, user: data.user };
@@ -68,10 +75,16 @@ export const authRouter = router({
     }),
 
   // 登出
-  logout: publicProcedure.mutation(async () => {
+  logout: publicProcedure.mutation(async ({ ctx }) => {
     try {
       const supabase = await createClient();
       const { error } = await supabase.auth.signOut();
+      
+      // 获取 token 并清理对应的缓存
+      const token = ctx.headers.get('authorization')?.split('Bearer ')[1];
+      if (token) {
+        userCache.delete(token);
+      }
       
       if (error) {
         throw new TRPCError({
