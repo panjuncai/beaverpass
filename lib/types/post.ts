@@ -37,6 +37,6 @@ export interface PostQueryParams {
   search?: string;
   minPrice?: number;
   maxPrice?: number;
-  sortBy?: 'createdAt' | 'price';
+  sortBy?: 'createdAt' | 'amount';
   sortOrder?: 'asc' | 'desc';
 } 

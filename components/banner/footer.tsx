@@ -1,7 +1,8 @@
 'use client'
 import { TabBar } from 'antd-mobile';
-import { SearchOutline, CameraOutline, } from 'antd-mobile-icons'
+import { SearchOutline, CameraOutline, ReceivePaymentOutline, MessageOutline, } from 'antd-mobile-icons'
 import { usePathname, useRouter } from 'next/navigation'
+import Recycle from '../icons/recycle';
 
 export default function Footer() {
   const pathname = usePathname()
@@ -9,6 +10,13 @@ export default function Footer() {
   const tabs = [
     { key: '/search', title: 'Search', icon: <SearchOutline /> },
     { key: '/post', title: 'Post', icon: <CameraOutline /> },
+    {key:'/inbox', title:'Inbox', icon:<MessageOutline />},
+    { key: '/order', title: 'Deals', icon: <ReceivePaymentOutline /> },
+    {
+      key: '/recycle',
+      title: 'Recycle',
+      icon: <Recycle color={pathname === '/recycle' ? 'var(--adm-color-primary)' : undefined} />
+    }
   ]
 
   return (

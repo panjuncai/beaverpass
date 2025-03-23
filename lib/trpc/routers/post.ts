@@ -3,7 +3,6 @@ import { protectedProcedure, publicProcedure, router } from "..";
 import { createPostSchema, getPostByIdSchema, getPostsSchema } from "@/lib/validations/post";
 
 
-// 创建帖子
 export const postRouter = router({
   // 获取单个帖子
   getPostById: publicProcedure
@@ -68,7 +67,7 @@ export const postRouter = router({
               amount: input.amount,
               isNegotiable: input.isNegotiable,
               deliveryType: input.deliveryType,
-              posterId: ctx.user.id,
+              posterId: ctx.loginUser.id,
             },
           });
 
@@ -91,12 +90,9 @@ export const postRouter = router({
               poster: true,
             },
           });
-        }, {
-          maxWait: 30000,
-          timeout: 30000,
         });
 
-        return { success: true, post };
+        return post;
       } catch (error) {
         console.error('Failed to create post:', error);
         throw new TRPCError({

@@ -26,7 +26,7 @@ export const uploadRouter = router({
           Key: key,
           ContentType: input.fileType,
           Metadata: {
-            uploadedBy: ctx.user.id,
+            uploadedBy: ctx.loginUser.id,
             originalName: input.fileName,
           },
         });
@@ -41,7 +41,7 @@ export const uploadRouter = router({
           fileName: input.fileName,
           fileType: input.fileType,
           fileSize: input.fileSize,
-          userId: ctx.user.id,
+          userId: ctx.loginUser.id,
         });
 
         return {

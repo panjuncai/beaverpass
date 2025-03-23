@@ -10,7 +10,7 @@ import { LRUCache } from 'lru-cache';
 // 定义上下文类型
 interface Context {
   headers: Headers;
-  user: User | null;
+  loginUser: User | null;
   prisma: PrismaClient;
 }
 
@@ -24,13 +24,8 @@ export const userCache = new LRUCache<string, User>({
 export const createTRPCContext = async (opts: { headers: Headers }): Promise<Context> => {
   const token = opts.headers.get('authorization')?.split('Bearer ')[1];
   
-  // console.log('Server context creation:', {
-  //   hasToken: !!token,
-  //   headers: Object.fromEntries(opts.headers.entries())
-  // });
-
   if (!token) {
-    return { headers: opts.headers, user: null, prisma };
+    return { headers: opts.headers, loginUser: null, prisma };
   }
 
   try {
@@ -42,7 +37,7 @@ export const createTRPCContext = async (opts: { headers: Headers }): Promise<Con
     });
 
     if (decoded.exp && decoded.exp < Date.now() / 1000) {
-      return { headers: opts.headers, user: null, prisma };
+      return { headers: opts.headers, loginUser: null, prisma };
     }
 
     // 2. 检查缓存
@@ -52,7 +47,7 @@ export const createTRPCContext = async (opts: { headers: Headers }): Promise<Con
     });
 
     if (cachedUser) {
-      return { headers: opts.headers, user: cachedUser, prisma };
+      return { headers: opts.headers, loginUser: cachedUser, prisma };
     }
 
     // 3. 缓存未命中才请求 Supabase
@@ -63,10 +58,10 @@ export const createTRPCContext = async (opts: { headers: Headers }): Promise<Con
       userCache.set(token, user);
     }
 
-    return { headers: opts.headers, user, prisma };
+    return { headers: opts.headers, loginUser: user, prisma };
   } catch (error) {
     console.error('Auth error:', error);
-    return { headers: opts.headers, user: null, prisma };
+    return { headers: opts.headers, loginUser: null, prisma };
   }
 };
 
@@ -81,14 +76,14 @@ export const publicProcedure = t.procedure;
 
 // 创建受保护的过程（需要登录）
 export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
-  if (!ctx.user) {
+  if (!ctx.loginUser) {
     throw new TRPCError({ code: 'UNAUTHORIZED', message: 'You need to login to access this resource' });
   }
   
   return next({
     ctx: {
       ...ctx,
-      user: ctx.user,
+      loginUser: ctx.loginUser,
     },
   });
 }); 

@@ -4,6 +4,7 @@ import Loading from '@/components/utils/loading'
 import { useRef } from 'react'
 import { usePostStore } from '@/lib/store/post-store'
 import { useAuthStore } from '@/lib/store/auth-store'
+import MessageModal from '@/components/modals/message-modal'
 
 export default function PostDetailBuy() {
     const {loginUser,isLoading}=useAuthStore()
@@ -15,24 +16,12 @@ export default function PostDetailBuy() {
     if(isLoading) return <Loading />
   return (
     <>
-    <dialog ref={dialogRef} className="modal modal-bottom sm:modal-middle">
-      <div className="modal-box">
-        <h2 className="font-bold text-lg">Please login first</h2>
-        <p className="py-4">You need to login to buy the product</p>
-        <div className="modal-action">
-          <form method="dialog">
-            <button className="btn btn-ghost mr-2" onClick={() => dialogRef.current?.close()}>Cancel</button>
-            <button className="btn btn-primary" onClick={() => {
-              dialogRef.current?.close()
-              void router.push('/login')
-            }}>Login</button>
-          </form>
-        </div>
-      </div>
-      <form method="dialog" className="modal-backdrop">
-        <button>close</button>
-      </form>
-    </dialog>
+    <MessageModal 
+      title="Please login first"
+      content="You need to login to buy the product"
+      dialogRef={dialogRef}
+      redirectUrl="/login"
+    />
 
     <div className="fixed bottom-4 left-0 right-0 flex justify-center">
             <button 

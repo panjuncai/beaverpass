@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { OrderQueryParams } from '@/lib/types/order';
 
 export const createOrderSchema = z.object({
   shippingAddress: z.string().min(1, "Address is required"),
@@ -17,23 +18,29 @@ export const createOrderSchema = z.object({
   status: z.string().default("PENDING_PAYMENT")
 });
 
+export const getOrdersSchema = z.object({
+  limit: z.number().min(1).max(100).optional().default(10),
+  cursor: z.string().optional(),
+  status: z.string().optional(),
+  id: z.string().uuid("Invalid order ID").optional(),
+  buyerId: z.string().uuid("Invalid buyer ID").optional(),
+  sellerId: z.string().uuid("Invalid seller ID").optional(),
+  postId: z.string().uuid("Invalid post ID").optional(),
+  shippingAddress: z.string().optional(),
+  shippingReceiver: z.string().optional(),
+  shippingPhone: z.string().optional(),
+  paymentMethod: z.string().optional(),
+  paymentTransactionId: z.string().optional(),
+  paymentFee: z.number().optional(),
+  deliveryFee: z.number().optional(),
+  serviceFee: z.number().optional(),
+  tax: z.number().optional(),
+  total: z.number().optional(),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
+  sortBy: z.enum(['createdAt', 'total']).optional().default('createdAt'),
+  sortOrder: z.enum(['asc', 'desc']).optional().default('desc')
+}) satisfies z.ZodType<OrderQueryParams>;
+
 export type CreateOrderInput = z.infer<typeof createOrderSchema>;
-
-// 订单状态枚举
-export const OrderStatus = {
-  PENDING_PAYMENT: "PENDING_PAYMENT",    // 待付款
-  PAID: "PAID",                         // 已付款
-  SHIPPED: "SHIPPED",                   // 已发货
-  DELIVERED: "DELIVERED",               // 已送达
-  COMPLETED: "COMPLETED",               // 已完成
-  CANCELLED: "CANCELLED",               // 已取消
-  REFUNDED: "REFUNDED"                  // 已退款
-} as const;
-
-// 支付方式枚举
-export const PaymentMethod = {
-  CREDIT_CARD: "CREDIT_CARD",          // 信用卡
-  DEBIT_CARD: "DEBIT_CARD",           // 借记卡
-  PAYPAL: "PAYPAL",                    // PayPal
-  VENMO: "VENMO"                       // Venmo
-} as const;
+export type GetOrdersInput = z.infer<typeof getOrdersSchema>;
