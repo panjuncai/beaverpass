@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { protectedProcedure, publicProcedure, router } from "..";
-import { createPostSchema, getPostByIdSchema, getPostsSchema } from "@/lib/validations/post";
+import { createPostSchema, getPostByIdSchema, getPostsSchema, updatePostSchema } from "@/lib/validations/post";
 
 
 export const postRouter = router({
@@ -101,5 +101,15 @@ export const postRouter = router({
           message: error instanceof Error ? error.message : "Failed to create post",
         });
       }
+    }),
+  updatePost: protectedProcedure
+    .input(updatePostSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { id, status } = input;
+      const updatedPost = await ctx.prisma.post.update({
+        where: { id },
+        data: { status },
+      });
+      return updatedPost;
     }),
 });

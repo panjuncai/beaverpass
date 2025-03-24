@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import type { PostQueryParams } from '@/lib/types/post'
+import { PostStatus } from '../types/enum';
 
 const imageSchema = z.object({
   imageUrl: z.string().url(),
@@ -16,6 +17,12 @@ export const createPostSchema = z.object({
     isNegotiable: z.boolean().optional(),
     deliveryType: z.string().min(1, 'Delivery type is required'),
     images: z.array(imageSchema),
+})
+
+// 更新帖子的 schema
+export const updatePostSchema = z.object({
+    id: z.string().uuid(),
+    status: z.enum([PostStatus.ACTIVE, PostStatus.INACTIVE, PostStatus.SOLD, PostStatus.DELETED]),
 })
 
 // 查询帖子的 schema

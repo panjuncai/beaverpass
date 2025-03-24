@@ -31,10 +31,10 @@ export const createTRPCContext = async (opts: { headers: Headers }): Promise<Con
   try {
     // 1. 先验证 token 格式和过期时间（本地操作，无网络请求）
     const decoded = jwtDecode(token);
-    console.log('Token validation:', {
-      decoded,
-      expired: decoded.exp && decoded.exp < Date.now() / 1000
-    });
+    // console.log('Token validation:', {
+    //   decoded,
+    //   expired: decoded.exp && decoded.exp < Date.now() / 1000
+    // });
 
     if (decoded.exp && decoded.exp < Date.now() / 1000) {
       return { headers: opts.headers, loginUser: null, prisma };
