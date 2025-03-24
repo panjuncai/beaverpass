@@ -11,7 +11,7 @@ export default function Footer() {
     { key: '/search', title: 'Search', icon: <SearchOutline /> },
     { key: '/post', title: 'Post', icon: <CameraOutline /> },
     {key:'/inbox', title:'Inbox', icon:<MessageOutline />},
-    { key: '/order', title: 'Deals', icon: <ReceivePaymentOutline /> },
+    { key: '/deals', title: 'Deals', icon: <ReceivePaymentOutline /> },
     {
       key: '/recycle',
       title: 'Recycle',

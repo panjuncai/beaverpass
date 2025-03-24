@@ -1,4 +1,3 @@
-import { Order as PrismaOrder } from "@prisma/client";
 // import type { inferRouterOutputs } from '@trpc/server';
 // import type { AppRouter } from '@/lib/trpc/routers/_app';
 
@@ -7,18 +6,36 @@ import { Order as PrismaOrder } from "@prisma/client";
 // export type OrderResponse = RouterOutput['order']['getOrderById'];
 
 // 序列化后的 Order 类型（用于前端展示）
-export type SerializedOrder = 
-Omit<PrismaOrder, 'paymentFee'> &
-Omit<PrismaOrder, 'deliveryFee'> &
-Omit<PrismaOrder, 'serviceFee'> &
-Omit<PrismaOrder, 'tax'> &
-Omit<PrismaOrder, 'total'> &
-{
+export type SerializedOrder = {
+  id: string;
+  status: string | null;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+  buyerId: string;
+  sellerId: string;
+  postId: string;
+  shippingAddress: string;
+  shippingReceiver: string;
+  shippingPhone: string;
+  paymentMethod: string;
+  paymentTransactionId: string | null;
   paymentFee: number;
   deliveryFee: number;
   serviceFee: number;
   tax: number;
   total: number;
+  post: {
+    id: string;
+    title: string;
+    amount: number;
+    images: { 
+      id: string; 
+      createdAt: Date | null; 
+      imageUrl: string; 
+      imageType: string | null; 
+      postId: string; 
+    }[];
+  } | null;
   buyer: {
     id: string;
     email: string;
@@ -41,11 +58,14 @@ export interface OrderQueryParams {
   limit?: number;
   cursor?: string;
   status?: string;
+  id?: string;
   buyerId?: string;
   sellerId?: string;
   postId?: string;
+  shippingAddress?: string;
+  shippingReceiver?: string;
+  shippingPhone?: string;
   paymentMethod?: string;
-  paymentStatus?: string;
   paymentTransactionId?: string;
   paymentFee?: number;
   deliveryFee?: number;
@@ -56,4 +76,13 @@ export interface OrderQueryParams {
   updatedAt?: Date;
   sortBy?: 'createdAt' | 'total';
   sortOrder?: 'asc' | 'desc';
+  include?: {
+    post?: {
+      include?: {
+        images?: boolean;
+      };
+    };
+    buyer?: boolean;
+    seller?: boolean;
+  };
 }

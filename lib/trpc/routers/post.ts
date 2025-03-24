@@ -30,6 +30,7 @@ export const postRouter = router({
       const posts = await ctx.prisma.post.findMany({
         take: input.limit,
         where: {
+          ...(input.posterId && { posterId: input.posterId }),
           ...(input.category && { category: input.category }),
           ...(input.search && {
             OR: [

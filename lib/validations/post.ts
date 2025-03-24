@@ -22,6 +22,7 @@ export const createPostSchema = z.object({
 export const getPostsSchema = z.object({
     limit: z.number().min(1).max(100).optional().default(10),
     cursor: z.string().optional(),
+    posterId: z.string().optional(),
     category: z.string().optional(),
     search: z.string().optional(),
     minPrice: z.number().optional(),

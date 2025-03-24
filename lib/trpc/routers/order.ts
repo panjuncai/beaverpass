@@ -2,35 +2,65 @@ import { TRPCError } from "@trpc/server";
 import { protectedProcedure, publicProcedure, router } from "..";
 import { createOrderSchema, getOrdersSchema } from "@/lib/validations/order";
 import { z } from "zod";
+import { Prisma } from "@prisma/client";
+
+type OrderWithRelations = Prisma.OrderGetPayload<{
+  include: {
+    post: {
+      include: {
+        images: true;
+      };
+    };
+    buyer: true;
+    seller: true;
+  };
+}>;
+
+const serializeOrder = (order: OrderWithRelations) => ({
+  ...order,
+  paymentFee: order.paymentFee ? Number(order.paymentFee) : 0,
+  deliveryFee: order.deliveryFee ? Number(order.deliveryFee) : 0,
+  serviceFee: order.serviceFee ? Number(order.serviceFee) : 0,
+  tax: order.tax ? Number(order.tax) : 0,
+  total: order.total ? Number(order.total) : 0,
+  post: order.post ? {
+    ...order.post,
+    amount: order.post.amount ? Number(order.post.amount) : 0
+  } : null
+});
 
 export const orderRouter = router({
   // 获取订单列表
   getOrders: publicProcedure.input(getOrdersSchema).query(async ({ ctx, input }) => {
     const orders = await ctx.prisma.order.findMany({
-        take: input.limit,
-        where: {
-            ...(input.id && { id: input.id }),
-            ...(input.postId && { postId: input.postId }),
-            ...(input.buyerId && { buyerId: input.buyerId }),
-            ...(input.sellerId && { sellerId: input.sellerId }),
-            ...(input.status && { status: input.status }),
-            ...(input.paymentMethod && { paymentMethod: input.paymentMethod }),
-            ...(input.paymentTransactionId && { paymentTransactionId: input.paymentTransactionId }),
-            ...(input.shippingAddress && { shippingAddress: {contains: input.shippingAddress} }),
-            ...(input.shippingReceiver && { shippingReceiver: {contains: input.shippingReceiver} }),
-            ...(input.shippingPhone && { shippingPhone: {contains: input.shippingPhone} }),
+      take: input.limit,
+      where: {
+        ...(input.id && { id: input.id }),
+        ...(input.postId && { postId: input.postId }),
+        ...(input.buyerId && { buyerId: input.buyerId }),
+        ...(input.sellerId && { sellerId: input.sellerId }),
+        ...(input.status && { status: input.status }),
+        ...(input.paymentMethod && { paymentMethod: input.paymentMethod }),
+        ...(input.paymentTransactionId && { paymentTransactionId: input.paymentTransactionId }),
+        ...(input.shippingAddress && { shippingAddress: {contains: input.shippingAddress} }),
+        ...(input.shippingReceiver && { shippingReceiver: {contains: input.shippingReceiver} }),
+        ...(input.shippingPhone && { shippingPhone: {contains: input.shippingPhone} }),
+      },
+      orderBy: {
+        [input.sortBy]: input.sortOrder,
+      },
+      include: {
+        post: {
+          include: {
+            images: true
+          }
         },
-        orderBy: {
-            [input.sortBy]: input.sortOrder,
-        },
-        include: {
-            post: true,
-            buyer: true,
-            seller: true,
-        },
-        ...(input.cursor && { cursor: { id: input.cursor }, skip: 1 }),
+        buyer: true,
+        seller: true,
+      },
+      ...(input.cursor && { cursor: { id: input.cursor }, skip: 1 }),
     });
-    return orders;
+    return orders.map(serializeOrder);
   }),
   // 创建订单
   createOrder: protectedProcedure.input(createOrderSchema).mutation(async ({ ctx, input }) => {

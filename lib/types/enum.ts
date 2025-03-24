@@ -48,3 +48,21 @@ export const OrderStatus = {
     OTHER: "OTHER"
   } as const;
   
+  // 帖子状态枚举
+  export const PostStatus = {
+    ACTIVE: "ACTIVE",
+    INACTIVE: "INACTIVE",
+    SOLD: "SOLD",
+    DELETED: "DELETED"
+  } as const;
+
+  // 订单类型枚举
+export const TabType = {
+    BUY: "BUY",
+    SELL: "SELL"
+} as const;
+export const BuyTabState = {
+    ACTIVE: "ACTIVE",
+    HISTORY: "HISTORY"
+} as const;
+export const SellTabState = PostStatus;

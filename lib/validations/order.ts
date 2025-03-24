@@ -39,7 +39,16 @@ export const getOrdersSchema = z.object({
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
   sortBy: z.enum(['createdAt', 'total']).optional().default('createdAt'),
-  sortOrder: z.enum(['asc', 'desc']).optional().default('desc')
+  sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
+  include: z.object({
+    post: z.object({
+      include: z.object({
+        images: z.boolean()
+      })
+    }).optional(),
+    buyer: z.boolean().optional(),
+    seller: z.boolean().optional()
+  }).optional()
 }) satisfies z.ZodType<OrderQueryParams>;
 
 export type CreateOrderInput = z.infer<typeof createOrderSchema>;
