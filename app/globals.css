@@ -20,10 +20,26 @@
   --adm-color-primary: #b45309;
 }
 
-/* 为 a 标签设置独立的样式 */
+/* Link styles */
 a {
-  color: inherit;
+  color: inherit; /* Use inherit instead of any specific color */
   text-decoration: none;
+}
+
+/* Nav specific links */
+.nav-link {
+  color: #1f2937; /* text-gray-800 equivalent */
+  transition: color 0.3s ease, transform 0.3s ease;
+  font-size: 1.05rem; /* Slightly larger than base (16px) but smaller than lg (18px) */
+}
+
+.nav-link:hover {
+  color: #65a30d !important; /* text-lime-600 equivalent */
+  transform: scale(1.05);
+}
+
+.nav-link.active {
+  color: #65a30d; /* text-lime-600 equivalent */
 }
 
 /* 为 antd-mobile 组件中的链接设置样式 */
@@ -40,6 +56,13 @@ a {
 
 *.hover {
   scrollbar-color: color-mix(in oklch,currentColor 60%,transparent) transparent;
+}
+
+/* Global soft-edge styles */
+.soft-edge {
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+  border: none !important;
 }
 
 @theme inline {
@@ -60,7 +83,9 @@ a {
   .container {
     width: 61.8%; 
     margin: 0 auto; 
-    border:solid 1px var(--adm-color-border)
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.05);
+    border-radius: 16px;
+    border: none !important;
   }
 }
 

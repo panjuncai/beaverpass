@@ -24,11 +24,6 @@ export default function HomePage() {
           transform-origin: center;
         }
         
-        .soft-edge {
-          box-shadow: 0 0 40px rgba(0, 0, 0, 0.05);
-          border-radius: 16px;
-        }
-        
         .mobile-menu {
           transform: translateX(100%);
           transition: transform 0.3s ease-in-out;
@@ -119,12 +114,11 @@ export default function HomePage() {
                   
                   {/* <!-- Desktop Navigation --> */}
                   <div className="hidden md:flex space-x-8 ml-4 px-8">
-                      <Link href={"/"} className="text-gray-800 hover:text-lime-600 hover:scale-105 transform transition-all duration-300 ease-in-out font-medium font-['Inter']">Home</Link>
-                      <Link href={"/post"} className="text-gray-800 hover:text-lime-600 hover:scale-105 transform transition-all duration-300 ease-in-out font-medium font-['Inter']">Post</Link>
-                      <Link href={"/inbox"} className="text-gray-800 hover:text-lime-600 hover:scale-105 transform transition-all duration-300 ease-in-out font-medium font-['Inter']">Inbox</Link>
-                      <Link href={"/deals"} className="text-gray-800 hover:text-lime-600 hover:scale-105 transform transition-all duration-300 ease-in-out font-medium font-['Inter']">Deals</Link>
-                      <Link href={"/recycle"} className="text-gray-800 hover:text-lime-600 hover:scale-105 transform transition-all duration-300 ease-in-out font-medium font-['Inter']">Donate</Link>
-                      <Link href={"/"} className="text-gray-800 hover:text-lime-600 hover:scale-105 transform transition-all duration-300 ease-in-out font-medium font-['Inter'] flex items-center gap-1">
+                      <Link href={"/post"} className="nav-link transform transition-all duration-300 ease-in-out font-medium font-['Inter']">Post</Link>
+                      <Link href={"/inbox"} className="nav-link transform transition-all duration-300 ease-in-out font-medium font-['Inter']">Inbox</Link>
+                      <Link href={"/deals"} className="nav-link transform transition-all duration-300 ease-in-out font-medium font-['Inter']">Deals</Link>
+                      <Link href={"/recycle"} className="nav-link transform transition-all duration-300 ease-in-out font-medium font-['Inter']">Donate</Link>
+                      <Link href={"/"} className="nav-link transform transition-all duration-300 ease-in-out font-medium font-['Inter'] flex items-center gap-1">
                           More
                           <svg className="w-4 h-4 transition-colors duration-300" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                               <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -133,7 +127,7 @@ export default function HomePage() {
                   </div>
                   
                   <div className="hidden md:block ml-auto">
-                      <Link href={"/login"} className="text-gray-800 hover:text-lime-600 hover:scale-105 transform transition-all duration-300 ease-in-out font-medium font-['Inter']">Sign In</Link>
+                      <Link href={"/login"} className="nav-link transform transition-all duration-300 ease-in-out font-medium font-['Inter']">Sign In</Link>
                   </div>
 
                   {/* <!-- Mobile Menu Button --> */}
@@ -167,15 +161,15 @@ export default function HomePage() {
                       </button>
                   </div>
                   
-                  <Link href="/login" className="py-3 px-4 text-gray-800 hover:text-lime-600 hover:bg-gray-50 rounded-lg transition-all duration-300 font-medium font-['Inter']">Sign In</Link>
+                  <Link href="/login" className="py-3 px-4 nav-link transform transition-all duration-300 ease-in-out font-medium font-['Inter']">Sign In</Link>
                   
                   <div className="border-t border-gray-200 my-4"></div>
                   
-                  <Link href="/" className="py-3 px-4 text-gray-800 hover:text-lime-600 hover:bg-gray-50 rounded-lg transition-all duration-300 font-medium font-['Inter']">Home</Link>
-                  <Link href="/post" className="py-3 px-4 text-gray-800 hover:text-lime-600 hover:bg-gray-50 rounded-lg transition-all duration-300 font-medium font-['Inter']">Post</Link>
-                  <Link href="/inbox" className="py-3 px-4 text-gray-800 hover:text-lime-600 hover:bg-gray-50 rounded-lg transition-all duration-300 font-medium font-['Inter']">Inbox</Link>
-                  <Link href="/deals" className="py-3 px-4 text-gray-800 hover:text-lime-600 hover:bg-gray-50 rounded-lg transition-all duration-300 font-medium font-['Inter']">Deals</Link>
-                  <Link href="/recycle" className="py-3 px-4 text-gray-800 hover:text-lime-600 hover:bg-gray-50 rounded-lg transition-all duration-300 font-medium font-['Inter']">Donate</Link>
+                  <Link href="/" className="py-3 px-4 nav-link active transform transition-all duration-300 ease-in-out font-medium font-['Inter']">Home</Link>
+                  <Link href="/post" className="py-3 px-4 nav-link transform transition-all duration-300 ease-in-out font-medium font-['Inter']">Post</Link>
+                  <Link href="/inbox" className="py-3 px-4 nav-link transform transition-all duration-300 ease-in-out font-medium font-['Inter']">Inbox</Link>
+                  <Link href="/deals" className="py-3 px-4 nav-link transform transition-all duration-300 ease-in-out font-medium font-['Inter']">Deals</Link>
+                  <Link href="/recycle" className="py-3 px-4 nav-link transform transition-all duration-300 ease-in-out font-medium font-['Inter']">Donate</Link>
                   
                   <div className="py-3 px-4">
                       <div className="flex items-center justify-between text-gray-800 font-medium font-['Inter']">
@@ -189,9 +183,9 @@ export default function HomePage() {
           </div>
 
           {/* <!-- Main Content Section --> */}
-          <div className="main-content flex flex-wrap justify-center gap-4 p-7">
+          <div className="main-content flex flex-row flex-nowrap justify-center items-start gap-2 p-4">
               {/* <!-- Left Side - Hidden on mobile --> */}
-              <div className="hidden md:flex md:flex-col space-y-4 w-72 h-[450px]">
+              <div className="hidden md:flex md:flex-col space-y-4 w-[270px] flex-shrink-0">
                   {/* <!-- Left Side: UP CARD --> */}
                   <div className="w-full h-[200px] bg-zinc-100 rounded-tr-[50px] rounded-bl-[50px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]">
                       <div className="px-8 py-8">
@@ -201,28 +195,27 @@ export default function HomePage() {
                           <span className="text-lime-600 text-2xl font-semibold font-['Poppins'] leading-7 tracking-widest"> Green<br/></span>
                           <span className="text-lime-600 text-2xl font-light font-['Poppins'] leading-7.5 tracking-widest">Give</span>
                           <span className="text-lime-600 text-2xl font-semibold font-['Poppins'] leading-7 tracking-widest"> Back</span>
-                          <div className="flex items-center justify-end space-x-2 mt-6" onClick={() => router.push('/search')}>
-                              <span className="text-yellow-950 text-xl font-normal font-['Poppins'] hover:text-lime-600 hover:scale-105 transform transition-all duration-300 ease-in-out group">Buy Now&nbsp;&nbsp;</span> 
-                              <div className="relative w-8 h-8 group">
-                                  <div className="w-8 h-8 absolute bg-yellow-950 rounded-full transition-colors duration-300 ease-in-out group-hover:bg-lime-600"></div>
-                                  {/* <!-- Single arrow using SVG for precise control --> */}
-                                  <svg className="absolute inset-0 m-auto transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                      <path d="M12 6L20 12L12 18M4 12H20" transform="translate(3, 3) scale(0.7)" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <div className="flex items-center justify-end space-x-2 mt-6 relative group cursor-pointer" onClick={() => router.push('/search')}>
+                              <div className="absolute inset-y-0 right-0 w-8 h-8 bg-yellow-950 rounded-full transition-all duration-300 ease-in-out group-hover:w-40 group-hover:rounded-3xl group-hover:bg-lime-600"></div>
+                              <span className="relative z-10 text-yellow-950 text-xl font-normal font-['Poppins'] transition-all duration-300 ease-in-out group-hover:text-white">Buy Now</span> 
+                              <div className="relative z-10 w-12 h-8 flex items-center justify-center">
+                                  <svg className="transition-transform duration-300 ease-in-out" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="25" height="25">
+                                      <path d="M12 6L20 12L12 18M4 12H20" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                   </svg>
                               </div>
                           </div>
                       </div>
                   </div>
                   {/* <!-- Left Side: DOWN CARD --> */}
-                  <div className="w-full h-[230px]">
+                  <div className="w-full h-[220px]">
                       <img className="w-full h-full rounded-tr-[50px] rounded-bl-[50px] object-cover" src="./homepage/1_girl.jpg" alt="Furniture 1" />
                   </div>
               </div>
 
               {/* <!-- Center - Full width on mobile --> */}
-              <div className="hero-container relative w-full md:w-[450px] h-[450px] md:h-[450px] flex-shrink-0">
+              <div className="hero-container relative w-full md:w-[430px] flex-shrink-0">
                   {/* <!-- Base layer: Image --> */}
-                  <img className="hero-image w-full h-full md:w-[450px] md:h-[450px] md:rounded-tl-[100px] md:rounded-br-[100px] object-cover" src="./homepage/2_van.jpg" alt="Main Furniture" />
+                  <img className="hero-image w-full h-full md:w-[450px] md:h-[440px] md:rounded-tl-[100px] md:rounded-br-[100px] object-cover" src="./homepage/2_van.jpg" alt="Main Furniture" />
                   
                   {/* <!-- Middle layer: Dark overlay --> */}
                   <div className="hero-overlay absolute top-0 left-0 w-full h-full md:h-[200px] opacity-30 bg-zinc-800 md:rounded-tl-[100px] z-10"></div>
@@ -251,21 +244,21 @@ export default function HomePage() {
                       
                       {/* <!-- Button section --> */}
                       <div className="mb-12 w-full flex flex-col gap-4">
-                          <Link href="/search" className="mobile-hero-button bg-white/80 flex items-center justify-between py-4 px-6 w-full">
-                              <span className="text-yellow-950 text-xl font-medium font-['Poppins']">Buy furniture</span>
-                              <div className="relative w-8 h-8">
-                                  <div className="w-8 h-8 absolute bg-yellow-950 rounded-full"></div>
-                                  <svg className="absolute inset-0 m-auto" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                      <path d="M12 6L20 12L12 18M4 12H20" transform="translate(2, 1) scale(0.8)" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <Link href="/search" className="mobile-hero-button relative group bg-white/80 flex items-center justify-between py-4 px-6 w-full overflow-hidden">
+                              <div className="absolute inset-y-0 right-0 w-12 h-full bg-yellow-950 transition-all duration-300 ease-in-out group-hover:w-64 group-hover:rounded-xl group-hover:bg-lime-600"></div>
+                              <span className="relative z-10 text-yellow-950 text-xl font-medium font-['Poppins'] transition-all duration-300 ease-in-out group-hover:text-white px-2">Buy furniture</span>
+                              <div className="relative z-10 w-8 h-8 flex items-center justify-center">
+                                  <svg className="transition-transform duration-300 ease-in-out" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                                      <path d="M12 6L20 12L12 18M4 12H20" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                   </svg>
                               </div>
                           </Link>
-                          <Link href="/post" className="mobile-hero-button bg-white/80 flex items-center justify-between py-4 px-6 w-full">
-                              <span className="text-yellow-950 text-xl font-medium font-['Poppins']">Sell furniture</span>
-                              <div className="relative w-8 h-8">
-                                  <div className="w-8 h-8 absolute bg-yellow-950 rounded-full"></div>
-                                  <svg className="absolute inset-0 m-auto" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                      <path d="M12 6L20 12L12 18M4 12H20" transform="translate(2, 1) scale(0.8)" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <Link href="/post" className="mobile-hero-button relative group bg-white/80 flex items-center justify-between py-4 px-6 w-full overflow-hidden">
+                              <div className="absolute inset-y-0 right-0 w-12 h-full bg-yellow-950 transition-all duration-300 ease-in-out group-hover:w-64 group-hover:rounded-xl group-hover:bg-lime-600"></div>
+                              <span className="relative z-10 text-yellow-950 text-xl font-medium font-['Poppins'] transition-all duration-300 ease-in-out group-hover:text-white px-2">Sell furniture</span>
+                              <div className="relative z-10 w-8 h-8 flex items-center justify-center">
+                                  <svg className="transition-transform duration-300 ease-in-out" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                                      <path d="M12 6L20 12L12 18M4 12H20" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                   </svg>
                               </div>
                           </Link>
@@ -274,7 +267,7 @@ export default function HomePage() {
               </div>
 
               {/* <!-- Right Side - Hidden on mobile --> */}
-              <div className="hidden md:flex md:flex-col space-y-4 w-72 h-[450px]">
+              <div className="hidden md:flex md:flex-col space-y-2 w-[270px] flex-shrink-0">
                   <div className="w-full h-[230px]">
                       <img className="w-full h-full rounded-tr-[50px] rounded-bl-[50px] object-cover" src="./homepage/3_boy.jpg" alt="Furniture 2" />
                   </div>
@@ -286,13 +279,12 @@ export default function HomePage() {
                           <span className="text-lime-600 text-2xl font-semibold font-['Poppins'] leading-7 tracking-widest"> More<br/></span>
                           <span className="text-lime-600 text-2xl font-light font-['Poppins'] leading-7.5 tracking-widest">Waste</span>
                           <span className="text-lime-600 text-2xl font-semibold font-['Poppins'] leading-7 tracking-widest"> Less</span>
-                          <div className="flex items-center justify-end space-x-2 mt-6" onClick={() => router.push('/post')}>
-                              <span className="text-yellow-950 text-xl font-normal font-['Poppins'] hover:text-lime-600 hover:scale-105 transform transition-all duration-300 ease-in-out group">Sell Now&nbsp;&nbsp;</span> 
-                              <div className="relative w-8 h-8 group">
-                                  <div className="w-8 h-8 absolute bg-yellow-950 rounded-full transition-colors duration-300 ease-in-out group-hover:bg-lime-600"></div>
-                                  {/* <!-- Single arrow using SVG for precise control --> */}
-                                  <svg className="absolute inset-0 m-auto transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                      <path d="M12 6L20 12L12 18M4 12H20" transform="translate(3, 3) scale(0.7)" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <div className="flex items-center justify-end space-x-2 mt-6 relative group cursor-pointer" onClick={() => router.push('/post')}>
+                              <div className="absolute inset-y-0 right-0 w-8 h-8 bg-yellow-950 rounded-full transition-all duration-300 ease-in-out group-hover:w-40 group-hover:rounded-3xl group-hover:bg-lime-600"></div>
+                              <span className="relative z-10 text-yellow-950 text-xl font-normal font-['Poppins'] transition-all duration-300 ease-in-out group-hover:text-white">Sell Now</span> 
+                              <div className="relative z-10 w-12 h-8 flex items-center justify-center">
+                                  <svg className="transition-transform duration-300 ease-in-out" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="25" height="25">
+                                      <path d="M12 6L20 12L12 18M4 12H20" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                   </svg>
                               </div>
                           </div>
@@ -302,68 +294,72 @@ export default function HomePage() {
           </div>
 
           {/* <!-- Popular Listings Section --> */}
-          <div className="w-full px-7 pt-5 pb-5 relative">
+          <div className="w-full px-7 pt-8 pb-16 relative">
               {/* <!-- Horizontal line --> */}
-              <div className="w-full h-[1px] bg-gray-200"></div>
-              
-              {/* <!-- Overlapping label - positioned to center over the line --> */}
-              <div className="absolute left-0 right-0 top-0 flex justify-center">
-                  <div className="w-40 h-9 bg-yellow-950 rounded-[20px] flex items-center justify-center">
-                      <h2 className="text-white text-base font-light font-['Inter']">Popular Listings</h2>
+              <div className="w-full h-[1px] bg-gray-200 relative">
+                  {/* <!-- Overlapping label - positioned to center over the line --> */}
+                  <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 top-0">
+                      <div className="w-40 h-9 bg-yellow-950 rounded-[20px] flex items-center justify-center">
+                          <h2 className="text-white text-base font-light font-['Inter']">Popular Listings</h2>
+                      </div>
                   </div>
               </div>
               
               {/* <!-- Add some space to move cards below the overlapping label --> */}
-              <div className="pt-4"></div>
+              <div className="pt-8"></div>
 
               {/* <!-- Navigation and Cards Container --> */}
               <div className="relative mt-4">
                   {/* <!-- Container for cards and navigation arrows with set width --> */}
-                  <div className="max-w-[1000px] mx-auto relative">
+                  <div className="max-w-[1000px] mx-auto relative px-14">
                       {/* <!-- Navigation Arrows - Positioned at left and right edges of the container --> */}
-                      <div className="absolute left-[-100px] top-1/2 transform -translate-y-1/2">
-                          <div className="w-16 h-16 rounded-full border border-zinc-300 flex items-center justify-center cursor-pointer group transition-all duration-300 ease-in-out hover:border-lime-600 hover:scale-105">
-                              <span className="text-black text-4xl font-light font-['Poppins'] group-hover:text-lime-600 transition-colors duration-300 ease-in-out">&lt;</span>
+                      <div className="absolute left-0 top-1/2 transform -translate-y-1/2">
+                          <div className="w-12 h-12 rounded-full border border-zinc-300 flex items-center justify-center cursor-pointer group transition-all duration-300 ease-in-out hover:border-lime-600 hover:scale-105">
+                              <span className="text-black text-3xl font-light font-['Poppins'] group-hover:text-lime-600 transition-colors duration-300 ease-in-out">&lt;</span>
                           </div>
                       </div>
                       
-                      <div className="absolute right-[-100px] top-1/2 transform -translate-y-1/2">
-                          <div className="w-16 h-16 rounded-full border border-zinc-300 flex items-center justify-center cursor-pointer group transition-all duration-300 ease-in-out hover:border-lime-600 hover:scale-105">
-                              <span className="text-black text-4xl font-light font-['Poppins'] group-hover:text-lime-600 transition-colors duration-300 ease-in-out">&gt;</span>
+                      <div className="absolute right-0 top-1/2 transform -translate-y-1/2">
+                          <div className="w-12 h-12 rounded-full border border-zinc-300 flex items-center justify-center cursor-pointer group transition-all duration-300 ease-in-out hover:border-lime-600 hover:scale-105">
+                              <span className="text-black text-3xl font-light font-['Poppins'] group-hover:text-lime-600 transition-colors duration-300 ease-in-out">&gt;</span>
                           </div>
                       </div>
 
                       {/* <!-- Listing Cards --> */}
-                      <div className="flex flex-wrap justify-center gap-8">
+                      <div className="flex flex-wrap justify-center gap-6">
                           {/* <!-- Card 1 --> */}
-                          <div onClick={() => router.push('/search')} className="w-52 h-56 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-110 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-300 ease-in-out cursor-pointer group">
-                              <img className="w-52 h-40 object-cover" src="./homepage/1_table.png" alt="Apartment Dining Table" />
-                              <div className="p-3 text-black text-base font-medium font-['Poppins'] group-hover:text-lime-600">
-                                  Apartment Dining Table<br/>$ 90
+                          <div onClick={() => router.push('/search')} className="w-44 h-52 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-110 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-300 ease-in-out cursor-pointer group">
+                              <img className="w-44 h-36 object-cover" src="./homepage/1_table.png" alt="Apartment Dining Table" />
+                              <div className="p-2">
+                                  <div className="text-black text-sm font-normal font-['Poppins'] group-hover:text-lime-600 truncate">Apartment Dining Table</div>
+                                  <div className="text-black text-sm font-medium font-['Poppins'] group-hover:text-lime-600">$ 90</div>
                               </div>
                           </div>
 
                           {/* <!-- Card 2 --> */}
-                          <div onClick={() => router.push('/search')} className="w-52 h-56 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-110 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-300 ease-in-out cursor-pointer group">
-                              <img className="w-52 h-40 object-cover" src="./homepage/2_sofa.png" alt="Cognac Faux-Leather" />
-                              <div className="p-3 text-black text-base font-medium font-['Poppins'] group-hover:text-lime-600">
-                                  COGNAC FAUX-LEATHER 4 ...<br/>$ 399
+                          <div onClick={() => router.push('/search')} className="w-44 h-52 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-110 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-300 ease-in-out cursor-pointer group">
+                              <img className="w-44 h-36 object-cover" src="./homepage/2_sofa.png" alt="Cognac Faux-Leather" />
+                              <div className="p-2">
+                                  <div className="text-black text-sm font-normal font-['Poppins'] group-hover:text-lime-600 truncate">COGNAC FAUX-LEATHER 4 SEATER</div>
+                                  <div className="text-black text-sm font-medium font-['Poppins'] group-hover:text-lime-600">$ 399</div>
                               </div>
                           </div>
 
                           {/* <!-- Card 3 --> */}
-                          <div onClick={() => router.push('/search')} className="w-52 h-56 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-110 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-300 ease-in-out cursor-pointer group">
-                              <img className="w-52 h-40 object-cover" src="./homepage/3_bed.png" alt="Single Bed & Matress" />
-                              <div className="p-3 text-black text-base font-medium font-['Poppins'] group-hover:text-lime-600">
-                                  Single Bed & Matress<br/>$ 120
+                          <div onClick={() => router.push('/search')} className="w-44 h-52 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-110 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-300 ease-in-out cursor-pointer group">
+                              <img className="w-44 h-36 object-cover" src="./homepage/3_bed.png" alt="Single Bed & Matress" />
+                              <div className="p-2">
+                                  <div className="text-black text-sm font-normal font-['Poppins'] group-hover:text-lime-600 truncate">Single Bed & Matress</div>
+                                  <div className="text-black text-sm font-medium font-['Poppins'] group-hover:text-lime-600">$ 120</div>
                               </div>
                           </div>
 
                           {/* <!-- Card 4 (New) --> */}
-                          <div onClick={() => router.push('/search')} className="w-52 h-56 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-110 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-300 ease-in-out cursor-pointer group">
-                              <img className="w-52 h-40 object-cover" src="./homepage/4_chair.png" alt="Modern Office Chair" />
-                              <div className="p-3 text-black text-base font-medium font-['Poppins'] group-hover:text-lime-600">
-                                  Modern Office Chair<br/>$ 150
+                          <div onClick={() => router.push('/search')} className="w-44 h-52 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-110 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-300 ease-in-out cursor-pointer group">
+                              <img className="w-44 h-36 object-cover" src="./homepage/4_chair.png" alt="Modern Office Chair" />
+                              <div className="p-2">
+                                  <div className="text-black text-sm font-normal font-['Poppins'] group-hover:text-lime-600 truncate">Modern Office Chair</div>
+                                  <div className="text-black text-sm font-medium font-['Poppins'] group-hover:text-lime-600">$ 150</div>
                               </div>
                           </div>
                       </div>
