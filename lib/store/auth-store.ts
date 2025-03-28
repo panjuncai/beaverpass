@@ -22,12 +22,24 @@ export const useAuthStore = create<AuthState>((set) => ({
   setLoginUser: (loginUser) => set({ loginUser }),
   setLoading: (isLoading) => set({ isLoading }),
   initialize: async () => {
-    const supabase = createClient();
-    const { data: { session } } = await supabase.auth.getSession();
-    set({ 
-      session,
-      loginUser: session?.user ?? null,
-      isLoading: false
-    });
+    try {
+      const supabase = createClient();
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      if (error) {
+        console.error('Auth initialization error:', error);
+        return;
+      }
+
+      console.log('Initializing auth state:', { session });
+      
+      set({ 
+        session,
+        loginUser: session?.user ?? null,
+        isLoading: false
+      });
+    } catch (error) {
+      console.error('Auth initialization error:', error);
+    }
   }
-})); 
+}));

@@ -12,6 +12,12 @@ import PostCard from "./post-card";
 
 export default function DealsPage() {
   const { loginUser, isLoading } = useAuthStore();
+  console.log(`loginUser------: ${JSON.stringify(loginUser)}`);
+  if(!loginUser) {
+    return <div className="flex flex-col h-full justify-center">
+      <NoLogin />
+    </div>;
+  }
   const {data:loginUserOrders,isLoading:isLoadingOrders} = trpc.order.getOrders.useQuery({
     buyerId: loginUser?.id,
     include: {
@@ -33,6 +39,10 @@ export default function DealsPage() {
   });
   // console.log(`loginUserPosts------: ${JSON.stringify(loginUserPosts)}`);
   // console.log(`loginUserOrders------: ${JSON.stringify(loginUserOrders)}`);
+  console.log(`loginUser------: ${JSON.stringify(loginUser)}`);
+  console.log(`isLoading------: ${isLoading}`);
+  console.log(`isLoadingPosts------: ${isLoadingPosts}`);
+  console.log(`isLoadingOrders------: ${isLoadingOrders}`);
 
   const activeOrderStatuses = [OrderStatus.PENDING_PAYMENT, OrderStatus.PAID, OrderStatus.SHIPPED] as const;
   const historyOrderStatuses = [OrderStatus.COMPLETED, OrderStatus.CANCELLED, OrderStatus.REFUNDED] as const;

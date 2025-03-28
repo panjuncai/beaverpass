@@ -10,6 +10,7 @@ import { trpc } from '@/lib/trpc/client';
 import Link from 'next/link';
 import { loginSchema, LoginFormValues } from '@/lib/validations/auth';
 import Loading from '@/components/utils/loading';
+import { useAuthStore } from '@/lib/store/auth-store';
 
 interface LoginFormProps {
   redirectTo?: string;
@@ -36,7 +37,13 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
 
    // 使用tRPC登录
    const loginMutation = trpc.auth.login.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // 更新客户端状态
+      const { setSession, setLoginUser } = useAuthStore.getState();
+      setSession(data.session);
+      setLoginUser(data.user);
+      
+      // 导航
       router.push(redirectTo || '/search');
       router.refresh();
     },

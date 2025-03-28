@@ -26,9 +26,19 @@ export const authRouter = router({
         if (data.user && data.session) {
           // 使用 access_token 作为缓存的 key
           userCache.set(data.session.access_token, data.user);
+          
+          // 返回完整的会话信息
+          return { 
+            success: true, 
+            user: data.user,
+            session: data.session 
+          };
         }
 
-        return { success: true, user: data.user };
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: 'Login failed: No session created',
+        });
       } catch (error) {
         if (error instanceof TRPCError) {
           throw error;
