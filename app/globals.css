@@ -39,7 +39,7 @@ a {
 }
 
 .nav-link.active {
-  color: #65a30d; /* text-lime-600 equivalent */
+  color: #65a30d !important; /* text-lime-600 equivalent */
 }
 
 /* 为 antd-mobile 组件中的链接设置样式 */

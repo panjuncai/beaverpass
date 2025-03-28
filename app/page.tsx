@@ -57,7 +57,7 @@ export default function HomePage() {
         }
         
         .mobile-hero-button {
-          background-color: rgba(255, 255, 255, 0.8);
+          background-color: rgba(255, 255, 255, 0.9);
           backdrop-filter: blur(4px);
           border-radius: 8px;
           transition: all 0.3s ease;
@@ -65,7 +65,7 @@ export default function HomePage() {
         }
         
         .mobile-hero-button:hover {
-          background-color: rgba(255, 255, 255, 0.9);
+          background-color: rgba(236, 253, 216, 0.95);
           transform: translateY(-2px);
           box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
@@ -83,30 +83,40 @@ export default function HomePage() {
         @media (max-width: 768px) {
           .main-content {
             transform: none;
+            padding: 0.5rem;
           }
           .hero-container {
-            height: 90vh;
+            height: auto;
+            max-height: 450px;
             width: 100%;
             padding: 0;
-            border-radius: 25px;
+            border-radius: 16px;
             overflow: hidden;
             margin: 0 auto;
+            position: relative;
           }
           .hero-image {
             width: 100%;
-            height: 100%;
-            border-radius: 25px;
+            height: auto;
+            max-height: 450px;
+            border-radius: 16px;
             object-fit: cover;
+            object-position: center 30%;
+            background-color: #f5f5f5;
           }
           .hero-overlay {
             height: 100%;
-            border-radius: 25px 25px 0 0;
+            border-radius: 16px 16px 0 0;
           }
+        }
+        .mobile-container {
+          box-shadow: none;
+          border-radius: 0;
         }
       `}</style>
 
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-0 m-0">
-        <div className="w-full max-w-[1400px] min-h-screen flex flex-col bg-white overflow-hidden mx-auto soft-edge">
+        <div className="w-full max-w-[1400px] min-h-screen flex flex-col bg-white overflow-hidden mx-auto soft-edge md:soft-edge mobile-container">
           {/* <!-- Header Section --> */}
           <div className="h-16 bg-white shadow-[0px_4px_10px_rgba(0,0,0,0.1)] flex items-center px-7 sticky top-0 z-50">
               <div className="w-full max-w-[1200px] mx-auto flex items-center">
@@ -141,13 +151,14 @@ export default function HomePage() {
 
           {/* <!-- Overlay for mobile menu --> */}
           <div 
-            className={`fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} 
+            className={`fixed inset-0 z-40 transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            style={{backgroundColor: 'rgba(0, 0, 0, 0.3)'}}
             onClick={toggleMobileMenu}
           ></div>
 
           {/* <!-- Mobile Menu - Half width --> */}
           <div 
-            className={`fixed top-0 right-0 h-screen w-80 bg-white z-50 md:hidden pt-16 transform transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+            className={`fixed top-0 right-0 h-screen w-[60%] max-w-[300px] bg-white z-50 md:hidden pt-16 shadow-lg transform transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
           >
               <div className="flex flex-col p-4">
                   <div className="flex items-center justify-between pb-4 border-b border-gray-200 mb-4">
@@ -165,19 +176,16 @@ export default function HomePage() {
                   
                   <div className="border-t border-gray-200 my-4"></div>
                   
-                  <Link href="/" className="py-3 px-4 nav-link active transform transition-all duration-300 ease-in-out font-medium font-['Inter']">Home</Link>
                   <Link href="/post" className="py-3 px-4 nav-link transform transition-all duration-300 ease-in-out font-medium font-['Inter']">Post</Link>
                   <Link href="/inbox" className="py-3 px-4 nav-link transform transition-all duration-300 ease-in-out font-medium font-['Inter']">Inbox</Link>
                   <Link href="/deals" className="py-3 px-4 nav-link transform transition-all duration-300 ease-in-out font-medium font-['Inter']">Deals</Link>
                   <Link href="/recycle" className="py-3 px-4 nav-link transform transition-all duration-300 ease-in-out font-medium font-['Inter']">Donate</Link>
                   
-                  <div className="py-3 px-4">
-                      <div className="flex items-center justify-between text-gray-800 font-medium font-['Inter']">
-                          More
-                          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                      </div>
+                  <div className="flex items-center justify-between py-3 px-4 nav-link transform transition-all duration-300 ease-in-out font-medium font-['Inter']">
+                      More
+                      <svg className="w-4 h-4 ml-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
                   </div>
               </div>
           </div>
@@ -215,14 +223,14 @@ export default function HomePage() {
               {/* <!-- Center - Full width on mobile --> */}
               <div className="hero-container relative w-full md:w-[430px] flex-shrink-0">
                   {/* <!-- Base layer: Image --> */}
-                  <img className="hero-image w-full h-full md:w-[450px] md:h-[440px] md:rounded-tl-[100px] md:rounded-br-[100px] object-cover" src="./homepage/2_van.jpg" alt="Main Furniture" />
+                  <img className="hero-image w-full h-full md:w-[450px] md:h-[440px] md:rounded-tl-[100px] md:rounded-br-[100px] object-cover md:object-cover" src="./homepage/2_van.jpg" alt="Main Furniture" />
                   
                   {/* <!-- Middle layer: Dark overlay --> */}
-                  <div className="hero-overlay absolute top-0 left-0 w-full h-full md:h-[200px] opacity-30 bg-zinc-800 md:rounded-tl-[100px] z-10"></div>
+                  <div className="hero-overlay absolute top-0 left-0 w-full md:h-[200px] opacity-50 bg-zinc-800 md:rounded-tl-[100px] z-10"></div>
                   
                   {/* <!-- Top layer: Text (hidden on mobile) --> */}
                   <div className="absolute top-0 left-0 w-full h-[200px] flex items-center justify-center z-20 hidden md:flex">
-                      <h1 className="text-white text-3xl font-black font-['Poppins'] leading-12 tracking-widest text-center drop-shadow-lg">
+                      <h1 className="text-white text-4xl font-black font-['Poppins'] leading-12 tracking-wide text-center drop-shadow-lg">
                           We Handle<br/>Pickup & Delivery<br/>
                               <span className="text-white text-base font-light font-['Poppins'] leading-2 tracking-widest text-center block mt-2" style={{textShadow: '0 0 20px rgba(63, 98, 18, 0.8), 0 0 20px rgba(63, 98, 18, 0.6), 0 0 30px rgba(101, 163, 13, 0.4)'}}>
                               Pass Your Furniture To Someone In Need
@@ -231,37 +239,47 @@ export default function HomePage() {
                   </div>
                   
                   {/* <!-- Mobile view text and buttons (visible only on mobile) --> */}
-                  <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-between z-20 p-4 md:hidden">
+                  <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-between z-20 p-6 md:hidden">
                       {/* <!-- Top text section --> */}
-                      <div className="mt-8 text-center">
-                          <h1 className="text-white text-base font-light font-['Poppins'] opacity-70 leading-2 tracking-widest text-center block mt-1 py-4">
-                              Pass Your Furniture To Someone In Need
-                          </h1>
-                          <h2 className="text-white text-3xl font-black font-['Poppins'] leading-12 tracking-widest text-center drop-shadow-lg">
+                      <div className="mt-14 text-center">
+                          <h2 className="text-white text-4xl font-black font-['Poppins'] leading-tight tracking-wide text-center drop-shadow-lg">
                               We Handle<br/>Pickup & Delivery
                           </h2>
                       </div>
                       
-                      {/* <!-- Button section --> */}
-                      <div className="mb-12 w-full flex flex-col gap-4">
-                          <Link href="/search" className="mobile-hero-button relative group bg-white/80 flex items-center justify-between py-4 px-6 w-full overflow-hidden">
-                              <div className="absolute inset-y-0 right-0 w-12 h-full bg-yellow-950 transition-all duration-300 ease-in-out group-hover:w-64 group-hover:rounded-xl group-hover:bg-lime-600"></div>
-                              <span className="relative z-10 text-yellow-950 text-xl font-medium font-['Poppins'] transition-all duration-300 ease-in-out group-hover:text-white px-2">Buy furniture</span>
-                              <div className="relative z-10 w-8 h-8 flex items-center justify-center">
-                                  <svg className="transition-transform duration-300 ease-in-out" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
-                                      <path d="M12 6L20 12L12 18M4 12H20" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                  </svg>
-                              </div>
-                          </Link>
-                          <Link href="/post" className="mobile-hero-button relative group bg-white/80 flex items-center justify-between py-4 px-6 w-full overflow-hidden">
-                              <div className="absolute inset-y-0 right-0 w-12 h-full bg-yellow-950 transition-all duration-300 ease-in-out group-hover:w-64 group-hover:rounded-xl group-hover:bg-lime-600"></div>
-                              <span className="relative z-10 text-yellow-950 text-xl font-medium font-['Poppins'] transition-all duration-300 ease-in-out group-hover:text-white px-2">Sell furniture</span>
-                              <div className="relative z-10 w-8 h-8 flex items-center justify-center">
-                                  <svg className="transition-transform duration-300 ease-in-out" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
-                                      <path d="M12 6L20 12L12 18M4 12H20" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                  </svg>
-                              </div>
-                          </Link>
+                      {/* <!-- Bottom button section --> */}
+                      <div className="w-full flex flex-col items-center justify-center mb-4 px-2">
+                          <div className="text-center mb-4">
+                              <h1 className="text-white text-xs font-light font-['Poppins'] opacity-90 leading-2 tracking-widest text-center">
+                                  Pass Your Furniture To Someone In Need
+                              </h1>
+                          </div>
+                          <div className="mb-3 w-full">
+                              <a href="#" className="mobile-hero-button w-full flex items-center justify-between px-4 py-3 rounded-lg bg-white bg-opacity-90 shadow-md transition-all duration-300 hover:bg-lime-50 hover:translate-y-[-2px] hover:shadow-lg" onClick={() => router.push('/search')}>
+                                  <span className="text-zinc-800 text-lg font-medium font-['Poppins']">Buy furniture</span>
+                                  <div className="bg-amber-800 rounded-full p-2">
+                                      <svg className="h-5 w-5 text-white" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                          <path stroke="none" d="M0 0h24v24H0z" />
+                                          <line x1="5" y1="12" x2="19" y2="12" />
+                                          <line x1="13" y1="18" x2="19" y2="12" />
+                                          <line x1="13" y1="6" x2="19" y2="12" />
+                                      </svg>
+                                  </div>
+                              </a>
+                          </div>
+                          <div className="w-full">
+                              <a href="#" className="mobile-hero-button w-full flex items-center justify-between px-4 py-3 rounded-lg bg-white bg-opacity-90 shadow-md transition-all duration-300 hover:bg-lime-50 hover:translate-y-[-2px] hover:shadow-lg" onClick={() => router.push('/post')}>
+                                  <span className="text-zinc-800 text-lg font-medium font-['Poppins']">Sell furniture</span>
+                                  <div className="bg-amber-800 rounded-full p-2">
+                                      <svg className="h-5 w-5 text-white" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                          <path stroke="none" d="M0 0h24v24H0z" />
+                                          <line x1="5" y1="12" x2="19" y2="12" />
+                                          <line x1="13" y1="18" x2="19" y2="12" />
+                                          <line x1="13" y1="6" x2="19" y2="12" />
+                                      </svg>
+                                  </div>
+                              </a>
+                          </div>
                       </div>
                   </div>
               </div>
@@ -294,7 +312,7 @@ export default function HomePage() {
           </div>
 
           {/* <!-- Popular Listings Section --> */}
-          <div className="w-full px-7 pt-8 pb-16 relative">
+          <div className="w-full px-4 md:px-7 pt-4 md:pt-8 pb-6 md:pb-12 relative">
               {/* <!-- Horizontal line --> */}
               <div className="w-full h-[1px] bg-gray-200 relative">
                   {/* <!-- Overlapping label - positioned to center over the line --> */}
@@ -306,58 +324,58 @@ export default function HomePage() {
               </div>
               
               {/* <!-- Add some space to move cards below the overlapping label --> */}
-              <div className="pt-8"></div>
+              <div className="pt-6 md:pt-8"></div>
 
               {/* <!-- Navigation and Cards Container --> */}
-              <div className="relative mt-4">
+              <div className="relative mt-2 md:mt-4">
                   {/* <!-- Container for cards and navigation arrows with set width --> */}
-                  <div className="max-w-[1000px] mx-auto relative px-14">
-                      {/* <!-- Navigation Arrows - Positioned at left and right edges of the container --> */}
-                      <div className="absolute left-0 top-1/2 transform -translate-y-1/2">
+                  <div className="max-w-[1000px] mx-auto relative px-4 md:px-14 py-2">
+                      {/* <!-- Navigation Arrows - Positioned at left and right edges of the container (hidden on small mobile) --> */}
+                      <div className="absolute left-0 top-1/2 transform -translate-y-1/2 hidden sm:block">
                           <div className="w-12 h-12 rounded-full border border-zinc-300 flex items-center justify-center cursor-pointer group transition-all duration-300 ease-in-out hover:border-lime-600 hover:scale-105">
                               <span className="text-black text-3xl font-light font-['Poppins'] group-hover:text-lime-600 transition-colors duration-300 ease-in-out">&lt;</span>
                           </div>
                       </div>
                       
-                      <div className="absolute right-0 top-1/2 transform -translate-y-1/2">
+                      <div className="absolute right-0 top-1/2 transform -translate-y-1/2 hidden sm:block">
                           <div className="w-12 h-12 rounded-full border border-zinc-300 flex items-center justify-center cursor-pointer group transition-all duration-300 ease-in-out hover:border-lime-600 hover:scale-105">
                               <span className="text-black text-3xl font-light font-['Poppins'] group-hover:text-lime-600 transition-colors duration-300 ease-in-out">&gt;</span>
                           </div>
                       </div>
 
                       {/* <!-- Listing Cards --> */}
-                      <div className="flex flex-wrap justify-center gap-6">
+                      <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 md:gap-8">
                           {/* <!-- Card 1 --> */}
-                          <div onClick={() => router.push('/search')} className="w-44 h-52 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-110 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-300 ease-in-out cursor-pointer group">
+                          <div onClick={() => router.push('/search')} className="w-44 h-[196px] md:h-52 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-105 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-500 ease-in-out cursor-pointer group mb-1 md:mb-0">
                               <img className="w-44 h-36 object-cover" src="./homepage/1_table.png" alt="Apartment Dining Table" />
-                              <div className="p-2">
+                              <div className="p-1 md:p-2">
                                   <div className="text-black text-sm font-normal font-['Poppins'] group-hover:text-lime-600 truncate">Apartment Dining Table</div>
                                   <div className="text-black text-sm font-medium font-['Poppins'] group-hover:text-lime-600">$ 90</div>
                               </div>
                           </div>
 
                           {/* <!-- Card 2 --> */}
-                          <div onClick={() => router.push('/search')} className="w-44 h-52 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-110 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-300 ease-in-out cursor-pointer group">
+                          <div onClick={() => router.push('/search')} className="w-44 h-[196px] md:h-52 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-105 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-500 ease-in-out cursor-pointer group mb-1 md:mb-0">
                               <img className="w-44 h-36 object-cover" src="./homepage/2_sofa.png" alt="Cognac Faux-Leather" />
-                              <div className="p-2">
+                              <div className="p-1 md:p-2">
                                   <div className="text-black text-sm font-normal font-['Poppins'] group-hover:text-lime-600 truncate">COGNAC FAUX-LEATHER 4 SEATER</div>
                                   <div className="text-black text-sm font-medium font-['Poppins'] group-hover:text-lime-600">$ 399</div>
                               </div>
                           </div>
 
                           {/* <!-- Card 3 --> */}
-                          <div onClick={() => router.push('/search')} className="w-44 h-52 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-110 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-300 ease-in-out cursor-pointer group">
+                          <div onClick={() => router.push('/search')} className="w-44 h-[196px] md:h-52 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-105 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-500 ease-in-out cursor-pointer group mb-1 md:mb-0">
                               <img className="w-44 h-36 object-cover" src="./homepage/3_bed.png" alt="Single Bed & Matress" />
-                              <div className="p-2">
+                              <div className="p-1 md:p-2">
                                   <div className="text-black text-sm font-normal font-['Poppins'] group-hover:text-lime-600 truncate">Single Bed & Matress</div>
                                   <div className="text-black text-sm font-medium font-['Poppins'] group-hover:text-lime-600">$ 120</div>
                               </div>
                           </div>
 
                           {/* <!-- Card 4 (New) --> */}
-                          <div onClick={() => router.push('/search')} className="w-44 h-52 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-110 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-300 ease-in-out cursor-pointer group">
+                          <div onClick={() => router.push('/search')} className="w-44 h-[196px] md:h-52 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-105 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-500 ease-in-out cursor-pointer group mb-1 md:mb-0">
                               <img className="w-44 h-36 object-cover" src="./homepage/4_chair.png" alt="Modern Office Chair" />
-                              <div className="p-2">
+                              <div className="p-1 md:p-2">
                                   <div className="text-black text-sm font-normal font-['Poppins'] group-hover:text-lime-600 truncate">Modern Office Chair</div>
                                   <div className="text-black text-sm font-medium font-['Poppins'] group-hover:text-lime-600">$ 150</div>
                               </div>
