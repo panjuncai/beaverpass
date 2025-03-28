@@ -38,16 +38,16 @@ export default function DealsPage() {
     console.log('Auth State:', { loginUser, isLoading });
   }, [loginUser, isLoading]);
 
-  if (isLoading || isLoadingOrders || isLoadingPosts) {
-    return <Loading />;
-  }
-
   if (!loginUser) {
     return (
       <div className="flex flex-col h-full justify-center">
         <NoLogin />
       </div>
     );
+  }
+
+  if (isLoading || isLoadingOrders || isLoadingPosts) {
+    return <Loading />;
   }
 
   const activeOrderStatuses = [

@@ -8,7 +8,7 @@ export default function Header() {
     <header className="navbar shadow-sm">
       <div className="flex-none w-[24px]"></div>
       <div className="flex-1 flex items-center justify-center">
-        <div className="relative w-[180px] h-[48px]" onClick={()=>{
+        <div className="relative w-[180px] h-[48px] hover:cursor-pointer" onClick={()=>{
           router.push('/');
         }}>
           <Image

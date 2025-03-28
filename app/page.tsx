@@ -167,15 +167,15 @@ export default function HomePage() {
                       </button>
                   </div>
                   
-                  <a href="#" className="py-3 px-4 text-gray-800 hover:text-lime-600 hover:bg-gray-50 rounded-lg transition-all duration-300 font-medium font-['Inter']">Sign In</a>
+                  <Link href="/login" className="py-3 px-4 text-gray-800 hover:text-lime-600 hover:bg-gray-50 rounded-lg transition-all duration-300 font-medium font-['Inter']">Sign In</Link>
                   
                   <div className="border-t border-gray-200 my-4"></div>
                   
-                  <a href="#" className="py-3 px-4 text-gray-800 hover:text-lime-600 hover:bg-gray-50 rounded-lg transition-all duration-300 font-medium font-['Inter']">Home</a>
-                  <a href="#" className="py-3 px-4 text-gray-800 hover:text-lime-600 hover:bg-gray-50 rounded-lg transition-all duration-300 font-medium font-['Inter']">Post</a>
-                  <a href="#" className="py-3 px-4 text-gray-800 hover:text-lime-600 hover:bg-gray-50 rounded-lg transition-all duration-300 font-medium font-['Inter']">Inbox</a>
-                  <a href="#" className="py-3 px-4 text-gray-800 hover:text-lime-600 hover:bg-gray-50 rounded-lg transition-all duration-300 font-medium font-['Inter']">Deals</a>
-                  <a href="#" className="py-3 px-4 text-gray-800 hover:text-lime-600 hover:bg-gray-50 rounded-lg transition-all duration-300 font-medium font-['Inter']">Donate</a>
+                  <Link href="/" className="py-3 px-4 text-gray-800 hover:text-lime-600 hover:bg-gray-50 rounded-lg transition-all duration-300 font-medium font-['Inter']">Home</Link>
+                  <Link href="/post" className="py-3 px-4 text-gray-800 hover:text-lime-600 hover:bg-gray-50 rounded-lg transition-all duration-300 font-medium font-['Inter']">Post</Link>
+                  <Link href="/inbox" className="py-3 px-4 text-gray-800 hover:text-lime-600 hover:bg-gray-50 rounded-lg transition-all duration-300 font-medium font-['Inter']">Inbox</Link>
+                  <Link href="/deals" className="py-3 px-4 text-gray-800 hover:text-lime-600 hover:bg-gray-50 rounded-lg transition-all duration-300 font-medium font-['Inter']">Deals</Link>
+                  <Link href="/recycle" className="py-3 px-4 text-gray-800 hover:text-lime-600 hover:bg-gray-50 rounded-lg transition-all duration-300 font-medium font-['Inter']">Donate</Link>
                   
                   <div className="py-3 px-4">
                       <div className="flex items-center justify-between text-gray-800 font-medium font-['Inter']">

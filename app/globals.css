@@ -17,11 +17,24 @@
 }
 
 :root:root {
-  --adm-color-primary:#b45309;
+  --adm-color-primary: #b45309;
+}
+
+/* 为 a 标签设置独立的样式 */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* 为 antd-mobile 组件中的链接设置样式 */
+.adm-list-item-content-main a,
+.adm-list-item-content-extra a {
+  color: inherit;
+  text-decoration: none;
 }
 
 .adm-toast-mask .adm-toast-main-icon .adm-toast-icon {
-  display:flex;
+  display: flex;
   justify-content: center;
 }
 
