@@ -17,7 +17,7 @@ export default function HomePage() {
 
   return (
     <>
-      <style jsx global>{`
+      <style jsx>{`
         .main-content {
           max-width: 1200px;
           margin: 0 auto;
@@ -251,7 +251,7 @@ export default function HomePage() {
                       
                       {/* <!-- Button section --> */}
                       <div className="mb-12 w-full flex flex-col gap-4">
-                          <a href="#" className="mobile-hero-button opacity-80 flex items-center justify-between py-4 px-6 w-full">
+                          <Link href="/search" className="mobile-hero-button bg-white/80 flex items-center justify-between py-4 px-6 w-full">
                               <span className="text-yellow-950 text-xl font-medium font-['Poppins']">Buy furniture</span>
                               <div className="relative w-8 h-8">
                                   <div className="w-8 h-8 absolute bg-yellow-950 rounded-full"></div>
@@ -259,8 +259,8 @@ export default function HomePage() {
                                       <path d="M12 6L20 12L12 18M4 12H20" transform="translate(2, 1) scale(0.8)" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                   </svg>
                               </div>
-                          </a>
-                          <a href="#" className="mobile-hero-button opacity-80 flex items-center justify-between py-4 px-6 w-full">
+                          </Link>
+                          <Link href="/post" className="mobile-hero-button bg-white/80 flex items-center justify-between py-4 px-6 w-full">
                               <span className="text-yellow-950 text-xl font-medium font-['Poppins']">Sell furniture</span>
                               <div className="relative w-8 h-8">
                                   <div className="w-8 h-8 absolute bg-yellow-950 rounded-full"></div>
@@ -268,7 +268,7 @@ export default function HomePage() {
                                       <path d="M12 6L20 12L12 18M4 12H20" transform="translate(2, 1) scale(0.8)" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                   </svg>
                               </div>
-                          </a>
+                          </Link>
                       </div>
                   </div>
               </div>
