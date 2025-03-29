@@ -26,6 +26,9 @@
     .adm-step-status-finish {
       --line-to-next-color: #65a30d;
   }
+  .ant-bubble-footer {
+    margin-top: 0px;
+  }
 } 
 
 

@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import { Providers } from '@/components/providers';
 import { Inter, Poppins } from 'next/font/google';
 
+
 const inter = Inter({ subsets: ['latin'] });
 const poppins = Poppins({ 
   weight: ['300', '400', '500', '600', '700'],
@@ -28,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="zh" className="trancy-en">
       <body className={`${inter.className} ${poppins.variable} container`}>
-        <Providers>{children}</Providers>
+          <Providers>{children}</Providers>
       </body>
     </html>
   );

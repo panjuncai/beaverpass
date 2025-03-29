@@ -3,53 +3,54 @@ import { SerializedPost } from "@/lib/types/post";
 import Verified from "@/components/icons/verified";
 import { Avatar, Rate } from "antd-mobile";
 import { useAuthStore } from "@/lib/store/auth-store";
-// import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { trpc } from "@/lib/trpc/client";
+
 export default function PostDetailMainSeller({
   post,
 }: {
   post: SerializedPost | null;
 }) {
-  //   const router = useRouter();
+  const router = useRouter();
   const { loginUser } = useAuthStore();
+  const utils = trpc.useUtils();
 
-  const handleChatClick = () => {
-    // if (existingRoom) {
-    //     // 先发送商品
-    //     await sendMessage({
-    //       roomId: existingRoom._id,
-    //       postId: post?.id,
-    //       messageType: 'post'
-    //     }).unwrap();
-    //     // 如果已有聊天室，直接跳转
-    //     void navigate(`/chat/${existingRoom._id}`,{
-    //       state:{
-    //         chatRoom: existingRoom
-    //       }
-    //     });
-    //   } else {
-    //     // 创建新聊天室并发送商品消息
-    //     const room = await createChatRoom({
-    //       sellerId: sellerId
-    //     }).unwrap();
-    //     await sendMessage({
-    //       roomId: room._id,
-    //       postId: post?.id,
-    //       messageType: 'post'
-    //     }).unwrap();
-    //     void navigate(`/chat/${room._id}`,{
-    //       state:{
-    //         chatRoom: room
-    //       }
-    //     });
-    //   }
-    // } catch (error) {
-    //   console.log('error', error);
-    //   Toast.show({
-    //     content: 'Failed to create chat',
-    //     icon: 'fail'
-    //   });
-    // }
+  // 创建聊天室的 mutation
+  const createChatRoomMutation = trpc.chat.createChatRoom.useMutation({
+    onSuccess: (chatRoom) => {
+      // 聊天室创建成功后，导航到聊天页面
+      utils.chat.getChatRooms.invalidate();
+      router.push(`/chat/${chatRoom.id}`);
+    },
+    onError: (error) => {
+      console.error("Failed to create chat room:", error);
+      console.log("Failed to create chat");
+    },
+  });
+
+  const handleChatClick = async () => {
+    if (!loginUser || !post?.poster?.id) {
+      console.log("Please login first");
+      return;
+    }
+
+    // 如果当前用户是商品的发布者，不允许与自己聊天
+    if (loginUser.id === post.poster.id) {
+      console.log("You cannot chat with yourself");
+      return;
+    }
+
+    try {
+      // 创建聊天室并发送商品消息
+      await createChatRoomMutation.mutateAsync({
+        participantIds: [post.poster.id],
+        postId: post.id,
+      });
+    } catch (error) {
+      console.error("Error in handleChatClick:", error);
+    }
   };
+
   return (
     <div className="mt-4 flex gap-4 shadow-sm p-2">
       <Avatar src={post?.poster?.avatar || '/default-avatar.png'} style={{ '--size': '64px' }}  />
@@ -71,10 +72,14 @@ export default function PostDetailMainSeller({
           </div>
           <button
             className="btn btn-sm btn-primary"
-            disabled={loginUser?.id === post?.poster?.id}
+            disabled={loginUser?.id === post?.poster?.id || createChatRoomMutation.isLoading}
             onClick={() => void handleChatClick()}
           >
-            Chat
+            {createChatRoomMutation.isLoading ? (
+              <span className="loading loading-spinner loading-xs"></span>
+            ) : (
+              "Chat"
+            )}
           </button>
         </div>
       </div>

@@ -16,6 +16,7 @@ export default function SearchPage() {
       <SearchBar handleSearch={handleSearch} />
       <SearchCategory selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
       <ProductsShow selectedCategory={selectedCategory} search={search} />
+      <div className="h-20"></div>
     </div>
   );
 } 

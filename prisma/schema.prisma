@@ -23,7 +23,10 @@ model User {
   phone             String?
   createdAt         DateTime?             @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt         DateTime?             @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  readMessages      MessageReadBy[]
+  sentMessages      Message[]             @relation("SentMessages")
   posts             Post[]
+  chatRooms         ChatRoomParticipant[]
   buyerOrders       Order[]               @relation("BuyerOrders")
   sellerOrders      Order[]               @relation("SellerOrders")
 
@@ -45,6 +48,7 @@ model Post {
   updatedAt    DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   orders       Order[]
   images       PostImage[]
+  messages     Message[]
   poster       User?     @relation(fields: [posterId], references: [id], onDelete: Cascade, onUpdate: Restrict)
 
   @@index([posterId], map: "idx_posts_poster_id")
@@ -88,4 +92,56 @@ model Order {
   @@index([buyerId], map: "idx_orders_buyer_id")
   @@index([sellerId], map: "idx_orders_seller_id")
   @@map("orders")
+}
+
+model ChatRoom {
+  id           String                @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt    DateTime?             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime?             @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  participants ChatRoomParticipant[]
+  messages     Message[]
+
+  @@map("chat_rooms")
+}
+
+model ChatRoomParticipant {
+  chatRoomId String    @map("chat_room_id") @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  createdAt  DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  chatRoom   ChatRoom  @relation(fields: [chatRoomId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+
+  @@id([chatRoomId, userId])
+  @@map("chat_room_participants")
+}
+
+model Message {
+  id          String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  chatRoomId  String     @map("chat_room_id") @db.Uuid
+  senderId    String?    @map("sender_id") @db.Uuid
+  content     String?
+  postId      String?    @map("post_id") @db.Uuid
+  messageType String?    @default("TEXT") @map("message_type")
+  createdAt   DateTime?  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime?  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  readBy      MessageReadBy[]
+  chatRoom    ChatRoom   @relation(fields: [chatRoomId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  post        Post?      @relation(fields: [postId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  sender      User?      @relation("SentMessages", fields: [senderId], references: [id], onUpdate: Restrict)
+
+  @@index([chatRoomId], map: "idx_messages_chat_room_id")
+  @@index([senderId], map: "idx_messages_sender_id")
+  @@map("messages")
+}
+
+model MessageReadBy {
+  messageId String    @map("message_id") @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  readAt    DateTime? @default(now()) @map("read_at") @db.Timestamptz(6)
+  message   Message   @relation(fields: [messageId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+
+  @@id([messageId, userId])
+  @@map("message_read_by")
 }

@@ -20,7 +20,7 @@ export default function Footer() {
   ]
 
   return (
-    <div className="border-t border-gray-200">
+    <div className="fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white">
       <TabBar activeKey={pathname} className="pb-safe">
         {tabs.map(item => (
           <TabBar.Item
