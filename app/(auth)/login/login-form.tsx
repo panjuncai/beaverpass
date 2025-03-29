@@ -132,7 +132,11 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
   return (
     <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
       <div className="text-center">
-        <h1 className="text-2xl font-bold">BeaverPass</h1>
+        <img 
+          src="/homepage/logo_maple.png" 
+          alt="BeaverPass" 
+          className="h-12 mx-auto"
+        />
       </div>
 
       {error && (
@@ -176,7 +180,7 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
 
         <button
           type="submit"
-          className="w-full btn btn-primary"
+          className="w-full h-12 relative bg-yellow-900 rounded-3xl text-center text-white text-base font-semibold font-['Poppins'] transition-all duration-300 hover:bg-yellow-800"
           disabled={isLoading}
         >
           {isLoading ? 'Signing in...' : 'Sign in'}
