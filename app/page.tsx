@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function HomePage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -120,7 +121,15 @@ export default function HomePage() {
           {/* <!-- Header Section --> */}
           <div className="h-16 bg-white shadow-[0px_4px_10px_rgba(0,0,0,0.1)] flex items-center px-7 sticky top-0 z-50">
               <div className="w-full max-w-[1200px] mx-auto flex items-center">
-                  <img className="w-44 h-12" src="./homepage/logo_maple.png" alt="Logo" />
+                  <div className="w-44 h-12 relative">
+                    <Image
+                      src="/homepage/logo_maple.png"
+                      alt="Logo"
+                      fill
+                      style={{ objectFit: 'contain' }}
+                      priority
+                    />
+                  </div>
                   
                   {/* <!-- Desktop Navigation --> */}
                   <div className="hidden md:flex space-x-8 ml-4 px-8">
@@ -215,15 +224,30 @@ export default function HomePage() {
                       </div>
                   </div>
                   {/* <!-- Left Side: DOWN CARD --> */}
-                  <div className="w-full h-[220px]">
-                      <img className="w-full h-full rounded-tr-[50px] rounded-bl-[50px] object-cover" src="./homepage/1_girl.jpg" alt="Furniture 1" />
+                  <div className="w-full h-[220px] relative">
+                      <Image
+                        src="/homepage/1_girl.jpg"
+                        alt="Furniture 1"
+                        fill
+                        style={{ objectFit: 'cover' }}
+                        className="rounded-tr-[50px] rounded-bl-[50px]"
+                      />
                   </div>
               </div>
 
               {/* <!-- Center - Full width on mobile --> */}
               <div className="hero-container relative w-full md:w-[430px] flex-shrink-0">
                   {/* <!-- Base layer: Image --> */}
-                  <img className="hero-image w-full h-full md:w-[450px] md:h-[440px] md:rounded-tl-[100px] md:rounded-br-[100px] object-cover md:object-cover" src="./homepage/2_van.jpg" alt="Main Furniture" />
+                  <div className="relative w-full h-full md:w-[450px] md:h-[440px]">
+                    <Image
+                      src="/homepage/2_van.jpg"
+                      alt="Main Furniture" 
+                      fill
+                      style={{ objectFit: 'cover' }}
+                      className="hero-image md:rounded-tl-[100px] md:rounded-br-[100px]"
+                      priority
+                    />
+                  </div>
                   
                   {/* <!-- Middle layer: Dark overlay --> */}
                   <div className="hero-overlay absolute top-0 left-0 w-full md:h-[200px] opacity-50 bg-zinc-800 md:rounded-tl-[100px] z-10"></div>
@@ -286,8 +310,14 @@ export default function HomePage() {
 
               {/* <!-- Right Side - Hidden on mobile --> */}
               <div className="hidden md:flex md:flex-col space-y-2 w-[270px] flex-shrink-0">
-                  <div className="w-full h-[230px]">
-                      <img className="w-full h-full rounded-tr-[50px] rounded-bl-[50px] object-cover" src="./homepage/3_boy.jpg" alt="Furniture 2" />
+                  <div className="w-full h-[230px] relative">
+                      <Image
+                        src="/homepage/3_boy.jpg"
+                        alt="Furniture 2"
+                        fill
+                        style={{ objectFit: 'cover' }}
+                        className="rounded-tr-[50px] rounded-bl-[50px]"
+                      />
                   </div>
                   <div className="w-full h-[200px] bg-zinc-100 rounded-tr-[50px] rounded-bl-[50px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]">
                       <div className="px-8 py-8">
@@ -347,7 +377,14 @@ export default function HomePage() {
                       <div className="flex flex-wrap justify-evenly sm:justify-center gap-x-2 gap-y-2 md:gap-8">
                           {/* <!-- Card 1 --> */}
                           <div onClick={() => router.push('/search')} className="w-[150px] md:w-44 h-[175px] md:h-52 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-105 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-500 ease-in-out cursor-pointer group mb-1 md:mb-0">
-                              <img className="w-full h-[115px] md:h-36 object-cover" src="./homepage/1_table.png" alt="Apartment Dining Table" />
+                              <div className="relative w-full h-[115px] md:h-36">
+                                <Image
+                                  src="/homepage/1_table.png"
+                                  alt="Apartment Dining Table"
+                                  fill
+                                  style={{ objectFit: 'cover' }}
+                                />
+                              </div>
                               <div className="p-1 md:p-2">
                                   <div className="text-black text-xs md:text-sm font-normal font-['Poppins'] group-hover:text-lime-600 truncate">Apartment Dining Table</div>
                                   <div className="text-black text-xs md:text-sm font-medium font-['Poppins'] group-hover:text-lime-600">$ 90</div>
@@ -356,7 +393,14 @@ export default function HomePage() {
 
                           {/* <!-- Card 2 --> */}
                           <div onClick={() => router.push('/search')} className="w-[150px] md:w-44 h-[175px] md:h-52 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-105 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-500 ease-in-out cursor-pointer group mb-1 md:mb-0">
-                              <img className="w-full h-[115px] md:h-36 object-cover" src="./homepage/2_sofa.png" alt="Cognac Faux-Leather" />
+                              <div className="relative w-full h-[115px] md:h-36">
+                                <Image
+                                  src="/homepage/2_sofa.png"
+                                  alt="Cognac Faux-Leather"
+                                  fill
+                                  style={{ objectFit: 'cover' }}
+                                />
+                              </div>
                               <div className="p-1 md:p-2">
                                   <div className="text-black text-xs md:text-sm font-normal font-['Poppins'] group-hover:text-lime-600 truncate">COGNAC FAUX-LEATHER 4 SEATER</div>
                                   <div className="text-black text-xs md:text-sm font-medium font-['Poppins'] group-hover:text-lime-600">$ 399</div>
@@ -365,7 +409,14 @@ export default function HomePage() {
 
                           {/* <!-- Card 3 --> */}
                           <div onClick={() => router.push('/search')} className="w-[150px] md:w-44 h-[175px] md:h-52 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-105 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-500 ease-in-out cursor-pointer group mb-1 md:mb-0">
-                              <img className="w-full h-[115px] md:h-36 object-cover" src="./homepage/3_bed.png" alt="Single Bed & Matress" />
+                              <div className="relative w-full h-[115px] md:h-36">
+                                <Image
+                                  src="/homepage/3_bed.png"
+                                  alt="Single Bed & Matress"
+                                  fill
+                                  style={{ objectFit: 'cover' }}
+                                />
+                              </div>
                               <div className="p-1 md:p-2">
                                   <div className="text-black text-xs md:text-sm font-normal font-['Poppins'] group-hover:text-lime-600 truncate">Single Bed & Matress</div>
                                   <div className="text-black text-xs md:text-sm font-medium font-['Poppins'] group-hover:text-lime-600">$ 120</div>
@@ -374,7 +425,14 @@ export default function HomePage() {
 
                           {/* <!-- Card 4 (New) --> */}
                           <div onClick={() => router.push('/search')} className="w-[150px] md:w-44 h-[175px] md:h-52 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-105 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-500 ease-in-out cursor-pointer group mb-1 md:mb-0">
-                              <img className="w-full h-[115px] md:h-36 object-cover" src="./homepage/4_chair.png" alt="Modern Office Chair" />
+                              <div className="relative w-full h-[115px] md:h-36">
+                                <Image
+                                  src="/homepage/4_chair.png"
+                                  alt="Modern Office Chair"
+                                  fill
+                                  style={{ objectFit: 'cover' }}
+                                />
+                              </div>
                               <div className="p-1 md:p-2">
                                   <div className="text-black text-xs md:text-sm font-normal font-['Poppins'] group-hover:text-lime-600 truncate">Modern Office Chair</div>
                                   <div className="text-black text-xs md:text-sm font-medium font-['Poppins'] group-hover:text-lime-600">$ 150</div>
