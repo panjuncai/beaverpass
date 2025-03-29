@@ -76,16 +76,17 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
   try {
     setError(null);
     setIsLoading(true);
-
+    const queryParams = redirectTo ? { redirectTo } : undefined;
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-         redirectTo: redirectTo || '/posts',
+        redirectTo: `${window.location.origin}/auth/callback`,
+        queryParams, // 添加查询参数
       },
     });
   } catch (error) {
     console.error("Google login error:", error);
-    const errorMessage = error instanceof Error ? error.message : '使用Google登录时出错';
+    const errorMessage = error instanceof Error ? error.message : 'Error logging in with Google';
     setError(errorMessage);
     setIsLoading(false);
   }

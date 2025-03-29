@@ -9,7 +9,6 @@ import ImageUpload from "@/components/utils/image-upload";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { PostCategory, PostCondition, DeliveryType } from "@/lib/types/enum";
 
-import NoLogin from "@/components/utils/no-login";
 import { useAuthStore } from "@/lib/store/auth-store";
 
 // 枚举映射
@@ -46,7 +45,6 @@ export default function PostForm() {
   const [formError, setFormError] = useState<string | null>(null);
   const { uploadBase64Image } = useFileUpload();
   const { loginUser } = useAuthStore();
-  const isAuthenticated = !!loginUser;
 
   // 使用useForm进行表单管理和验证
   const {
@@ -782,13 +780,9 @@ E.g., Solid wood dining table with minor scratches on the top surface. Dimension
     </div>
   );
 
-  return isAuthenticated ? (
+  return  (
     <div className="flex flex-col h-full">
       <FormContent />
     </div>
-  ) : (
-    <div className="flex flex-col h-full justify-center">
-      <NoLogin />
-    </div>
-  );
+  ) 
 }
