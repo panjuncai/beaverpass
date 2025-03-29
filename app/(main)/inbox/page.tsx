@@ -28,9 +28,7 @@ export default function InboxPage() {
       </div>
     );
   }
-
   
-
   // 根据不同类型筛选聊天室
   const filterChatRooms = (type: string) => {
     if (!chatRoomsQuery.data) return [];
@@ -87,7 +85,7 @@ export default function InboxPage() {
           if (lastMessage?.content) {
             messagePreview = lastMessage.content;
           } else if (lastMessage?.post) {
-            messagePreview = lastMessage.post.title;
+            messagePreview = lastMessage.post.description;
           }
           
           // 未读数量 (这个功能需要后端支持)

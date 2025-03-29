@@ -7,6 +7,12 @@ import { usePathname, useRouter } from 'next/navigation'
 export default function Footer() {
   const pathname = usePathname()
   const router = useRouter()
+  
+  // 如果是聊天页面，不显示底部导航栏
+  if (pathname.startsWith('/chat')) {
+    return null;
+  }
+  
   const tabs = [
     { key: '/search', title: 'Search', icon: <SearchOutline /> },
     { key: '/post', title: 'Post', icon: <CameraOutline /> },
