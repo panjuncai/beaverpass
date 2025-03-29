@@ -240,7 +240,7 @@ export default function PostForm() {
   // 步骤内容组件
   const StepOne = () => (
     <>
-      <div className="flex justify-center mt-6 text-2xl text-primary font-bold">
+      <div className="flex justify-center mt-6 text-yellow-900 text-xl font-semibold font-['Poppins']">
         Step 1: Choose a Category
       </div>
       <div className="flex justify-center mt-4">
@@ -287,7 +287,7 @@ export default function PostForm() {
     
     return (
     <>
-      <div className="flex justify-center mt-6 text-2xl text-primary font-bold">
+      <div className="flex justify-center mt-6 text-yellow-900 text-xl font-semibold font-['Poppins']">
         Step 2: Describe Your Item
       </div>
       <div className="p-6">
@@ -414,7 +414,7 @@ E.g., Solid wood dining table with minor scratches on the top surface. Dimension
 
   const StepThree = () => (
     <>
-      <div className="flex justify-center mt-6 text-2xl text-primary font-bold">
+      <div className="flex justify-center mt-6 text-yellow-900 text-xl font-semibold font-['Poppins']">
         Step 3: Select Condition
       </div>
       <div className="flex justify-center mt-4">
@@ -451,7 +451,7 @@ E.g., Solid wood dining table with minor scratches on the top surface. Dimension
 
   const StepFour = () => (
     <>
-      <div className="flex justify-center mt-6 text-2xl text-primary font-bold">
+      <div className="flex justify-center mt-6 text-yellow-900 text-xl font-semibold font-['Poppins']">
         Step 4: Add Photos
       </div>
       <div className="flex justify-center mt-4">
@@ -491,7 +491,7 @@ E.g., Solid wood dining table with minor scratches on the top surface. Dimension
 
   const StepFive = () => (
     <>
-      <div className="flex justify-center mt-6 text-2xl text-primary font-bold">
+      <div className="flex justify-center mt-6 text-yellow-900 text-xl font-semibold font-['Poppins']">
         Step 5: Set Your Price
       </div>
       <div className="flex flex-col justify-center mt-4 p-8">
@@ -553,7 +553,7 @@ E.g., Solid wood dining table with minor scratches on the top surface. Dimension
 
   const StepSix = () => (
     <>
-      <div className="flex justify-center mt-6 text-2xl text-primary font-bold">
+      <div className="flex justify-center mt-6 text-yellow-900 text-xl font-semibold font-['Poppins']">
         Step 6: Choose Delivery Options
       </div>
       <div className="flex flex-col justify-center mt-4 p-8">
@@ -646,44 +646,55 @@ E.g., Solid wood dining table with minor scratches on the top surface. Dimension
   // 表单页面内容
   const FormContent = () => (
     <div>
-      {/* 使用antd-mobile的Steps组件 */}
-      <div className="flex justify-center">
-        <Steps current={currentStep} className="mt-4 w-full px-4" style={{
-            '--title-font-size': '17px',
-            '--description-font-size': '15px',
-            '--indicator-margin-right': '12px',
-            '--icon-size': '36px',
-            '--icon-color': '#65a30d',
-            '--title-color': '#65a30d',
-            '--active-title-color': '#65a30d',
-            '--active-color': '#65a30d',
-            '--active-line-color': '#65a30d',
-          } as React.CSSProperties}>
-          {[
-            { title: "Category" },
-            { title: "Describe" },
-            { title: "Condition" },
-            { title: "Photos" },
-            { title: "Price" },
-            { title: "Delivery" }
-          ].map((step, index) => (
-            <Step 
-              key={index} 
-              title={index+1} 
-              icon={index < currentStep ? <CheckCircleFill color="#65a30d" /> : index === currentStep ? <ClockCircleFill color="#65a30d" /> : <ClockCircleOutline />} 
-            />
+      {/* Step indicators */}
+      <div className="flex justify-center overflow-hidden mt-6 mb-4">
+        <div className="w-full px-4 flex items-center justify-between max-w-md relative">
+          {/* Connecting lines (behind the circles) */}
+          <div className="absolute top-4 left-10 right-10 h-[1px] bg-gray-300"></div>
+          <div className="absolute top-4 left-10 right-10 h-[1px] bg-lime-600" style={{ width: `${Math.min(100, (currentStep) * 20)}%` }}></div>
+          
+          {/* Step circles */}
+          {[1, 2, 3, 4, 5, 6].map((stepNum, index) => (
+            <div key={index} className="flex flex-col items-center z-10">
+              <div className="relative">
+                {/* Circle with border */}
+                <div className={`w-8 h-8 rounded-full border-2 ${index <= currentStep ? 'border-lime-600' : 'border-gray-400'} flex items-center justify-center bg-white relative`}>
+                  {/* Inner dot for current step */}
+                  {index === currentStep && (
+                    <div className="w-2.5 h-2.5 bg-lime-600 rounded-full"></div>
+                  )}
+                  {/* Checkmark for completed steps - green background with white checkmark */}
+                  {index < currentStep && (
+                    <div className="w-8 h-8 bg-lime-600 rounded-full flex items-center justify-center absolute inset-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  )}
+                  {/* Gray dot for unfinished steps */}
+                  {index > currentStep && (
+                    <div className="w-2.5 h-2.5 bg-gray-300 rounded-full"></div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Step number */}
+              <div className={`mt-2 text-sm ${index <= currentStep ? 'text-lime-600 font-medium' : 'text-gray-400'}`}>
+                {stepNum}
+              </div>
+            </div>
           ))}
-        </Steps>
+        </div>
       </div>
 
       {renderStepContent()}
 
       {/* 导航按钮 */}
       <div className="fixed bottom-16 left-0 right-0 flex justify-center mt-8">
-        <div className="flex items-center gap-6 w-full justify-center">
+        <div className="flex items-center gap-4 w-full max-w-md px-4 justify-center">
           <button
-            className={`btn btn-outline text-primary btn-xl w-1/3 rounded-full shadow-md ${
-              currentStep === 0 ? "hidden" : ""
+            className={`h-12 relative bg-white border-2 border-yellow-900 rounded-3xl text-center text-yellow-900 text-base font-semibold font-['Poppins'] transition-all duration-300 hover:bg-gray-100 shadow-md ${
+              currentStep === 0 ? "hidden" : "w-36 md:w-40"
             }`}
             onClick={handlePrevious}
             disabled={isSubmitting}
@@ -691,9 +702,9 @@ E.g., Solid wood dining table with minor scratches on the top surface. Dimension
             Previous
           </button>
           <button
-            className={`btn btn-primary btn-xl ${
-              currentStep === 0 ? "w-4/5" : "w-1/3"
-            } rounded-full shadow-md`}
+            className={`h-12 relative bg-yellow-900 rounded-3xl text-center text-white text-base font-semibold font-['Poppins'] transition-all duration-300 hover:bg-yellow-800 shadow-md ${
+              currentStep === 0 ? "w-64 md:w-80" : "w-36 md:w-40"
+            }`}
             onClick={currentStep === 5 ? handlePublish : handleNext}
             disabled={isSubmitting || createPostMutation.isLoading}
           >
