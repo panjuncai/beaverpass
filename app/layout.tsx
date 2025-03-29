@@ -27,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh" className="trancy-en">
+    <html lang="zh">
       <body className={`${inter.className} ${poppins.variable} container`}>
           <Providers>{children}</Providers>
       </body>
