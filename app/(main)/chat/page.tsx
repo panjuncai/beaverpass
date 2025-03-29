@@ -30,7 +30,11 @@ export default function ChatPage() {
   }, []);
 
   if (!loginUser) {
-    return <NoLogin />;
+    return (
+      <div className="flex flex-col h-full justify-center">
+        <NoLogin />
+      </div>
+    );
   }
 
   return (

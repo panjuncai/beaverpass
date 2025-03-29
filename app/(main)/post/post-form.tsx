@@ -10,7 +10,7 @@ import { useFileUpload } from "@/hooks/useFileUpload";
 import { PostCategory, PostCondition, DeliveryType } from "@/lib/types/enum";
 
 import NoLogin from "@/components/utils/no-login";
-import { useAuthStore } from "@/lib/store/auth-store"
+import { useAuthStore } from "@/lib/store/auth-store";
 
 // 枚举映射
 const CATEGORY_OPTIONS = [
@@ -32,7 +32,10 @@ const CONDITION_OPTIONS = [
 ];
 
 const DELIVERY_OPTIONS = [
-  { value: DeliveryType.HOME_DELIVERY, label: "Home Delivery (via third-party service)" },
+  {
+    value: DeliveryType.HOME_DELIVERY,
+    label: "Home Delivery (via third-party service)",
+  },
   { value: DeliveryType.PICKUP, label: "Pickup by Buyer" },
   { value: DeliveryType.BOTH, label: "Both Options" },
 ];
@@ -79,21 +82,29 @@ export default function PostForm() {
   // 处理图片上传
   const handleImageUpload = async (viewType: string, base64String: string) => {
     try {
-      const fileName = `post_${loginUser?.id || new Date().getTime()}_${viewType}.jpg`;
+      const fileName = `post_${
+        loginUser?.id || new Date().getTime()
+      }_${viewType}.jpg`;
       const imageUrl = await uploadBase64Image(base64String, fileName);
-      
+
       // 更新images数组
       const currentImages = getValues("images");
-      const filteredImages = currentImages.filter(img => img.imageType !== viewType);
+      const filteredImages = currentImages.filter(
+        (img) => img.imageType !== viewType
+      );
 
-      setValue("images", [
-        ...filteredImages,
-        {
-          imageUrl,
-          imageType: viewType,
-        }
-      ], { shouldValidate: false });
-      
+      setValue(
+        "images",
+        [
+          ...filteredImages,
+          {
+            imageUrl,
+            imageType: viewType,
+          },
+        ],
+        { shouldValidate: false }
+      );
+
       setFormError(null);
     } catch (error) {
       console.error("Error uploading image to S3:", error);
@@ -113,7 +124,7 @@ export default function PostForm() {
   const formatPrice = (value: string) => {
     // 移除非数字和小数点
     let formattedValue = value.replace(/[^\d.]/g, "");
-    
+
     // 确保只有一个小数点
     const parts = formattedValue.split(".");
     if (parts.length > 2) {
@@ -134,15 +145,15 @@ export default function PostForm() {
   };
 
   // 处理价格变更
-  const handlePriceChange = (updates: { 
-    amount?: string; 
+  const handlePriceChange = (updates: {
+    amount?: string;
     isNegotiable?: boolean;
   }) => {
     if (updates.amount !== undefined) {
       const amount = updates.amount === "" ? 0 : parseFloat(updates.amount);
       setValue("amount", amount);
     }
-    
+
     if (updates.isNegotiable !== undefined) {
       setValue("isNegotiable", updates.isNegotiable);
     }
@@ -164,7 +175,7 @@ export default function PostForm() {
     try {
       // 检查是否有图片上传
       if (data.images.length === 0) {
-        setFormError('At least one image is required');
+        setFormError("At least one image is required");
         setCurrentStep(3); // 返回到图片上传步骤
         return;
       }
@@ -173,7 +184,7 @@ export default function PostForm() {
       console.log("Submitting data:", data);
       await createPostMutation.mutateAsync(data);
     } catch (error) {
-      console.error('Error in onSubmit:', error);
+      console.error("Error in onSubmit:", error);
       // 让错误在 mutation 的 onError 中处理
     }
   };
@@ -184,7 +195,7 @@ export default function PostForm() {
     if (isValid) {
       const data = getValues(); // 获取所有表单数据
       await onSubmit(data);
-    }else{
+    } else {
       setFormError("Please check the form for errors");
     }
   };
@@ -204,7 +215,7 @@ export default function PostForm() {
         isValid = await trigger("condition");
         break;
       case 3: // 图片
-        isValid = images.some(img => img.imageType === "FRONT");
+        isValid = images.some((img) => img.imageType === "FRONT");
         if (!isValid) {
           setFormError("Front image is required");
         }
@@ -254,8 +265,14 @@ export default function PostForm() {
                   className={category === option.value ? "bg-[#7EAC2D]" : ""}
                 >
                   <a
-                    className={category === option.value ? "text-white !important" : "nav-link"}
-                    style={category === option.value ? { color: 'white' } : undefined}
+                    className={
+                      category === option.value
+                        ? "text-white !important"
+                        : "nav-link"
+                    }
+                    style={
+                      category === option.value ? { color: "white" } : undefined
+                    }
                     onClick={() => setValue("category", option.value)}
                   >
                     {option.label}
@@ -275,137 +292,139 @@ export default function PostForm() {
   const StepTwo = () => {
     const description = getValues("description") || "";
     const [charCount, setCharCount] = useState(description.length);
-    
-    const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+
+    const handleDescriptionChange = (
+      e: React.ChangeEvent<HTMLTextAreaElement>
+    ) => {
       const value = e.target.value;
       setValue("description", value);
       setCharCount(value.length);
     };
-    
+
     return (
-    <>
-      <div className="flex justify-center mt-6 text-yellow-900 text-xl font-semibold font-['Poppins']">
-        Step 2: Describe Your Item
-      </div>
-      <div className="p-6">
-        <div className="flex justify-center mt-4">
-          <label className="input input-bordered flex items-center gap-2 w-full">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 256 256"
-              className="w-2 h-2"
-            >
-              <rect width="256" height="256" fill="none" />
-              <line
-                x1="128"
-                y1="40"
-                x2="128"
-                y2="216"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="16"
-              />
-              <line
-                x1="48"
-                y1="80"
-                x2="208"
-                y2="176"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="16"
-              />
-              <line
-                x1="48"
-                y1="176"
-                x2="208"
-                y2="80"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="16"
-              />
-            </svg>
-            <input
-              type="text"
-              className="grow"
-              placeholder="Title"
-              {...register("title")}
-            />
-          </label>
+      <>
+        <div className="flex justify-center mt-6 text-yellow-900 text-xl font-semibold font-['Poppins']">
+          Step 2: Describe Your Item
         </div>
-        {errors.title && (
-          <div className="text-error text-sm mt-2">{errors.title.message}</div>
-        )}
-        <div className="flex flex-col items-center mt-4">
-          <label className="input input-bordered flex items-start gap-2 w-full h-48">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 256 256"
-              className="w-2 h-2 mt-4"
-            >
-              <rect width="256" height="256" fill="none" />
-              <line
-                x1="128"
-                y1="40"
-                x2="128"
-                y2="216"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="16"
+        <div className="p-6">
+          <div className="flex justify-center mt-4">
+            <label className="input input-bordered flex items-center gap-2 w-full">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 256 256"
+                className="w-2 h-2"
+              >
+                <rect width="256" height="256" fill="none" />
+                <line
+                  x1="128"
+                  y1="40"
+                  x2="128"
+                  y2="216"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="16"
+                />
+                <line
+                  x1="48"
+                  y1="80"
+                  x2="208"
+                  y2="176"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="16"
+                />
+                <line
+                  x1="48"
+                  y1="176"
+                  x2="208"
+                  y2="80"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="16"
+                />
+              </svg>
+              <input
+                type="text"
+                className="grow"
+                placeholder="Title"
+                {...register("title")}
               />
-              <line
-                x1="48"
-                y1="80"
-                x2="208"
-                y2="176"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="16"
-              />
-              <line
-                x1="48"
-                y1="176"
-                x2="208"
-                y2="80"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="16"
-              />
-            </svg>
-            <textarea
-              className="grow h-full resize-none bg-transparent border-none outline-none pt-1"
-              placeholder={`Description
+            </label>
+          </div>
+          {errors.title && (
+            <div className="text-error text-sm mt-2">
+              {errors.title.message}
+            </div>
+          )}
+          <div className="flex flex-col items-center mt-4">
+            <label className="input input-bordered flex items-start gap-2 w-full h-48">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 256 256"
+                className="w-2 h-2 mt-4"
+              >
+                <rect width="256" height="256" fill="none" />
+                <line
+                  x1="128"
+                  y1="40"
+                  x2="128"
+                  y2="216"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="16"
+                />
+                <line
+                  x1="48"
+                  y1="80"
+                  x2="208"
+                  y2="176"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="16"
+                />
+                <line
+                  x1="48"
+                  y1="176"
+                  x2="208"
+                  y2="80"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="16"
+                />
+              </svg>
+              <textarea
+                className="grow h-full resize-none bg-transparent border-none outline-none pt-1"
+                placeholder={`Description
 E.g., Solid wood dining table with minor scratches on the top surface. Dimensions: 120cm x 80cm.
               `}
-              maxLength={500}
-              defaultValue={getValues("description")}
-              onChange={handleDescriptionChange}
-            ></textarea>
-          </label>
-          <div className="flex w-full mt-2">
-            <span className="label-text-alt">
-              {charCount}/500 characters
-            </span>
+                maxLength={500}
+                defaultValue={getValues("description")}
+                onChange={handleDescriptionChange}
+              ></textarea>
+            </label>
+            <div className="flex w-full mt-2">
+              <span className="label-text-alt">{charCount}/500 characters</span>
+            </div>
           </div>
+          {errors.description && (
+            <div className="text-error text-sm mt-2">
+              {errors.description.message}
+            </div>
+          )}
         </div>
-        {errors.description && (
-          <div className="text-error text-sm mt-2">
-            {errors.description.message}
-          </div>
-        )}
-      </div>
-    </>
+      </>
     );
   };
 
@@ -428,8 +447,14 @@ E.g., Solid wood dining table with minor scratches on the top surface. Dimension
                   className={condition === option.value ? "bg-[#7EAC2D]" : ""}
                 >
                   <a
-                    className={condition === option.value ? "text-white" : "nav-link"}
-                    style={condition === option.value ? { color: 'white' } : undefined}
+                    className={
+                      condition === option.value ? "text-white" : "nav-link"
+                    }
+                    style={
+                      condition === option.value
+                        ? { color: "white" }
+                        : undefined
+                    }
                     onClick={() => setValue("condition", option.value)}
                   >
                     {option.label}
@@ -441,7 +466,9 @@ E.g., Solid wood dining table with minor scratches on the top surface. Dimension
         </div>
       </div>
       {errors.condition && (
-        <div className="text-error text-sm mt-2">{errors.condition.message}</div>
+        <div className="text-error text-sm mt-2">
+          {errors.condition.message}
+        </div>
       )}
     </>
   );
@@ -455,26 +482,31 @@ E.g., Solid wood dining table with minor scratches on the top surface. Dimension
         <div className="pl-12 space-y-6 w-full">
           <ImageUpload
             viewType="FRONT"
-            imageUrl={images.find(img => img.imageType === "FRONT")?.imageUrl}
+            imageUrl={images.find((img) => img.imageType === "FRONT")?.imageUrl}
             onImageUpload={handleImageUpload}
             onImageDelete={handleImageDelete}
-            showError={!images.some(img => img.imageType === "FRONT") && formError?.includes("Front image")}
+            showError={
+              !images.some((img) => img.imageType === "FRONT") &&
+              formError?.includes("Front image")
+            }
           />
           <ImageUpload
             viewType="SIDE"
-            imageUrl={images.find(img => img.imageType === "SIDE")?.imageUrl}
+            imageUrl={images.find((img) => img.imageType === "SIDE")?.imageUrl}
             onImageUpload={handleImageUpload}
             onImageDelete={handleImageDelete}
           />
           <ImageUpload
             viewType="BACK"
-            imageUrl={images.find(img => img.imageType === "BACK")?.imageUrl}
+            imageUrl={images.find((img) => img.imageType === "BACK")?.imageUrl}
             onImageUpload={handleImageUpload}
             onImageDelete={handleImageDelete}
           />
           <ImageUpload
             viewType="DAMAGE"
-            imageUrl={images.find(img => img.imageType === "DAMAGE")?.imageUrl}
+            imageUrl={
+              images.find((img) => img.imageType === "DAMAGE")?.imageUrl
+            }
             onImageUpload={handleImageUpload}
             onImageDelete={handleImageDelete}
           />
@@ -516,7 +548,9 @@ E.g., Solid wood dining table with minor scratches on the top surface. Dimension
             </div>
           </label>
           {errors.amount && (
-            <div className="text-error text-sm mt-2">{errors.amount.message}</div>
+            <div className="text-error text-sm mt-2">
+              {errors.amount.message}
+            </div>
           )}
         </div>
         <div className="form-control">
@@ -538,7 +572,9 @@ E.g., Solid wood dining table with minor scratches on the top surface. Dimension
               type="checkbox"
               className="checkbox"
               checked={isNegotiable}
-              onChange={(e) => handlePriceChange({ isNegotiable: e.target.checked })}
+              onChange={(e) =>
+                handlePriceChange({ isNegotiable: e.target.checked })
+              }
               disabled={isFree}
             />
             <span className="label-text text-lg">Price is negotiable</span>
@@ -554,7 +590,7 @@ E.g., Solid wood dining table with minor scratches on the top surface. Dimension
         Step 6: Choose Delivery Options
       </div>
       <div className="flex flex-col justify-center mt-4 p-8">
-        {DELIVERY_OPTIONS.map(option => (
+        {DELIVERY_OPTIONS.map((option) => (
           <div className="form-control" key={option.value}>
             <label className="label cursor-pointer justify-start gap-6">
               <input
@@ -614,7 +650,9 @@ E.g., Solid wood dining table with minor scratches on the top surface. Dimension
           </span>
         </div>
         {errors.deliveryType && (
-          <div className="text-error text-sm mt-2">{errors.deliveryType.message}</div>
+          <div className="text-error text-sm mt-2">
+            {errors.deliveryType.message}
+          </div>
         )}
       </div>
     </>
@@ -648,14 +686,21 @@ E.g., Solid wood dining table with minor scratches on the top surface. Dimension
         <div className="w-full px-4 flex items-center justify-between max-w-md relative">
           {/* Connecting lines (behind the circles) */}
           <div className="absolute top-4 left-10 right-10 h-[1px] bg-gray-300"></div>
-          <div className="absolute top-4 left-10 right-10 h-[1px] bg-lime-600" style={{ width: `${Math.min(100, (currentStep) * 20)}%` }}></div>
-          
+          <div
+            className="absolute top-4 left-10 right-10 h-[1px] bg-lime-600"
+            style={{ width: `${Math.min(100, currentStep * 20)}%` }}
+          ></div>
+
           {/* Step circles */}
           {[1, 2, 3, 4, 5, 6].map((stepNum, index) => (
             <div key={index} className="flex flex-col items-center z-10">
               <div className="relative">
                 {/* Circle with border */}
-                <div className={`w-8 h-8 rounded-full border-2 ${index <= currentStep ? 'border-lime-600' : 'border-gray-400'} flex items-center justify-center bg-white relative`}>
+                <div
+                  className={`w-8 h-8 rounded-full border-2 ${
+                    index <= currentStep ? "border-lime-600" : "border-gray-400"
+                  } flex items-center justify-center bg-white relative`}
+                >
                   {/* Inner dot for current step */}
                   {index === currentStep && (
                     <div className="w-2.5 h-2.5 bg-lime-600 rounded-full"></div>
@@ -663,8 +708,19 @@ E.g., Solid wood dining table with minor scratches on the top surface. Dimension
                   {/* Checkmark for completed steps - green background with white checkmark */}
                   {index < currentStep && (
                     <div className="w-8 h-8 bg-lime-600 rounded-full flex items-center justify-center absolute inset-0">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="w-4 h-4 text-white"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
                     </div>
                   )}
@@ -674,9 +730,15 @@ E.g., Solid wood dining table with minor scratches on the top surface. Dimension
                   )}
                 </div>
               </div>
-              
+
               {/* Step number */}
-              <div className={`mt-2 text-sm ${index <= currentStep ? 'text-lime-600 font-medium' : 'text-gray-400'}`}>
+              <div
+                className={`mt-2 text-sm ${
+                  index <= currentStep
+                    ? "text-lime-600 font-medium"
+                    : "text-gray-400"
+                }`}
+              >
                 {stepNum}
               </div>
             </div>
@@ -720,17 +782,13 @@ E.g., Solid wood dining table with minor scratches on the top surface. Dimension
     </div>
   );
 
-  // 登录卡片
-  const LoginContent = () => (
+  return isAuthenticated ? (
+    <div className="flex flex-col h-full">
+      <FormContent />
+    </div>
+  ) : (
     <div className="flex flex-col h-full justify-center">
       <NoLogin />
     </div>
   );
-
-  return (
-    <div className="flex flex-col h-full">
-      {isAuthenticated ? <FormContent /> : <LoginContent />}
-    </div>
-  );
-};
-
+}

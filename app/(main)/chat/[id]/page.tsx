@@ -91,7 +91,11 @@ export default function ChatRoomPage({ params }: PageProps) {
   };
 
   if (!loginUser) {
-    return <NoLogin />;
+    return (
+      <div className="flex flex-col h-full justify-center">
+        <NoLogin />
+      </div>
+    );
   }
 
   // 找到对方用户（非当前用户）

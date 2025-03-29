@@ -22,7 +22,11 @@ export default function InboxPage() {
   );
 
   if (!loginUser) {
-    return <NoLogin />;
+    return (
+      <div className="flex flex-col h-full justify-center">
+        <NoLogin />
+      </div>
+    );
   }
 
   
