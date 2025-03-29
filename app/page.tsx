@@ -258,7 +258,7 @@ export default function HomePage() {
                               <a href="#" className="mobile-hero-button w-full flex items-center justify-between px-4 py-3 rounded-lg bg-white bg-opacity-90 shadow-md transition-all duration-300 hover:bg-lime-50 hover:translate-y-[-2px] hover:shadow-lg" onClick={() => router.push('/search')}>
                                   <span className="text-zinc-800 text-lg font-medium font-['Poppins']">Buy furniture</span>
                                   <div className="bg-amber-800 rounded-full p-2">
-                                      <svg className="h-5 w-5 text-white" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                      <svg className="h-5 w-5 text-white" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
                                           <path stroke="none" d="M0 0h24v24H0z" />
                                           <line x1="5" y1="12" x2="19" y2="12" />
                                           <line x1="13" y1="18" x2="19" y2="12" />
@@ -271,7 +271,7 @@ export default function HomePage() {
                               <a href="#" className="mobile-hero-button w-full flex items-center justify-between px-4 py-3 rounded-lg bg-white bg-opacity-90 shadow-md transition-all duration-300 hover:bg-lime-50 hover:translate-y-[-2px] hover:shadow-lg" onClick={() => router.push('/post')}>
                                   <span className="text-zinc-800 text-lg font-medium font-['Poppins']">Sell furniture</span>
                                   <div className="bg-amber-800 rounded-full p-2">
-                                      <svg className="h-5 w-5 text-white" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                      <svg className="h-5 w-5 text-white" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
                                           <path stroke="none" d="M0 0h24v24H0z" />
                                           <line x1="5" y1="12" x2="19" y2="12" />
                                           <line x1="13" y1="18" x2="19" y2="12" />
