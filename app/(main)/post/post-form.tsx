@@ -1,227 +1,727 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import { CreatePostInput, createPostSchema } from "@/lib/validations/post";
-import ImageUpload from "../../../components/utils/image-upload";
+import ImageUpload from "@/components/utils/image-upload";
 import { useFileUpload } from "@/hooks/useFileUpload";
+import { PostCategory, PostCondition, DeliveryType } from "@/lib/types/enum";
+import { Steps } from "antd-mobile";
+import NoLogin from "@/components/utils/no-login";
+import { useAuthStore } from "@/lib/store/auth-store"
+import { CheckCircleFill, ClockCircleFill, ClockCircleOutline } from "antd-mobile-icons";
 
-export const CreatePostForm = () => {
+const { Step } = Steps;
+
+// 枚举映射
+const CATEGORY_OPTIONS = [
+  { value: PostCategory.LIVING_ROOM_FURNITURE, label: "Living Room Furniture" },
+  { value: PostCategory.BEDROOM_FURNITURE, label: "Bedroom Furniture" },
+  { value: PostCategory.DINING_ROOM_FURNITURE, label: "Dining Room Furniture" },
+  { value: PostCategory.OFFICE_FURNITURE, label: "Office Furniture" },
+  { value: PostCategory.OUTDOOR_FURNITURE, label: "Outdoor Furniture" },
+  { value: PostCategory.STORAGE, label: "Storage" },
+  { value: PostCategory.OTHER, label: "Other" },
+];
+
+const CONDITION_OPTIONS = [
+  { value: PostCondition.LIKE_NEW, label: "Like New" },
+  { value: PostCondition.GENTLY_USED, label: "Gently Used" },
+  { value: PostCondition.MINOR_SCRATCHES, label: "Minor Scratches" },
+  { value: PostCondition.STAINS, label: "Stains" },
+  { value: PostCondition.NEEDS_REPAIR, label: "Needs Repair" },
+];
+
+const DELIVERY_OPTIONS = [
+  { value: DeliveryType.HOME_DELIVERY, label: "Home Delivery (via third-party service)" },
+  { value: DeliveryType.PICKUP, label: "Pickup by Buyer" },
+  { value: DeliveryType.BOTH, label: "Both Options" },
+];
+
+export default function PostForm() {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [formError, setFormError] = useState<string | null>(null);
   const { uploadBase64Image } = useFileUpload();
+  const { loginUser } = useAuthStore();
+  const isAuthenticated = !!loginUser;
 
+  // 使用useForm进行表单管理和验证
   const {
     register,
     handleSubmit,
     setValue,
     watch,
-    formState: { errors },
+    formState: { errors, isSubmitting },
+    getValues,
+    trigger,
   } = useForm<CreatePostInput>({
     resolver: zodResolver(createPostSchema),
     defaultValues: {
-      category: "",
+      category: PostCategory.LIVING_ROOM_FURNITURE,
       title: "",
       description: "",
-      condition: "",
+      condition: PostCondition.LIKE_NEW,
       amount: 0,
       isNegotiable: false,
-      deliveryType: "",
+      deliveryType: DeliveryType.HOME_DELIVERY,
       images: [],
     },
   });
 
-  // 监听 images 字段的变化
+  // 监听表单字段
   const images = watch("images");
+  const isFree = watch("amount") === 0;
+  const category = watch("category");
+  const condition = watch("condition");
+  const deliveryType = watch("deliveryType");
+  const isNegotiable = watch("isNegotiable");
 
   // 处理图片上传
   const handleImageUpload = async (viewType: string, base64String: string) => {
     try {
-      const fileName = `post_${new Date().getTime()}_${viewType}.jpg`;
+      const fileName = `post_${loginUser?.id || new Date().getTime()}_${viewType}.jpg`;
       const imageUrl = await uploadBase64Image(base64String, fileName);
       
-      // 使用 setValue 更新 images 数组，但不触发验证
+      // 更新images数组
+      const currentImages = getValues("images");
+      const filteredImages = currentImages.filter(img => img.imageType !== viewType);
+
       setValue("images", [
-        ...images,
+        ...filteredImages,
         {
           imageUrl,
           imageType: viewType,
         }
-      ], { shouldValidate: false });  // 改为 false，不立即触发验证
+      ], { shouldValidate: false });
       
-      // 清除可能存在的错误信息
-      setError(null);
-      
+      setFormError(null);
     } catch (error) {
       console.error("Error uploading image to S3:", error);
-      setError("Failed to upload image");
+      setFormError("Failed to upload image");
     }
   };
 
   const handleImageDelete = (viewType: string) => {
-    // 使用 setValue 删除指定类型的图片，但不触发验证
     setValue(
       "images",
       images.filter((img) => img.imageType !== viewType),
-      { shouldValidate: false }  // 改为 false，不立即触发验证
+      { shouldValidate: false }
     );
   };
 
-  // 处理表单提交
-  const createPostMutation = trpc.post.createPost.useMutation({
-    onSuccess: (data) => {
-      console.log("Post created:", data);
-      router.push("/search");
-    },
-    onError: (error) => {
-      setError(error.message);
-      setIsLoading(false);
-    },
-  });
-
-  const onSubmit = async (data: CreatePostInput) => {
-    console.log('onSubmit called with data:', data);
+  // 格式化价格
+  const formatPrice = (value: string) => {
+    // 移除非数字和小数点
+    let formattedValue = value.replace(/[^\d.]/g, "");
     
-    if (data.images.length === 0) {
-      setError('At least one image is required');
-      return;
+    // 确保只有一个小数点
+    const parts = formattedValue.split(".");
+    if (parts.length > 2) {
+      formattedValue = parts[0] + "." + parts.slice(1).join("");
     }
 
-    setIsLoading(true);
-    setError(null);
+    // 如果是以小数点开始，添加前导零
+    if (formattedValue.startsWith(".")) {
+      formattedValue = "0" + formattedValue;
+    }
 
-    try {
-      await createPostMutation.mutateAsync(data);
-    } catch (error) {
-      console.error('Error in onSubmit:', error);
-      setIsLoading(false);
+    // 限制小数位数为两位
+    if (parts.length > 1 && parts[1].length > 2) {
+      formattedValue = parts[0] + "." + parts[1].slice(0, 2);
+    }
+
+    return formattedValue;
+  };
+
+  // 处理价格变更
+  const handlePriceChange = (updates: { 
+    amount?: string; 
+    isNegotiable?: boolean;
+  }) => {
+    if (updates.amount !== undefined) {
+      const amount = updates.amount === "" ? 0 : parseFloat(updates.amount);
+      setValue("amount", amount);
+    }
+    
+    if (updates.isNegotiable !== undefined) {
+      setValue("isNegotiable", updates.isNegotiable);
     }
   };
 
-  return (
-    <div className="container px-4 py-8 mx-auto">
-      {/* {Object.values(errors).length > 0 && (
-        <div className="p-3 text-sm text-red-500 bg-red-100 rounded-md">
-          {Object.values(errors).map((error) => (
-            <p key={error.message}>{error.message}</p>
-          ))}
-        </div>
-      )} */}
-      {error && (
-        <div className="p-3 text-sm text-red-500 bg-red-100 rounded-md">
-          {error}
-        </div>
-      )}
-      <form 
-        onSubmit={handleSubmit(onSubmit)} 
-        className="space-y-4"
-      >
-        <input
-          id="category"
-          placeholder="Category"
-          required
-          {...register("category")}
-          className="border p-2 w-full"
-        />
-        {errors.category && (
-          <p className="mt-1 text-sm text-red-500">{errors.category.message}</p>
-        )}
-        <input
-          id="title"
-          placeholder="Title"
-          required
-          {...register("title")}
-          className="border p-2 w-full"
-        />
-        {errors.title && (
-          <p className="mt-1 text-sm text-red-500">{errors.title.message}</p>
-        )}
-        <textarea
-          id="description"
-          placeholder="Description (max 500 chars)"
-          required
-          {...register("description")}
-          maxLength={500}
-          className="border p-2 w-full"
-        />
-        {errors.description && (
-          <p className="mt-1 text-sm text-red-500">
-            {errors.description.message}
-          </p>
-        )}
-        <input
-          id="condition"
-          placeholder="Condition"
-          required
-          {...register("condition")}
-          className="border p-2 w-full"
-        />
-        {errors.condition && (
-          <p className="mt-1 text-sm text-red-500">
-            {errors.condition.message}
-          </p>
-        )}
-        <input
-          id="amount"
-          type="number"
-          placeholder="Amount"
-          required
-          min={0}
-          step={0.01}
-          {...register("amount")}
-          className="border p-2 w-full"
-        />
-        {errors.amount && (
-          <p className="mt-1 text-sm text-red-500">{errors.amount.message}</p>
-        )}
-        <label className="flex items-center gap-2">
-          <input
-            id="isNegotiable"
-            type="checkbox"
-            {...register("isNegotiable")}
-          />
-          Negotiable
-        </label>
-        {errors.isNegotiable && (
-          <p className="mt-1 text-sm text-red-500">
-            {errors.isNegotiable.message}
-          </p>
-        )}
-        <input
-          id="deliveryType"
-          placeholder="Delivery Type"
-          required
-          {...register("deliveryType")}
-          className="border p-2 w-full"
-        />
+  // 创建帖子的TRPC mutation
+  const createPostMutation = trpc.post.createPost.useMutation({
+    onSuccess: () => {
+      router.push("/search");
+    },
+    onError: (error) => {
+      console.error("Error creating post:", error);
+      setFormError(error.message);
+    },
+  });
 
-        <div className="w-full">
+  // 表单提交
+  const onSubmit = async (data: CreatePostInput) => {
+    try {
+      // 检查是否有图片上传
+      if (data.images.length === 0) {
+        setFormError('At least one image is required');
+        setCurrentStep(3); // 返回到图片上传步骤
+        return;
+      }
+
+      setFormError(null);
+      console.log("Submitting data:", data);
+      await createPostMutation.mutateAsync(data);
+    } catch (error) {
+      console.error('Error in onSubmit:', error);
+      // 让错误在 mutation 的 onError 中处理
+    }
+  };
+
+  // 在最后一步点击发布按钮的处理
+  const handlePublish = async () => {
+    const isValid = await trigger(); // 触发所有字段的验证
+    if (isValid) {
+      const data = getValues(); // 获取所有表单数据
+      await onSubmit(data);
+    }else{
+      setFormError("Please check the form for errors");
+    }
+  };
+
+  // 步骤验证和导航
+  const handleNext = async () => {
+    let isValid = false;
+
+    switch (currentStep) {
+      case 0: // 分类
+        isValid = await trigger("category");
+        break;
+      case 1: // 描述
+        isValid = await trigger(["title", "description"]);
+        break;
+      case 2: // 条件
+        isValid = await trigger("condition");
+        break;
+      case 3: // 图片
+        isValid = images.some(img => img.imageType === "FRONT");
+        if (!isValid) {
+          setFormError("Front image is required");
+        }
+        break;
+      case 4: // 价格
+        isValid = await trigger("amount");
+        break;
+      case 5: // 配送选项
+        isValid = await trigger("deliveryType");
+        break;
+      default:
+        isValid = true;
+    }
+
+    if (isValid) {
+      if (currentStep < 5) {
+        setCurrentStep(currentStep + 1);
+      } else {
+        void handleSubmit(onSubmit)();
+      }
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  // 步骤内容组件
+  const StepOne = () => (
+    <>
+      <div className="flex justify-center mt-6 text-2xl text-primary font-bold">
+        Step 1: Choose a Category
+      </div>
+      <div className="flex justify-center mt-4">
+        <div className="collapse collapse-arrow border border-base-300 bg-base-100 rounded-box w-64">
+          <input type="checkbox" defaultChecked />
+          <div className="collapse-title text-xl font-semibold flex items-center justify-between text-gray-400">
+            Category
+          </div>
+          <div className="collapse-content p-0">
+            <ul className="menu bg-base-100 w-full text-lg">
+              {CATEGORY_OPTIONS.map((option) => (
+                <li
+                  key={option.value}
+                  className={category === option.value ? "bg-[#7EAC2D]" : ""}
+                >
+                  <a
+                    className={category === option.value ? "text-white !important" : "nav-link"}
+                    style={category === option.value ? { color: 'white' } : undefined}
+                    onClick={() => setValue("category", option.value)}
+                  >
+                    {option.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+      {errors.category && (
+        <div className="text-error text-sm mt-2">{errors.category.message}</div>
+      )}
+    </>
+  );
+
+  const StepTwo = () => {
+    const description = getValues("description") || "";
+    const [charCount, setCharCount] = useState(description.length);
+    
+    const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const value = e.target.value;
+      setValue("description", value);
+      setCharCount(value.length);
+    };
+    
+    return (
+    <>
+      <div className="flex justify-center mt-6 text-2xl text-primary font-bold">
+        Step 2: Describe Your Item
+      </div>
+      <div className="p-6">
+        <div className="flex justify-center mt-4">
+          <label className="input input-bordered flex items-center gap-2 w-full">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 256 256"
+              className="w-2 h-2"
+            >
+              <rect width="256" height="256" fill="none" />
+              <line
+                x1="128"
+                y1="40"
+                x2="128"
+                y2="216"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="16"
+              />
+              <line
+                x1="48"
+                y1="80"
+                x2="208"
+                y2="176"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="16"
+              />
+              <line
+                x1="48"
+                y1="176"
+                x2="208"
+                y2="80"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="16"
+              />
+            </svg>
+            <input
+              type="text"
+              className="grow"
+              placeholder="Title"
+              {...register("title")}
+            />
+          </label>
+        </div>
+        {errors.title && (
+          <div className="text-error text-sm mt-2">{errors.title.message}</div>
+        )}
+        <div className="flex flex-col items-center mt-4">
+          <label className="input input-bordered flex items-start gap-2 w-full h-48">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 256 256"
+              className="w-2 h-2 mt-4"
+            >
+              <rect width="256" height="256" fill="none" />
+              <line
+                x1="128"
+                y1="40"
+                x2="128"
+                y2="216"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="16"
+              />
+              <line
+                x1="48"
+                y1="80"
+                x2="208"
+                y2="176"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="16"
+              />
+              <line
+                x1="48"
+                y1="176"
+                x2="208"
+                y2="80"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="16"
+              />
+            </svg>
+            <textarea
+              className="grow h-full resize-none bg-transparent border-none outline-none pt-1"
+              placeholder={`Description
+E.g., Solid wood dining table with minor scratches on the top surface. Dimensions: 120cm x 80cm.
+              `}
+              maxLength={500}
+              defaultValue={getValues("description")}
+              onChange={handleDescriptionChange}
+            ></textarea>
+          </label>
+          <div className="flex w-full mt-2">
+            <span className="label-text-alt">
+              {charCount}/500 characters
+            </span>
+          </div>
+        </div>
+        {errors.description && (
+          <div className="text-error text-sm mt-2">
+            {errors.description.message}
+          </div>
+        )}
+      </div>
+    </>
+    );
+  };
+
+  const StepThree = () => (
+    <>
+      <div className="flex justify-center mt-6 text-2xl text-primary font-bold">
+        Step 3: Select Condition
+      </div>
+      <div className="flex justify-center mt-4">
+        <div className="collapse collapse-arrow border border-base-300 bg-base-100 rounded-box w-64">
+          <input type="checkbox" defaultChecked />
+          <div className="collapse-title text-xl font-semibold flex items-center justify-between text-gray-400">
+            Item Condition
+          </div>
+          <div className="collapse-content p-0">
+            <ul className="menu bg-base-100 w-full text-lg">
+              {CONDITION_OPTIONS.map((option) => (
+                <li
+                  key={option.value}
+                  className={condition === option.value ? "bg-[#7EAC2D]" : ""}
+                >
+                  <a
+                    className={condition === option.value ? "text-white" : "nav-link"}
+                    style={condition === option.value ? { color: 'white' } : undefined}
+                    onClick={() => setValue("condition", option.value)}
+                  >
+                    {option.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+      {errors.condition && (
+        <div className="text-error text-sm mt-2">{errors.condition.message}</div>
+      )}
+    </>
+  );
+
+  const StepFour = () => (
+    <>
+      <div className="flex justify-center mt-6 text-2xl text-primary font-bold">
+        Step 4: Add Photos
+      </div>
+      <div className="flex justify-center mt-4">
+        <div className="pl-12 space-y-6 w-full">
           <ImageUpload
             viewType="FRONT"
             imageUrl={images.find(img => img.imageType === "FRONT")?.imageUrl}
             onImageUpload={handleImageUpload}
             onImageDelete={handleImageDelete}
+            showError={!images.some(img => img.imageType === "FRONT") && formError?.includes("Front image")}
+          />
+          <ImageUpload
+            viewType="SIDE"
+            imageUrl={images.find(img => img.imageType === "SIDE")?.imageUrl}
+            onImageUpload={handleImageUpload}
+            onImageDelete={handleImageDelete}
+          />
+          <ImageUpload
+            viewType="BACK"
+            imageUrl={images.find(img => img.imageType === "BACK")?.imageUrl}
+            onImageUpload={handleImageUpload}
+            onImageDelete={handleImageDelete}
+          />
+          <ImageUpload
+            viewType="DAMAGE"
+            imageUrl={images.find(img => img.imageType === "DAMAGE")?.imageUrl}
+            onImageUpload={handleImageUpload}
+            onImageDelete={handleImageDelete}
           />
         </div>
+      </div>
+      {errors.images && (
+        <div className="text-error text-sm mt-2">{errors.images.message}</div>
+      )}
+    </>
+  );
 
-        {errors.images && (
-          <p className="mt-1 text-sm text-red-500">
-            {errors.images.message}
-          </p>
+  const StepFive = () => (
+    <>
+      <div className="flex justify-center mt-6 text-2xl text-primary font-bold">
+        Step 5: Set Your Price
+      </div>
+      <div className="flex flex-col justify-center mt-4 p-8">
+        <div className="form-control">
+          <label className="label cursor-pointer justify-start gap-2">
+            <input
+              type="radio"
+              name="price-type"
+              className="radio checked:bg-primary"
+              checked={!isFree}
+              onChange={() => setValue("amount", isFree ? 10 : 0)}
+            />
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Price"
+                className="input input-bordered w-full max-w-xs"
+                value={isFree ? "0" : watch("amount") || ""}
+                onChange={(e) => {
+                  const value = formatPrice(e.target.value);
+                  handlePriceChange({ amount: value });
+                }}
+                disabled={isFree}
+              />
+            </div>
+          </label>
+          {errors.amount && (
+            <div className="text-error text-sm mt-2">{errors.amount.message}</div>
+          )}
+        </div>
+        <div className="form-control">
+          <label className="label cursor-pointer justify-start gap-6">
+            <input
+              type="radio"
+              name="price-type"
+              className="radio checked:bg-primary"
+              checked={isFree}
+              onChange={() => setValue("amount", isFree ? 10 : 0)}
+            />
+            <span className="label-text text-lg">Free</span>
+          </label>
+        </div>
+        <hr className="border-gray-200 mt-4" />
+        <div className="form-control">
+          <label className="label cursor-pointer justify-start gap-6">
+            <input
+              type="checkbox"
+              className="checkbox"
+              checked={isNegotiable}
+              onChange={(e) => handlePriceChange({ isNegotiable: e.target.checked })}
+              disabled={isFree}
+            />
+            <span className="label-text text-lg">Price is negotiable</span>
+          </label>
+        </div>
+      </div>
+    </>
+  );
+
+  const StepSix = () => (
+    <>
+      <div className="flex justify-center mt-6 text-2xl text-primary font-bold">
+        Step 6: Choose Delivery Options
+      </div>
+      <div className="flex flex-col justify-center mt-4 p-8">
+        {DELIVERY_OPTIONS.map(option => (
+          <div className="form-control" key={option.value}>
+            <label className="label cursor-pointer justify-start gap-6">
+              <input
+                type="radio"
+                name="delivery-type"
+                className="radio checked:bg-primary"
+                checked={deliveryType === option.value}
+                onChange={() => setValue("deliveryType", option.value)}
+              />
+              <span className="label-text text-lg">{option.label}</span>
+            </label>
+          </div>
+        ))}
+        <div className="flex items-center gap-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-12 h-12 text-primary"
+            viewBox="0 0 256 256"
+          >
+            <rect width="256" height="256" fill="none" />
+            <path
+              d="M96,192a32,32,0,0,0,64,0"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="16"
+            />
+            <path
+              d="M184,24a102.71,102.71,0,0,1,36.29,40"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="16"
+            />
+            <path
+              d="M35.71,64A102.71,102.71,0,0,1,72,24"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="16"
+            />
+            <path
+              d="M56,112a72,72,0,0,1,144,0c0,35.82,8.3,56.6,14.9,68A8,8,0,0,1,208,192H48a8,8,0,0,1-6.88-12C47.71,168.6,56,147.81,56,112Z"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="16"
+            />
+          </svg>
+          <span className="text-gray-400 text-md">
+            Choose the delivery methods you can offer. Delivery services may
+            charge extra.
+          </span>
+        </div>
+        {errors.deliveryType && (
+          <div className="text-error text-sm mt-2">{errors.deliveryType.message}</div>
         )}
+      </div>
+    </>
+  );
 
-        <button
-          className="btn btn-primary w-full"
-          type="submit"
-          disabled={isLoading}
-        >
-          {isLoading ? "Posting..." : "Post"}
-        </button>
-      </form>
-      <div className="h-300"></div>
+  // 渲染步骤内容
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 0:
+        return <StepOne />;
+      case 1:
+        return <StepTwo />;
+      case 2:
+        return <StepThree />;
+      case 3:
+        return <StepFour />;
+      case 4:
+        return <StepFive />;
+      case 5:
+        return <StepSix />;
+      default:
+        return null;
+    }
+  };
+
+  // 表单页面内容
+  const FormContent = () => (
+    <div>
+      {/* 使用antd-mobile的Steps组件 */}
+      <div className="flex justify-center">
+        <Steps current={currentStep} className="mt-4 w-full px-4" style={{
+            '--title-font-size': '17px',
+            '--description-font-size': '15px',
+            '--indicator-margin-right': '12px',
+            '--icon-size': '36px',
+            '--icon-color': '#65a30d',
+            '--title-color': '#65a30d',
+            '--active-title-color': '#65a30d',
+            '--active-color': '#65a30d',
+            '--active-line-color': '#65a30d',
+          } as React.CSSProperties}>
+          {[
+            { title: "Category" },
+            { title: "Describe" },
+            { title: "Condition" },
+            { title: "Photos" },
+            { title: "Price" },
+            { title: "Delivery" }
+          ].map((step, index) => (
+            <Step 
+              key={index} 
+              title={index+1} 
+              icon={index < currentStep ? <CheckCircleFill color="#65a30d" /> : index === currentStep ? <ClockCircleFill color="#65a30d" /> : <ClockCircleOutline />} 
+            />
+          ))}
+        </Steps>
+      </div>
+
+      {renderStepContent()}
+
+      {/* 导航按钮 */}
+      <div className="fixed bottom-16 left-0 right-0 flex justify-center mt-8">
+        <div className="flex items-center gap-6 w-full justify-center">
+          <button
+            className={`btn btn-outline text-primary btn-xl w-1/3 rounded-full shadow-md ${
+              currentStep === 0 ? "hidden" : ""
+            }`}
+            onClick={handlePrevious}
+            disabled={isSubmitting}
+          >
+            Previous
+          </button>
+          <button
+            className={`btn btn-primary btn-xl ${
+              currentStep === 0 ? "w-4/5" : "w-1/3"
+            } rounded-full shadow-md`}
+            onClick={currentStep === 5 ? handlePublish : handleNext}
+            disabled={isSubmitting || createPostMutation.isLoading}
+          >
+            {currentStep === 5 ? (
+              isSubmitting || createPostMutation.isLoading ? (
+                <span className="loading loading-spinner"></span>
+              ) : (
+                "Publish"
+              )
+            ) : (
+              "Next"
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  // 登录卡片
+  const LoginContent = () => (
+    <div className="flex flex-col h-full justify-center">
+      <NoLogin />
+    </div>
+  );
+
+  return (
+    <div className="flex flex-col h-full">
+      {isAuthenticated ? <FormContent /> : <LoginContent />}
     </div>
   );
 };

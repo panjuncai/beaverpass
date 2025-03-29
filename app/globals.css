@@ -3,8 +3,7 @@
 @plugin "daisyui/theme" {
   name: "light";
   default: true;
-  --color-primary: "#593719";
-  --color-secondary: "#f6d860";
+  --color-primary: "#b45309";
   --color-primary-content: "#fff";
 }
 
@@ -18,7 +17,19 @@
 
 :root:root {
   --adm-color-primary: #b45309;
-}
+} 
+
+:root:root {
+  .adm-step-status-process .adm-step-title {
+    color: #65a30d;
+    }
+    .adm-step-status-finish {
+      --line-to-next-color: #65a30d;
+  }
+} 
+
+
+
 
 /* Link styles */
 a {
@@ -41,6 +52,7 @@ a {
 .nav-link.active {
   color: #65a30d !important; /* text-lime-600 equivalent */
 }
+
 
 /* 为 antd-mobile 组件中的链接设置样式 */
 .adm-list-item-content-main a,
