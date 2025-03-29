@@ -242,7 +242,7 @@ export default function HomePage() {
                   <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-between z-20 p-6 md:hidden">
                       {/* <!-- Top text section --> */}
                       <div className="mt-14 text-center">
-                          <h2 className="text-white text-4xl font-black font-['Poppins'] leading-tight tracking-wide text-center drop-shadow-lg">
+                          <h2 className="text-white text-3xl font-black font-['Poppins'] leading-tight tracking-wide text-center drop-shadow-lg">
                               We Handle<br/>Pickup & Delivery
                           </h2>
                       </div>
@@ -250,7 +250,7 @@ export default function HomePage() {
                       {/* <!-- Bottom button section --> */}
                       <div className="w-full flex flex-col items-center justify-center mb-4 px-2">
                           <div className="text-center mb-4">
-                              <h1 className="text-white text-xs font-light font-['Poppins'] opacity-90 leading-2 tracking-widest text-center">
+                              <h1 className="text-white text-xs font-light font-['Poppins'] opacity-90 leading-2 tracking-normal text-center">
                                   Pass Your Furniture To Someone In Need
                               </h1>
                           </div>
@@ -329,7 +329,7 @@ export default function HomePage() {
               {/* <!-- Navigation and Cards Container --> */}
               <div className="relative mt-2 md:mt-4">
                   {/* <!-- Container for cards and navigation arrows with set width --> */}
-                  <div className="max-w-[1000px] mx-auto relative px-4 md:px-14 py-2">
+                  <div className="max-w-[1000px] mx-auto relative px-1 sm:px-4 md:px-14 py-2">
                       {/* <!-- Navigation Arrows - Positioned at left and right edges of the container (hidden on small mobile) --> */}
                       <div className="absolute left-0 top-1/2 transform -translate-y-1/2 hidden sm:block">
                           <div className="w-12 h-12 rounded-full border border-zinc-300 flex items-center justify-center cursor-pointer group transition-all duration-300 ease-in-out hover:border-lime-600 hover:scale-105">
@@ -344,40 +344,40 @@ export default function HomePage() {
                       </div>
 
                       {/* <!-- Listing Cards --> */}
-                      <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 md:gap-8">
+                      <div className="flex flex-wrap justify-evenly sm:justify-center gap-x-2 gap-y-2 md:gap-8">
                           {/* <!-- Card 1 --> */}
-                          <div onClick={() => router.push('/search')} className="w-44 h-[196px] md:h-52 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-105 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-500 ease-in-out cursor-pointer group mb-1 md:mb-0">
-                              <img className="w-44 h-36 object-cover" src="./homepage/1_table.png" alt="Apartment Dining Table" />
+                          <div onClick={() => router.push('/search')} className="w-[150px] md:w-44 h-[175px] md:h-52 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-105 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-500 ease-in-out cursor-pointer group mb-1 md:mb-0">
+                              <img className="w-full h-[115px] md:h-36 object-cover" src="./homepage/1_table.png" alt="Apartment Dining Table" />
                               <div className="p-1 md:p-2">
-                                  <div className="text-black text-sm font-normal font-['Poppins'] group-hover:text-lime-600 truncate">Apartment Dining Table</div>
-                                  <div className="text-black text-sm font-medium font-['Poppins'] group-hover:text-lime-600">$ 90</div>
+                                  <div className="text-black text-xs md:text-sm font-normal font-['Poppins'] group-hover:text-lime-600 truncate">Apartment Dining Table</div>
+                                  <div className="text-black text-xs md:text-sm font-medium font-['Poppins'] group-hover:text-lime-600">$ 90</div>
                               </div>
                           </div>
 
                           {/* <!-- Card 2 --> */}
-                          <div onClick={() => router.push('/search')} className="w-44 h-[196px] md:h-52 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-105 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-500 ease-in-out cursor-pointer group mb-1 md:mb-0">
-                              <img className="w-44 h-36 object-cover" src="./homepage/2_sofa.png" alt="Cognac Faux-Leather" />
+                          <div onClick={() => router.push('/search')} className="w-[150px] md:w-44 h-[175px] md:h-52 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-105 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-500 ease-in-out cursor-pointer group mb-1 md:mb-0">
+                              <img className="w-full h-[115px] md:h-36 object-cover" src="./homepage/2_sofa.png" alt="Cognac Faux-Leather" />
                               <div className="p-1 md:p-2">
-                                  <div className="text-black text-sm font-normal font-['Poppins'] group-hover:text-lime-600 truncate">COGNAC FAUX-LEATHER 4 SEATER</div>
-                                  <div className="text-black text-sm font-medium font-['Poppins'] group-hover:text-lime-600">$ 399</div>
+                                  <div className="text-black text-xs md:text-sm font-normal font-['Poppins'] group-hover:text-lime-600 truncate">COGNAC FAUX-LEATHER 4 SEATER</div>
+                                  <div className="text-black text-xs md:text-sm font-medium font-['Poppins'] group-hover:text-lime-600">$ 399</div>
                               </div>
                           </div>
 
                           {/* <!-- Card 3 --> */}
-                          <div onClick={() => router.push('/search')} className="w-44 h-[196px] md:h-52 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-105 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-500 ease-in-out cursor-pointer group mb-1 md:mb-0">
-                              <img className="w-44 h-36 object-cover" src="./homepage/3_bed.png" alt="Single Bed & Matress" />
+                          <div onClick={() => router.push('/search')} className="w-[150px] md:w-44 h-[175px] md:h-52 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-105 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-500 ease-in-out cursor-pointer group mb-1 md:mb-0">
+                              <img className="w-full h-[115px] md:h-36 object-cover" src="./homepage/3_bed.png" alt="Single Bed & Matress" />
                               <div className="p-1 md:p-2">
-                                  <div className="text-black text-sm font-normal font-['Poppins'] group-hover:text-lime-600 truncate">Single Bed & Matress</div>
-                                  <div className="text-black text-sm font-medium font-['Poppins'] group-hover:text-lime-600">$ 120</div>
+                                  <div className="text-black text-xs md:text-sm font-normal font-['Poppins'] group-hover:text-lime-600 truncate">Single Bed & Matress</div>
+                                  <div className="text-black text-xs md:text-sm font-medium font-['Poppins'] group-hover:text-lime-600">$ 120</div>
                               </div>
                           </div>
 
                           {/* <!-- Card 4 (New) --> */}
-                          <div onClick={() => router.push('/search')} className="w-44 h-[196px] md:h-52 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-105 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-500 ease-in-out cursor-pointer group mb-1 md:mb-0">
-                              <img className="w-44 h-36 object-cover" src="./homepage/4_chair.png" alt="Modern Office Chair" />
+                          <div onClick={() => router.push('/search')} className="w-[150px] md:w-44 h-[175px] md:h-52 rounded-[20px] shadow-[0px_4px_7.300000190734863px_0px_rgba(0,0,0,0.26)] border-2 border-stone-100 overflow-hidden hover:scale-105 hover:shadow-[0px_0px_20px_rgba(63,98,18,0.5)] transform transition-all duration-500 ease-in-out cursor-pointer group mb-1 md:mb-0">
+                              <img className="w-full h-[115px] md:h-36 object-cover" src="./homepage/4_chair.png" alt="Modern Office Chair" />
                               <div className="p-1 md:p-2">
-                                  <div className="text-black text-sm font-normal font-['Poppins'] group-hover:text-lime-600 truncate">Modern Office Chair</div>
-                                  <div className="text-black text-sm font-medium font-['Poppins'] group-hover:text-lime-600">$ 150</div>
+                                  <div className="text-black text-xs md:text-sm font-normal font-['Poppins'] group-hover:text-lime-600 truncate">Modern Office Chair</div>
+                                  <div className="text-black text-xs md:text-sm font-medium font-['Poppins'] group-hover:text-lime-600">$ 150</div>
                               </div>
                           </div>
                       </div>
