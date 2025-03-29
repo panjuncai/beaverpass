@@ -2,7 +2,7 @@ import { MessageType } from "@/lib/types/enum";
 import { MessageOutput } from "@/lib/trpc/client";
 import { Bubble } from "@ant-design/x";
 import { Avatar } from "antd-mobile";
-
+import formatTime from "@/utils/tools/format-time";
 interface ChatMessageProps {
   message: MessageOutput;
   isOwnMessage: boolean;
@@ -27,32 +27,14 @@ function PostBubble({ message, isOwnMessage }: ChatMessageProps){
   )
 }
 export default function ChatMessage({ message, isOwnMessage }: ChatMessageProps) {
-  // 计算消息发送的时间显示
-  const getTimeDisplay = (date: Date | null | undefined) => {
-    if (!date) return "";
     
-    const now = new Date();
-    const messageDate = new Date(date);
-    const diffMinutes = Math.floor((now.getTime() - messageDate.getTime()) / (1000 * 60));
-    
-    if (diffMinutes < 60) {
-      return `${diffMinutes} minutes ago`;
-    } else if (diffMinutes < 24 * 60) {
-      const hours = Math.floor(diffMinutes / 60);
-      return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
-    } else {
-      const days = Math.floor(diffMinutes / (60 * 24));
-      return `${days} ${days === 1 ? 'day' : 'days'} ago`;
-    }
-  };
-  
   return (
 
       <div>
         {message.messageType === MessageType.TEXT && (
           <div key={message.id}>
             {message.messageType === MessageType.TEXT && (
-              <Bubble placement={isOwnMessage ? "end" : "start"} variant={isOwnMessage ? "outlined" : "filled"} footer={<span className="text-xs text-gray-400">{getTimeDisplay(message.createdAt)}</span>} content={message.content} />
+              <Bubble placement={isOwnMessage ? "end" : "start"} variant={isOwnMessage ? "outlined" : "filled"} footer={<span className="text-xs text-gray-400">{formatTime(message.createdAt)}</span>} content={message.content} />
             )}
           </div>
         )}
@@ -60,7 +42,7 @@ export default function ChatMessage({ message, isOwnMessage }: ChatMessageProps)
         {message.messageType === MessageType.POST && message.post && (
           <div key={message.id}>
             {message.messageType === MessageType.POST && message.post && (
-              <Bubble placement={isOwnMessage ? "end" : "start"} variant={isOwnMessage ? "outlined" : "filled"} footer={<span className="text-xs text-gray-400">{getTimeDisplay(message.createdAt)}</span>} content={<PostBubble message={message} isOwnMessage={isOwnMessage} />} />
+              <Bubble placement={isOwnMessage ? "end" : "start"} variant={isOwnMessage ? "outlined" : "filled"} footer={<span className="text-xs text-gray-400">{formatTime(message.createdAt)}</span>} content={<PostBubble message={message} isOwnMessage={isOwnMessage} />} />
             )}
           </div>
         )}

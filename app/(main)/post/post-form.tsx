@@ -8,12 +8,9 @@ import { CreatePostInput, createPostSchema } from "@/lib/validations/post";
 import ImageUpload from "@/components/utils/image-upload";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { PostCategory, PostCondition, DeliveryType } from "@/lib/types/enum";
-import { Steps } from "antd-mobile";
+
 import NoLogin from "@/components/utils/no-login";
 import { useAuthStore } from "@/lib/store/auth-store"
-import { CheckCircleFill, ClockCircleFill, ClockCircleOutline } from "antd-mobile-icons";
-
-const { Step } = Steps;
 
 // 枚举映射
 const CATEGORY_OPTIONS = [

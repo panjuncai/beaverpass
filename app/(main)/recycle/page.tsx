@@ -5,7 +5,7 @@ export default function RecyclePage() {
     <>
     <div className="flex flex-col h-full justify-center items-center">
       {/* <NoLogin /> */}
-      Recycle
+      Donate
     </div>
     </>
   );

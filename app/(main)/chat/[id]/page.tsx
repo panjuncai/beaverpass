@@ -6,7 +6,7 @@ import { MessageType } from "@/lib/types/enum";
 // import { MessageWithSender } from "@/lib/types/chat";
 import React, { FormEvent, useEffect, useRef, useState } from "react";
 import NoLogin from "@/components/utils/no-login";
-import ChatMessage from "@/app/(detail)/chat/[id]/ChatMessage";
+import ChatMessage from "@/app/(main)/chat/[id]/ChatMessage";
 import { Avatar } from "antd-mobile";
 import { Rate } from "antd-mobile";
 import Verified from "@/components/icons/verified";
