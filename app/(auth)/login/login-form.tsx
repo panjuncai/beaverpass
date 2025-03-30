@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { loginSchema, LoginFormValues } from '@/lib/validations/auth';
 import Loading from '@/components/utils/loading';
 import { useAuthStore } from '@/lib/store/auth-store';
-
+import Image from 'next/image';
 interface LoginFormProps {
   redirectTo?: string;
 }
@@ -117,13 +117,23 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
 
   return (
     <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
-      <div className="text-center">
+      {/* <div className="text-center">
         <img 
           src="/homepage/logo_maple.png" 
           alt="BeaverPass" 
           className="h-12 mx-auto"
         />
-      </div>
+      </div> */}
+      <div className="text-center relative mx-auto h-18">
+          <Image
+            src="/homepage/logo_maple.png"
+            alt="BeaverPass"
+            priority
+            fill
+            objectFit='contain'
+            className="object-contain rounded-xl w-full h-full"
+          />
+        </div>
 
       {error && (
         <div className="p-3 text-sm text-red-500 bg-red-100 rounded-md">

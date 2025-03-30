@@ -6,7 +6,7 @@ import { MessageType } from "@/lib/types/enum";
 // import { MessageWithSender } from "@/lib/types/chat";
 import React, { FormEvent, useEffect, useRef, useState } from "react";
 import NoLogin from "@/components/utils/no-login";
-import ChatMessage from "@/app/(main)/chat/[id]/ChatMessage";
+import ChatMessage from "@/temp/chat/[id]/ChatMessage";
 import { Avatar } from "antd-mobile";
 import { Rate } from "antd-mobile";
 import Verified from "@/components/icons/verified";
@@ -59,7 +59,7 @@ export default function ChatRoomPage({ params }: PageProps) {
   const sendMessageMutation = trpc.chat.sendMessage.useMutation({
     onSuccess: (newMessage) => {
       // 使用推断的类型
-      setMessages((prev) => [...prev, newMessage as MessageOutput]);
+      setMessages((prev) => [...prev, newMessage as unknown as MessageOutput]);
       setMessageText("");
     },
     onError: (error) => {

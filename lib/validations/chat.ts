@@ -39,6 +39,10 @@ export const getMessagesSchema = z.object({
   cursor: z.string().optional(),
 });
 
+export const getMessagesByTemporaryIdSchema = z.object({
+  temporaryId: z.string().uuid(),
+});
+
 export const markMessageReadSchema = z.object({
   messageId: z.string().uuid(),
   userId: z.string().uuid(),

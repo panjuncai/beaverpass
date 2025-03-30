@@ -10,10 +10,21 @@ import {
   joinChatRoomSchema,
   leaveChatRoomSchema,
   setTypingStatusSchema,
+  getMessagesByTemporaryIdSchema,
 } from "@/lib/validations/chat";
 import { MessageStatus, MessageType } from "@/lib/types/enum";
 import {createClient} from '@/utils/supabase/server'
-
+interface MessageData {
+  chat_room_id: string;
+  sender_id: string;
+  message_type: keyof typeof MessageType;
+  temporary_id: string;
+  content?: string;
+  post_id?: string;
+  status?: MessageStatus;
+  created_at?: string;
+  updated_at?: string;
+}
 export const chatRouter = router({
   // 创建聊天室
   createChatRoom: protectedProcedure
@@ -301,6 +312,27 @@ export const chatRouter = router({
       }
     }),
 
+  // 根据临时ID获取消息
+  getMessagesByTemporaryId: protectedProcedure
+    .input(getMessagesByTemporaryIdSchema)
+    .query(async ({ input, ctx }) => {
+      try {
+        const { temporaryId } = input;
+        const message = await ctx.prisma.message.findFirst({
+          where: {
+            temporaryId,
+          },
+        });
+        return message;
+      } catch (error) {
+        console.error("Failed to get messages by temporary id:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to get messages by temporary id",
+        });
+      }
+    }),
+
   // 发送消息
   sendMessage: protectedProcedure
     .input(sendMessageSchema)
@@ -337,11 +369,11 @@ export const chatRouter = router({
         }
 
         // 准备消息数据
-        const messageData:any = {
+        const messageData:MessageData = {
           chat_room_id: chatRoomId,
           sender_id: ctx.loginUser.id,
           message_type: messageType,
-          temporary_id: temporaryId,
+          temporary_id: temporaryId ?? '',
           status:MessageStatus.STORED
         };
 

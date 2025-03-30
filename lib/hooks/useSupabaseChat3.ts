@@ -277,7 +277,7 @@ export function useSupabaseChat2(userId: string, chatRoomId?: string) {
     pendingMessagesCopy.forEach(message => {
       // 通过trpc发送消息
       sendMessageMutation.mutate({
-        id: message.id, // 临时ID
+        temporaryId: message.id, // 临时ID
         chatRoomId: message.chatRoomId,
         content: message.content,
         postId: message.postId,
@@ -402,7 +402,7 @@ export function useSupabaseChat2(userId: string, chatRoomId?: string) {
     
     // 通过trpc重发消息
     sendMessageMutation.mutate({
-      id: messageToRetry.id,
+      temporaryId: messageToRetry.id,
       chatRoomId: messageToRetry.chatRoomId,
       content: messageToRetry.content,
       postId: messageToRetry.postId,

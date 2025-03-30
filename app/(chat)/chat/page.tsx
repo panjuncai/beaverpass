@@ -1,7 +1,7 @@
 'use client';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { trpc } from '@/lib/trpc/client';
+import { ChatRoomOutput, trpc } from '@/lib/trpc/client';
 import { useAuthStore } from '@/lib/store/auth-store';
 import { Empty, List, Avatar, Badge } from 'antd-mobile';
 import { format } from 'date-fns';
@@ -74,9 +74,9 @@ export default function ChatRoomsPage() {
   };
   
   // 获取聊天对象名称
-  const getOtherParticipantName = (chatRoom: any) => {
+  const getOtherParticipantName = (chatRoom:ChatRoomOutput) => {
     const otherParticipant = chatRoom.participants.find(
-      (p: any) => p.userId !== loginUser?.id
+      (p) => p.userId !== loginUser?.id
     );
     
     if (!otherParticipant || !otherParticipant.user) return 'Unknown user';
@@ -90,7 +90,7 @@ export default function ChatRoomsPage() {
   };
   
   // 获取最后一条消息的预览
-  const getLastMessagePreview = (chatRoom: any) => {
+  const getLastMessagePreview = (chatRoom: ChatRoomOutput) => {
     if (!chatRoom.messages || chatRoom.messages.length === 0) {
       return 'No messages';
     }
@@ -107,22 +107,22 @@ export default function ChatRoomsPage() {
   };
   
   // 检查是否有未读消息
-  const hasUnreadMessages = (chatRoom: any) => {
-    if (!chatRoom.messages || chatRoom.messages.length === 0) {
-      return false;
-    }
+  // const hasUnreadMessages = (chatRoom: ChatRoomOutput) => {
+  //   if (!chatRoom.messages || chatRoom.messages.length === 0) {
+  //     return false;
+  //   }
     
-    const lastMessage = chatRoom.messages[0];
+  //   const lastMessage = chatRoom.messages[0];
     
-    // 如果最后一条消息是自己发的，则没有未读消息
-    if (lastMessage.senderId === loginUser?.id) {
-      return false;
-    }
+  //   // 如果最后一条消息是自己发的，则没有未读消息
+  //   if (lastMessage.senderId === loginUser?.id) {
+  //     return false;
+  //   }
     
-    // 检查是否已读
-    const readBy = lastMessage.readBy || [];
-    return !readBy.some((read: any) => read.userId === loginUser?.id);
-  };
+  //   // 检查是否已读
+  //   const readBy = lastMessage.readBy || [];
+  //   return !readBy.some((read: any) => read.userId === loginUser?.id);
+  // };
 
   return (
     <div className="pb-safe">
@@ -135,12 +135,12 @@ export default function ChatRoomsPage() {
                 style={{ 
                   '--right': '0px', 
                   '--top': '0px',
-                  display: hasUnreadMessages(chatRoom) ? 'block' : 'none'
+                  // display: hasUnreadMessages(chatRoom) ? 'block' : 'none'
                 }}
                 content={Badge.dot}
               >
                 <Avatar
-                  src={chatRoom.participants.find((p: any) => p.userId !== loginUser?.id)?.user?.avatar || ''}
+                  src={chatRoom.participants.find((p) => p.userId !== loginUser?.id)?.user?.avatar || ''}
                   style={{ '--size': '48px' }}
                 />
               </Badge>
