@@ -6,6 +6,7 @@ import { useAuthStore } from '@/lib/store/auth-store';
 import { Empty, List, Avatar, Badge } from 'antd-mobile';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
+import { MessageType } from '@/lib/types/enum';
 
 export default function ChatRoomsPage() {
   const router = useRouter();
@@ -96,9 +97,9 @@ export default function ChatRoomsPage() {
     
     const lastMessage = chatRoom.messages[0];
     
-    if (lastMessage.messageType === 'TEXT') {
+    if (lastMessage.messageType === MessageType.TEXT) {
       return lastMessage.content || '';
-    } else if (lastMessage.messageType === 'POST') {
+    } else if (lastMessage.messageType === MessageType.POST) {
       return '[Post message]';
     } else {
       return 'Unknown message type';

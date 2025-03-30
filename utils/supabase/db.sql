@@ -70,6 +70,7 @@ CREATE TABLE chat_room_participants (
   chat_room_id UUID NOT NULL,
   user_id UUID NOT NULL,
   is_online BOOLEAN DEFAULT FALSE,
+  is_typing BOOLEAN DEFAULT FALSE,
   last_active_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (chat_room_id,user_id),
   FOREIGN KEY (chat_room_id) REFERENCES chat_rooms(id) ON DELETE CASCADE,
@@ -141,31 +142,31 @@ CREATE TABLE orders (
 CREATE INDEX idx_orders_buyer_id ON orders(buyer_id);
 CREATE INDEX idx_orders_seller_id ON orders(seller_id);
 
+-- 在 Supabase SQL 编辑器中执行
+alter publication supabase_realtime add table messages, chat_room_participants, message_read_by;
 
 -- 为messages表启用RLS
-ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
+--ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 
 -- 创建允许读取消息的策略
-CREATE POLICY "允许查看聊天室消息" ON messages
-  FOR SELECT 
-  USING (
-    chat_room_id IN (
-      SELECT chat_room_id 
-      FROM chat_room_participants 
-      WHERE user_id = auth.uid()
-    )
-  );
+-- CREATE POLICY "允许查看聊天室消息" ON messages
+--   FOR SELECT 
+--   USING (
+--     chat_room_id IN (
+--       SELECT chat_room_id 
+--       FROM chat_room_participants 
+--       WHERE user_id = auth.uid()
+--     )
+--   );
 
 -- 创建允许创建消息的策略
-CREATE POLICY "允许发送消息" ON messages
-  FOR INSERT 
-  WITH CHECK (
-    sender_id = auth.uid() AND
-    chat_room_id IN (
-      SELECT chat_room_id 
-      FROM chat_room_participants 
-      WHERE user_id = auth.uid()
-    )
-  );
-
--- 也应该为其他相关表设置RLS
+-- CREATE POLICY "允许发送消息" ON messages
+--   FOR INSERT 
+--   WITH CHECK (
+--     sender_id = auth.uid() AND
+--     chat_room_id IN (
+--       SELECT chat_room_id 
+--       FROM chat_room_participants 
+--       WHERE user_id = auth.uid()
+--     )
+--   );

@@ -8,15 +8,15 @@ export default function Footer() {
   const pathname = usePathname()
   const router = useRouter()
   
-  // 如果是聊天页面，不显示底部导航栏
-  if (pathname.startsWith('/chat')) {
+  // 如果是聊天详情页面，不显示底部导航栏
+  if (pathname.startsWith('/chat/')) {
     return null;
   }
   
   const tabs = [
     { key: '/search', title: 'Search', icon: <SearchOutline /> },
     { key: '/post', title: 'Post', icon: <CameraOutline /> },
-    {key:'/inbox', title:'Inbox', icon:<MessageOutline />},
+    {key:'/chat', title:'Inbox', icon:<MessageOutline />},
     { key: '/deals', title: 'Deals', icon: <ReceivePaymentOutline /> },
     // {
     //   key: '/recycle',

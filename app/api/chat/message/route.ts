@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { MessageStatus, SocketEvents } from '@/lib/types/socket';
+import { MessageStatus } from '@/lib/types/enum';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 
@@ -27,6 +27,7 @@ export async function POST(request: Request) {
     // 存储消息到数据库
     const storedMessage = await prisma.message.create({
       data: {
+        temporaryId: id, // 保存临时ID以便前端识别
         chatRoomId,
         senderId,
         content: content || null,
@@ -49,10 +50,10 @@ export async function POST(request: Request) {
       data: { updatedAt: new Date() }
     });
     
-    // await supabase.from('chat_room_participants').update({
-    //   is_typing: false,
-    // }).eq('chat_room_id', chatRoomId).eq('user_id', senderId);
-    
+    // 关闭用户正在输入状态
+    await supabase.from('chat_room_participants').update({
+      is_typing: false,
+    }).eq('chat_room_id', chatRoomId).eq('user_id', senderId);
     
     return NextResponse.json({
       success: true,
@@ -106,13 +107,10 @@ export async function PUT(request: Request) {
     });
     
     if (message) {
-      // 触发Pusher事件通知消息已读
-      await pusher.trigger(`private-chat-${message.chatRoomId}`, SocketEvents.MESSAGE_READ, {
-        messageId,
-        userId,
-        chatRoomId: message.chatRoomId,
-        readAt: new Date()
-      });
+      // 触发Supabase事件通知消息已读
+      // 这里不需要额外触发事件，Supabase realtime会自动处理
+      // message_read_by表的更改会被监听者接收到
+      console.log('Message marked as read:', messageId, 'by user:', userId);
     }
     
     return NextResponse.json({ success: true });

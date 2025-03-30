@@ -1,23 +1,24 @@
 'use client';
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback, KeyboardEvent } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { trpc } from '@/lib/trpc/client';
 import { useAuthStore } from '@/lib/store/auth-store';
-import { Avatar, Button, Image, Skeleton, TextArea } from 'antd-mobile';
-import { MessageType } from '@/lib/types/enum';
+import {Button, Image, Skeleton, TextArea } from 'antd-mobile';
+import { MessageStatus, MessageType } from '@/lib/types/enum';
 import { format } from 'date-fns';
 import { enUS } from 'date-fns/locale';
-import { usePusher } from '@/lib/hooks/usePusher';
 import { useSupabaseChat } from '@/lib/hooks/useSupabaseChat';
-
 export default function ChatDetailPage() {
   const router = useRouter();
   const { id: chatRoomId } = useParams<{ id: string }>();
   const { loginUser } = useAuthStore();
   const [message, setMessage] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [otherUserTyping, setOtherUserTyping] = useState(false);
+  // const [isTyping, setIsTyping] = useState(false);
+  // const [otherUserTyping, setOtherUserTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // 在组件顶部定义ref
+  // const markedMessageIdsRef = useRef(new Set<string>());
   
   // 如果没有登录，重定向到登录页
   useEffect(() => {
@@ -26,23 +27,25 @@ export default function ChatDetailPage() {
     }
   }, [loginUser, router]);
   
-  // 初始化Pusher
   const {
     isConnected,
     isReconnecting,
     error,
     pendingMessages,
     sendMessage,
-    retryMessage,
-    markMessageAsRead,
-    setTypingStatus,
+    // clearAllPendingMessages,
+    // retryMessage,
+    // markMessageAsRead,
+    // setTypingStatus,
   } = useSupabaseChat(loginUser?.id || '', chatRoomId);
+
+  
   
   // 获取聊天室信息
-  const { data: chatRoom } = trpc.chat.getChatRoomById.useQuery(
-    { chatRoomId },
-    { enabled: !!chatRoomId && !!loginUser?.id }
-  );
+  // const { data: chatRoom } = trpc.chat.getChatRoomById.useQuery(
+  //   { chatRoomId },
+  //   { enabled: !!chatRoomId && !!loginUser?.id }
+  // );
   
   // 获取聊天消息
   const { data: messages, isLoading: isLoadingMessages } = trpc.chat.getMessages.useQuery(
@@ -51,31 +54,47 @@ export default function ChatDetailPage() {
   );
   
   // 获取聊天对象信息
-  const otherParticipant = chatRoom?.participants?.find(
-    p => p.userId !== loginUser?.id
-  )?.user;
+  // const otherParticipant = chatRoom?.participants?.find(
+  //   p => p.userId !== loginUser?.id
+  // )?.user;
   
   // 监听消息输入
-  const handleInputChange = useCallback((val: string) => {
-    setMessage(val);
+  // const handleInputChange = useCallback((val: string) => {
+  //   setMessage(val);
     
-    // 如果正在输入，设置打字状态
-    if (!isTyping && val.length > 0) {
-      setIsTyping(true);
-      setTypingStatus(true);
-    } else if (isTyping && val.length === 0) {
-      setIsTyping(false);
-      setTypingStatus(false);
+  //   // 如果正在输入，设置打字状态
+  //   if (!isTyping && val.length > 0) {
+  //     setIsTyping(true);
+  //     setTypingStatus(true);
+  //   } else if (isTyping && val.length === 0) {
+  //     setIsTyping(false);
+  //     setTypingStatus(false);
+  //   }
+  // }, [isTyping, setTypingStatus]);
+  const handleInputChange = (val: string) => {
+    setMessage(val);
+  };
+
+  // 处理按键事件，回车发送消息，Shift+回车换行
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault(); // 阻止默认的换行行为
+      handleSendMessage();
     }
-  }, [isTyping, setTypingStatus]);
+  };
+
+  // 滚动到底部
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
+  }, [messagesEndRef]);
   
   // 发送消息
   const handleSendMessage = useCallback(async () => {
     if (!message.trim() || !loginUser?.id) return;
     
     // 停止打字状态
-    setIsTyping(false);
-    setTypingStatus(false);
+    // setIsTyping(false);
+    // setTypingStatus(false);
     
     // 发送消息
     sendMessage({
@@ -89,40 +108,50 @@ export default function ChatDetailPage() {
     
     // 滚动到底部
     scrollToBottom();
-  }, [message, loginUser?.id, chatRoomId, setTypingStatus, sendMessage]);
+  }, [message, loginUser?.id, chatRoomId, sendMessage,scrollToBottom]);
   
-  // 滚动到底部
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messagesEndRef]);
+  
   
   // 标记消息为已读
-  useEffect(() => {
-    if (!messages || !loginUser?.id) return;
+  // useEffect(() => {
+    // if (!messages || !loginUser?.id) return;
     
-    // 缓存已经标记过的消息ID，避免重复标记
-    const markedMessageIds = new Set<string>();
+    // // 使用之前定义的ref
+    // const markedMessageIds = markedMessageIdsRef.current;
     
-    // 找到所有不是自己发的且未读的消息
-    const unreadMessages = messages.filter(
-      msg => msg.senderId !== loginUser.id && 
-      !msg.readBy?.some(read => read.userId === loginUser.id) &&
-      !markedMessageIds.has(msg.id)
-    );
+    // const unreadMessages = messages.filter(
+    //   msg => msg.senderId !== loginUser.id && 
+    //   !msg.readBy?.some(read => read.userId === loginUser.id) &&
+    //   !markedMessageIds.has(msg.id)
+    // );
     
-    // 标记为已读
-    unreadMessages.forEach(msg => {
-      markMessageAsRead(msg.id);
-      markedMessageIds.add(msg.id);
-    });
-  }, [messages, loginUser?.id, markMessageAsRead]);
+    // unreadMessages.forEach(msg => {
+    //   markMessageAsRead(msg.id);
+    //   markedMessageIds.add(msg.id);
+    // });
+  // }, [messages, loginUser?.id, markMessageAsRead]);
   
   // 当消息加载完成后滚动到底部
   useEffect(() => {
     if (messages && messages.length > 0) {
       scrollToBottom();
     }
-  }, [messages]);
+  }, [messages,scrollToBottom]);
+
+  // 过滤掉已经在数据库数据中存在的本地消息
+  const filteredPendingMessages = pendingMessages.filter(pendingMsg => {
+    // 如果存在temporary_id，检查是否已经在数据库消息中
+    if (pendingMsg.temporary_id && messages) {
+      // 如果数据库消息中已经存在相同的temporary_id，则过滤掉该本地消息
+      return !messages.some(dbMsg => dbMsg.temporaryId === pendingMsg.temporary_id);
+    }
+    // 没有temporary_id的消息保留显示
+    return true;
+  });
+  
+  useEffect(()=>{
+    
+  },[messages]);
   
   // 格式化消息时间
   const formatMessageTime = (date: Date) => {
@@ -167,7 +196,7 @@ export default function ChatDetailPage() {
     if (error) {
       return (
         <div className="fixed top-0 left-0 right-0 bg-red-500 text-white text-xs text-center py-1 z-20">
-          Connection error, please check the network
+          Connection error: {error.message}
         </div>
       );
     }
@@ -191,6 +220,14 @@ export default function ChatDetailPage() {
     return null;
   };
   
+  // 退出聊天室，彻底清理本地消息
+  // useEffect(() => {
+  //   return () => {
+  //     // 离开页面时清理所有本地消息
+  //     clearAllPendingMessages();
+  //   };
+  // }, [clearAllPendingMessages]);
+  
   return (
     <div className="flex flex-col h-full">
       {renderConnectionStatus()}
@@ -209,7 +246,7 @@ export default function ChatDetailPage() {
                 const isOwnMessage = msg.senderId === loginUser?.id;
                 
                 return (
-                  <div key={msg.id}>
+                  <div key={msg.id || `db-msg-${index}`}>
                     {/* 日期分割线 */}
                     {shouldShowDateDivider(index) && (
                       <div className="flex justify-center my-4">
@@ -222,13 +259,13 @@ export default function ChatDetailPage() {
                     {/* 消息气泡 */}
                     <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
                       {/* 对方头像 */}
-                      {!isOwnMessage && (
+                      {/* {!isOwnMessage && (
                         <Avatar
                           src={otherParticipant?.avatar || ''}
                           style={{ '--size': '36px' }}
                           className="mr-2"
                         />
-                      )}
+                      )} */}
                       
                       {/* 消息内容 */}
                       <div
@@ -278,40 +315,44 @@ export default function ChatDetailPage() {
               })}
               
               {/* 临时消息显示 */}
-              {pendingMessages.map(msg => (
-                <div key={msg.id} className="flex justify-end">
+              {filteredPendingMessages.map(msg => (
+                <div key={msg.temporary_id || msg.id || `local-msg-${msg.created_at}`} className="flex justify-end">
                   <div className="max-w-[70%] bg-lime-300 text-black rounded-tl-lg rounded-tr-lg rounded-bl-lg p-3 shadow-sm">
                     <div className="whitespace-pre-wrap break-words">{msg.content}</div>
                     
                     {/* 消息状态 */}
                     <div className="text-[10px] mt-1 text-gray-700 text-right flex items-center justify-end">
                       <span className="mr-1">
-                        {msg.status === 'sending' && 'Sending...'}
-                        {msg.status === 'failed' && 'Send failed'}
+                        {msg.status === MessageStatus.SENDING && 'Sending...'}
+                        {msg.status === MessageStatus.SENT && 'Sent'}
+                        {msg.status === MessageStatus.FAILED && 'Send failed'}
+                        {msg.status === MessageStatus.STORED && 'Stored'}
+                        {msg.status === MessageStatus.DELIVERED && 'Delivered'}
+                        {msg.status === MessageStatus.READ && 'Read'}
                       </span>
                       
                       {/* 重试按钮 */}
-                      {msg.status === 'failed' && (
+                      {/* {msg.status === 'failed' && (
                         <button
                           className="text-xs text-blue-600"
                           onClick={() => retryMessage(msg.id)}
                         >
                           Retry
                         </button>
-                      )}
+                      )} */}
                     </div>
                   </div>
                 </div>
               ))}
               
-              {/* 对方正在输入提示 */}
-              {otherUserTyping && (
+              {/* 对方正在输入提示 otherUserTyping */}
+              {false&& (
                 <div className="flex justify-start">
-                  <Avatar
+                  {/* <Avatar
                     src={otherParticipant?.avatar || ''}
                     style={{ '--size': '36px' }}
                     className="mr-2"
-                  />
+                  /> */}
                   <div className="bg-white text-black rounded-lg p-2 px-3 shadow-sm border border-gray-200">
                     <div className="flex space-x-1">
                       <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
@@ -323,7 +364,7 @@ export default function ChatDetailPage() {
               )}
               
               {/* 用于滚动到底部的引用点 */}
-              <div ref={messagesEndRef} className="h-1" />
+              <div ref={messagesEndRef} className="h-20" />
             </div>
           </>
         )}
@@ -336,8 +377,9 @@ export default function ChatDetailPage() {
             placeholder="Enter message..."
             value={message}
             onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
             autoSize={{ minRows: 1, maxRows: 4 }}
-            className="flex-1 bg-gray-100 rounded-xl p-3 mr-2"
+            className="flex-1 bg-gray-100 rounded-xl p-2 mr-2 h-10"
           />
           <Button
             color="primary"
@@ -346,7 +388,8 @@ export default function ChatDetailPage() {
             className="h-10 w-20 rounded-xl"
             style={{ 
               '--background-color': message.trim() ? '#65a30d' : '#d1d5db',
-              '--text-color': '#ffffff'
+              '--text-color': '#ffffff',
+              '--border-color':'none'
             }}
           >
             Send

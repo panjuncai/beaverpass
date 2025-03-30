@@ -66,3 +66,16 @@ export const BuyTabState = {
     HISTORY: "HISTORY"
 } as const;
 export const SellTabState = PostStatus;
+
+/**
+ * 消息状态枚举
+ */
+export enum MessageStatus {
+  SENDING = 'sending',    // 正在发送中
+  SENT = 'sent',          // 已发送到服务器
+  STORED = 'stored',      // 已存储到数据库
+  DELIVERED = 'delivered',// 已送达给接收者
+  READ = 'read',          // 已被接收者读取
+  FAILED = 'failed',      // 发送失败
+  RETRY = 'retry'         // 准备重试发送
+}

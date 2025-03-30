@@ -70,7 +70,7 @@ export default function ChatRoomPage({ params }: PageProps) {
   // 滚动到最新消息
   useEffect(() => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+      messagesEndRef.current.scrollIntoView({ behavior: "instant" });
     }
   }, [messages]);
 

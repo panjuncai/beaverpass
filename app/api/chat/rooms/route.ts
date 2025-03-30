@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { SocketEvents } from '@/lib/types/socket';
 import { prisma } from '@/lib/prisma';
 import {createClient} from '@/utils/supabase/server'
 
@@ -49,7 +48,6 @@ export async function POST(request: Request) {
       },
     });
     
-    // await pusher.trigger(`private-chat-${chatRoomId}`, SocketEvents.USER_ONLINE, userId);
     // 使用supabase触发事件
     await supabase.from('chat_room_participants').update({
       is_online: true,
@@ -97,7 +95,6 @@ export async function PUT(request: Request) {
       },
     });
     
-    // await pusher.trigger(`private-chat-${chatRoomId}`, SocketEvents.USER_OFFLINE, userId);
     // 使用supabase触发事件
     await supabase.from('chat_room_participants').update({
       is_online: false,
@@ -131,11 +128,6 @@ export async function PATCH(request: Request) {
       );
     }
     
-    // await pusher.trigger(`private-chat-${chatRoomId}`, SocketEvents.MESSAGE_TYPING, {
-    //   userId,
-    //   isTyping,
-    //   chatRoomId
-    // });
     // 使用supabase触发事件
     await supabase.from('chat_room_participants').update({
       is_typing: isTyping,

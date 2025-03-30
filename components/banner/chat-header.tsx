@@ -21,7 +21,7 @@ export default function ChatHeader() {
   // 标题显示逻辑
   const getPageTitle = () => {
     if (pathname === '/chat') {
-      return 'Message List';
+      return 'Inbox';
     } else if (pathname.includes('/chat/') && otherParticipant) {
       return otherParticipant.firstName + ' ' + otherParticipant.lastName || 'Chat';
     }

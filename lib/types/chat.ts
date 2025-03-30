@@ -1,3 +1,5 @@
+import { MessageType } from './enum';
+
 // 仅包含输入类型接口，移除了不再需要的类型定义
 
 // 这些输入类型接口仍然需要，因为它们用于定义 API 输入
@@ -10,7 +12,7 @@ export interface SendMessageInput {
   chatRoomId: string;
   content?: string; // 文本消息内容
   postId?: string; // 发送商品消息时的商品ID
-  messageType: string;
+  messageType:keyof typeof MessageType;
 }
 
 export interface GetChatRoomsInput {

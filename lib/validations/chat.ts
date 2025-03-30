@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MessageType } from "../types/enum";
+import { MessageType } from "@/lib/types/enum";
 
 export const createChatRoomSchema = z.object({
   participantIds: z.array(z.string().uuid()).min(1, "At least one participant is required"),
@@ -7,7 +7,7 @@ export const createChatRoomSchema = z.object({
 });
 
 export const sendMessageSchema = z.object({
-  id: z.string().uuid().optional(), // 临时消息ID
+  temporaryId: z.string().uuid().optional(), // 临时消息ID
   chatRoomId: z.string().uuid(),
   // 根据消息类型有条件地验证
   content: z.string().optional(),

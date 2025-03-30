@@ -3,6 +3,7 @@
 import ChatHeader from '@/components/banner/chat-header';
 import { Suspense } from 'react';
 import CenteredLoading from '../(main)/loading';
+import Footer from '@/components/banner/footer';
 
 export default function ChatLayout({
   children,
@@ -17,6 +18,7 @@ export default function ChatLayout({
           {children}
         </Suspense>
       </main>
+      <Footer />
     </div>
   );
 } 
