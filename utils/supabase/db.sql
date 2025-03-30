@@ -69,6 +69,8 @@ CREATE TABLE chat_rooms (
 CREATE TABLE chat_room_participants (
   chat_room_id UUID NOT NULL,
   user_id UUID NOT NULL,
+  is_online BOOLEAN DEFAULT FALSE,
+  last_active_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (chat_room_id,user_id),
   FOREIGN KEY (chat_room_id) REFERENCES chat_rooms(id) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -78,9 +80,10 @@ CREATE TABLE chat_room_participants (
 
 CREATE TABLE messages (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  temporary_id UUID,
   chat_room_id UUID NOT NULL REFERENCES chat_rooms(id) ON DELETE CASCADE,
   sender_id UUID REFERENCES users(id) ON DELETE SET NULL,
-
+  status TEXT DEFAULT 'SENT',
   content TEXT,
   post_id UUID REFERENCES posts(id) ON DELETE SET NULL,
   message_type TEXT NOT NULL DEFAULT 'TEXT',
@@ -137,3 +140,32 @@ CREATE TABLE orders (
 );
 CREATE INDEX idx_orders_buyer_id ON orders(buyer_id);
 CREATE INDEX idx_orders_seller_id ON orders(seller_id);
+
+
+-- 为messages表启用RLS
+ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
+
+-- 创建允许读取消息的策略
+CREATE POLICY "允许查看聊天室消息" ON messages
+  FOR SELECT 
+  USING (
+    chat_room_id IN (
+      SELECT chat_room_id 
+      FROM chat_room_participants 
+      WHERE user_id = auth.uid()
+    )
+  );
+
+-- 创建允许创建消息的策略
+CREATE POLICY "允许发送消息" ON messages
+  FOR INSERT 
+  WITH CHECK (
+    sender_id = auth.uid() AND
+    chat_room_id IN (
+      SELECT chat_room_id 
+      FROM chat_room_participants 
+      WHERE user_id = auth.uid()
+    )
+  );
+
+-- 也应该为其他相关表设置RLS

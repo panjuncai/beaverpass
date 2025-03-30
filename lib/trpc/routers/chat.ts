@@ -6,8 +6,15 @@ import {
   getMessagesSchema,
   markMessageReadSchema,
   sendMessageSchema,
+  getChatRoomByIdSchema,
+  joinChatRoomSchema,
+  leaveChatRoomSchema,
+  setTypingStatusSchema,
 } from "@/lib/validations/chat";
 import { MessageType } from "@/lib/types/enum";
+import { SocketEvents, MessageStatus } from "@/lib/types/socket";
+import {createClient} from '@/utils/supabase/server'
+const supabase = createClient();
 
 export const chatRouter = router({
   // 创建聊天室
@@ -91,14 +98,27 @@ export const chatRouter = router({
             });
           }
 
-          await ctx.prisma.message.create({
+          const message = await ctx.prisma.message.create({
             data: {
               chatRoomId: chatRoom.id,
               senderId: ctx.loginUser.id,
               postId: postId,
               messageType: MessageType.POST,
             },
+            include: {
+              sender: true,
+              post: {
+                include: {
+                  images: true,
+                },
+              },
+            },
           });
+        // supabase 触发事件
+        // to do...
+        await supabase.from('chat_room_participants').update({
+          is_typing: false,
+        }).eq('chat_room_id', chatRoom.id).eq('user_id', ctx.loginUser.id);
         }
 
         return chatRoom;
@@ -107,6 +127,69 @@ export const chatRouter = router({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to create chat room",
+        });
+      }
+    }),
+
+  // 获取单个聊天室
+  getChatRoomById: protectedProcedure
+    .input(getChatRoomByIdSchema)
+    .query(async ({ input, ctx }) => {
+      try {
+        const { chatRoomId } = input;
+        
+        // 检查聊天室是否存在
+        const chatRoom = await ctx.prisma.chatRoom.findUnique({
+          where: { id: chatRoomId },
+          include: {
+            participants: {
+              include: {
+                user: true,
+              },
+            },
+            messages: {
+              orderBy: {
+                createdAt: "desc",
+              },
+              take: 1,
+              include: {
+                sender: true,
+                post: true,
+                readBy: true,
+              },
+            },
+          },
+        });
+
+        if (!chatRoom) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Chat room not found",
+          });
+        }
+
+        // 检查用户是否是聊天室成员
+        const isMember = chatRoom.participants.some(
+          (participant) => participant.userId === ctx.loginUser.id
+        );
+
+        if (!isMember) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You are not a member of this chat room",
+          });
+        }
+
+        // 添加当前用户ID，方便前端识别
+        return {
+          ...chatRoom,
+          currentUserId: ctx.loginUser.id,
+        };
+      } catch (error) {
+        console.error("Failed to get chat room:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to get chat room",
         });
       }
     }),
@@ -217,8 +300,8 @@ export const chatRouter = router({
     .input(sendMessageSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        const { chatRoomId, content, postId, messageType } = input;
-
+        const { id, chatRoomId, content, postId, messageType } = input;
+        const supabase = await createClient();
         // 检查用户是否是聊天室成员
         const isMember = await ctx.prisma.chatRoomParticipant.findUnique({
           where: {
@@ -273,8 +356,6 @@ export const chatRouter = router({
           messageData.postId = postId ?? null;
         }
 
-        console.log("messageData", messageData);
-
         const message = await ctx.prisma.message.create({
           data: messageData,
           include: {
@@ -292,6 +373,14 @@ export const chatRouter = router({
           where: { id: chatRoomId },
           data: { updatedAt: new Date() },
         });
+        
+        // 使用supabase触发消息通知
+        // to do...
+        
+        // 如果提供了临时ID，发送消息已存储通知
+        if (id) {
+          // to do...
+        }
 
         return message;
       } catch (error) {
@@ -358,13 +447,114 @@ export const chatRouter = router({
             readAt: new Date(),
           },
         });
-
+        
+        // 使用supabase触发已读通知
+        // to do...
         return readBy;
       } catch (error) {
         console.error("Failed to mark message as read:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to mark message as read",
+        });
+      }
+    }),
+    
+  // 加入聊天室（更新用户在线状态）
+  joinChatRoom: protectedProcedure
+    .input(joinChatRoomSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { chatRoomId, userId } = input;
+        
+        // 验证用户是否属于该聊天室
+        const participant = await ctx.prisma.chatRoomParticipant.findFirst({
+          where: {
+            chatRoomId,
+            userId,
+          },
+        });
+        
+        if (!participant) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "User is not a participant of the chat room",
+          });
+        }
+        
+        // 更新用户状态
+        await ctx.prisma.chatRoomParticipant.update({
+          where: {
+            chatRoomId_userId: {
+              chatRoomId,
+              userId,
+            },
+          },
+          data: {
+            isOnline: true,
+            lastActiveAt: new Date(),
+          },
+        });
+        
+        // 使用supabase触发用户上线通知
+        // to do...
+        return { success: true };
+      } catch (error) {
+        console.error("Failed to join chat room:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to join chat room",
+        });
+      }
+    }),
+    
+  // 离开聊天室（更新用户离线状态）
+  leaveChatRoom: protectedProcedure
+    .input(leaveChatRoomSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { chatRoomId, userId } = input;
+        
+        // 更新用户状态
+        await ctx.prisma.chatRoomParticipant.update({
+          where: {
+            chatRoomId_userId: {
+              chatRoomId,
+              userId,
+            },
+          },
+          data: {
+            lastActiveAt: new Date(),
+          },
+        });
+        
+        // 使用supabase触发用户离线通知
+        // to do...
+        return { success: true };
+      } catch (error) {
+        console.error("Failed to leave chat room:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to leave chat room",
+        });
+      }
+    }),
+    
+  // 设置正在输入状态
+  setTypingStatus: protectedProcedure
+    .input(setTypingStatusSchema)
+    .mutation(async ({ input }) => {
+      try {
+        const { chatRoomId, userId, isTyping } = input;
+        
+        // 使用supabase触发用户正在输入通知
+        // to do...
+        return { success: true };
+      } catch (error) {
+        console.error("Failed to update typing status:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to update typing status",
         });
       }
     }),

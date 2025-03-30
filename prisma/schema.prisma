@@ -107,6 +107,8 @@ model ChatRoom {
 model ChatRoomParticipant {
   chatRoomId String    @map("chat_room_id") @db.Uuid
   userId     String    @map("user_id") @db.Uuid
+  isOnline   Boolean   @default(false) @map("is_online")
+  lastActiveAt DateTime? @default(now()) @map("last_active_at") @db.Timestamptz(6)
   createdAt  DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt  DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   chatRoom   ChatRoom  @relation(fields: [chatRoomId], references: [id], onDelete: Cascade, onUpdate: Restrict)
@@ -118,8 +120,10 @@ model ChatRoomParticipant {
 
 model Message {
   id          String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  temporaryId String?    @map("temporary_id") @db.Uuid
   chatRoomId  String     @map("chat_room_id") @db.Uuid
   senderId    String?    @map("sender_id") @db.Uuid
+  status      String?    @default("SENT") @map("status")
   content     String?
   postId      String?    @map("post_id") @db.Uuid
   messageType String?    @default("TEXT") @map("message_type")

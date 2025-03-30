@@ -1,16 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Tabs, Avatar, Badge } from "antd-mobile";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { trpc } from "@/lib/trpc/client";
 import NoLogin from "@/components/utils/no-login";
 import formatTime from "@/utils/tools/format-time";
+
 export default function InboxPage() {
   const router = useRouter();
   const { loginUser } = useAuthStore();
   const [activeTab, setActiveTab] = useState("all");
+
+  useEffect(() => {
+    // 将inbox页面重定向到chat页面
+    router.replace('/chat');
+  }, [router]);
 
   // 获取聊天室列表
   const chatRoomsQuery = trpc.chat.getChatRooms.useQuery(
@@ -142,22 +148,8 @@ export default function InboxPage() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white">
-      {/* 选项卡 */}
-      <Tabs
-        activeKey={activeTab}
-        onChange={setActiveTab}
-      >
-        <Tabs.Tab title="All" key="all">
-          {renderChatList("all")}
-        </Tabs.Tab>
-        <Tabs.Tab title="Buying" key="buying">
-          {renderChatList("buying")}
-        </Tabs.Tab>
-        <Tabs.Tab title="Selling" key="selling">
-          {renderChatList("selling")}
-        </Tabs.Tab>
-      </Tabs>
+    <div className="flex items-center justify-center h-screen">
+      <div className="animate-spin w-8 h-8 border-t-2 border-lime-600 rounded-full"></div>
     </div>
   );
 }

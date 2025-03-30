@@ -7,6 +7,7 @@ export const createChatRoomSchema = z.object({
 });
 
 export const sendMessageSchema = z.object({
+  id: z.string().uuid().optional(), // 临时消息ID
   chatRoomId: z.string().uuid(),
   // 根据消息类型有条件地验证
   content: z.string().optional(),
@@ -28,6 +29,10 @@ export const getChatRoomsSchema = z.object({
   userId: z.string().uuid(),
 });
 
+export const getChatRoomByIdSchema = z.object({
+  chatRoomId: z.string().uuid(),
+});
+
 export const getMessagesSchema = z.object({
   chatRoomId: z.string().uuid(),
   limit: z.number().min(1).max(50).optional().default(20),
@@ -39,8 +44,31 @@ export const markMessageReadSchema = z.object({
   userId: z.string().uuid(),
 });
 
+// 加入聊天室Schema
+export const joinChatRoomSchema = z.object({
+  chatRoomId: z.string().uuid(),
+  userId: z.string().uuid(),
+});
+
+// 离开聊天室Schema
+export const leaveChatRoomSchema = z.object({
+  chatRoomId: z.string().uuid(),
+  userId: z.string().uuid(),
+});
+
+// 更新正在输入状态Schema
+export const setTypingStatusSchema = z.object({
+  chatRoomId: z.string().uuid(),
+  userId: z.string().uuid(),
+  isTyping: z.boolean(),
+});
+
 export type CreateChatRoomInput = z.infer<typeof createChatRoomSchema>;
 export type SendMessageInput = z.infer<typeof sendMessageSchema>;
 export type GetChatRoomsInput = z.infer<typeof getChatRoomsSchema>;
+export type GetChatRoomByIdInput = z.infer<typeof getChatRoomByIdSchema>;
 export type GetMessagesInput = z.infer<typeof getMessagesSchema>;
-export type MarkMessageReadInput = z.infer<typeof markMessageReadSchema>; 
+export type MarkMessageReadInput = z.infer<typeof markMessageReadSchema>;
+export type JoinChatRoomInput = z.infer<typeof joinChatRoomSchema>;
+export type LeaveChatRoomInput = z.infer<typeof leaveChatRoomSchema>;
+export type SetTypingStatusInput = z.infer<typeof setTypingStatusSchema>; 
