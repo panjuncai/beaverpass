@@ -9,6 +9,20 @@ export const postRouter = router({
     .input(getPostByIdSchema)
     .query(async ({ input, ctx }) => {
       try {
+        // Define a mapping function to handle nullable fields
+        const mapUser = (user: any) => {
+          if (!user) return null;
+          return {
+            id: user.id,
+            email: user.email,
+            firstName: user.firstName || "",
+            lastName: user.lastName || "",
+            avatar: user.avatar || null,
+            phone: user.phone || null,
+            address: user.address || null
+          };
+        };
+        
         const post = await ctx.prisma.post.findUnique({
           where: { id: input.id },
           include: {
@@ -23,7 +37,14 @@ export const postRouter = router({
           message: 'Post not found',
         });
       }
-      return post;
+      
+      // Map the post to handle nullable fields
+      const mappedPost = {
+        ...post,
+        poster: mapUser(post.poster)
+      };
+      
+      return mappedPost;
       } catch (error) {
         console.error('🙀🙀🙀Failed to get post:', error);
         throw new TRPCError({
@@ -37,6 +58,20 @@ export const postRouter = router({
     .input(getPostsSchema)
     .query(async ({ input, ctx }) => {
       try {
+        // Define a mapping function to handle nullable fields
+        const mapUser = (user: any) => {
+          if (!user) return null;
+          return {
+            id: user.id,
+            email: user.email,
+            firstName: user.firstName || "",
+            lastName: user.lastName || "",
+            avatar: user.avatar || null,
+            phone: user.phone || null,
+            address: user.address || null
+          };
+        };
+        
         const posts = await ctx.prisma.post.findMany({
           take: input.limit,
           where: {
@@ -60,7 +95,14 @@ export const postRouter = router({
         },
         ...(input.cursor && { cursor: { id: input.cursor }, skip: 1 }),
       });
-      return posts;
+      
+      // Map the posts to handle nullable fields
+      const mappedPosts = posts.map(post => ({
+        ...post,
+        poster: mapUser(post.poster)
+      }));
+      
+      return mappedPosts;
       } catch (error) {
         console.error('🙀🙀🙀Failed to get posts:', error);
         throw new TRPCError({
@@ -73,6 +115,20 @@ export const postRouter = router({
     .input(createPostSchema)
     .mutation(async ({ input, ctx }) => {
       try {
+        // Define a mapping function to handle nullable fields
+        const mapUser = (user: any) => {
+          if (!user) return null;
+          return {
+            id: user.id,
+            email: user.email,
+            firstName: user.firstName || "",
+            lastName: user.lastName || "",
+            avatar: user.avatar || null,
+            phone: user.phone || null,
+            address: user.address || null
+          };
+        };
+        
         // 使用事务来确保帖子和图片同时保存
         const post = await ctx.prisma.$transaction(async (tx) => {
           // 创建帖子
@@ -110,7 +166,13 @@ export const postRouter = router({
           });
         });
 
-        return post;
+        // Map the post to handle nullable fields
+        const mappedPost = post ? {
+          ...post,
+          poster: mapUser(post.poster)
+        } : null;
+
+        return mappedPost;
       } catch (error) {
         console.error('🙀🙀🙀Failed to create post:', error);
         throw new TRPCError({

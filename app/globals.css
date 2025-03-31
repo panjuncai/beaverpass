@@ -134,3 +134,15 @@ body {
   font-weight: 600;
   letter-spacing: -0.01em;
 }
+
+/* Add this anywhere in the file */
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+}

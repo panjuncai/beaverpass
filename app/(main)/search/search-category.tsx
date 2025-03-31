@@ -6,83 +6,83 @@ export default function SearchCategory({
   setSelectedCategory: React.Dispatch<React.SetStateAction<string>>;
 }) {
   return (
-    <div className="overflow-x-auto p-2 ml-2 mr-2">
-      <div className="flex gap-2 min-w-max">
+    <div className="overflow-x-auto no-scrollbar pt-2 pb-6 px-4">
+      <div className="flex gap-4 min-w-max">
         <button
-          className={`btn ${
+          className={`w-16 h-9 rounded-xl transition-colors flex items-center justify-center border border-neutral-900/20 text-sm font-semibold font-['Poppins'] ${
             selectedCategory === "All"
-              ? "btn-primary"
-              : "btn-outline text-gray-400"
+              ? "bg-yellow-900/90 text-white"
+              : "bg-white text-neutral-900/20 hover:bg-gray-100"
           }`}
           onClick={() => setSelectedCategory("All")}
         >
           All
         </button>
         <button
-          className={`btn ${
+          className={`h-9 px-6 rounded-xl transition-colors flex items-center justify-center border border-neutral-900/20 text-sm font-semibold font-['Poppins'] ${
             selectedCategory === "Bed"
-              ? "btn-primary"
-              : "btn-outline text-gray-400"
+              ? "bg-yellow-900/90 text-white"
+              : "bg-white text-neutral-900/20 hover:bg-gray-100"
           }`}
           onClick={() => setSelectedCategory("Bed")}
         >
           Beds
         </button>
         <button
-          className={`btn ${
+          className={`h-9 px-6 rounded-xl transition-colors flex items-center justify-center border border-neutral-900/20 text-sm font-semibold font-['Poppins'] ${
             selectedCategory === "Desk"
-              ? "btn-primary"
-              : "btn-outline text-gray-400"
+              ? "bg-yellow-900/90 text-white"
+              : "bg-white text-neutral-900/20 hover:bg-gray-100"
           }`}
           onClick={() => setSelectedCategory("Desk")}
         >
           Desks
         </button>
         <button
-          className={`btn ${
+          className={`h-9 px-6 rounded-xl transition-colors flex items-center justify-center border border-neutral-900/20 text-sm font-semibold font-['Poppins'] ${
             selectedCategory === "Chair"
-              ? "btn-primary"
-              : "btn-outline text-gray-400"
+              ? "bg-yellow-900/90 text-white"
+              : "bg-white text-neutral-900/20 hover:bg-gray-100"
           }`}
           onClick={() => setSelectedCategory("Chair")}
         >
           Chairs
         </button>
         <button
-          className={`btn ${
+          className={`h-9 px-6 rounded-xl transition-colors flex items-center justify-center border border-neutral-900/20 text-sm font-semibold font-['Poppins'] ${
             selectedCategory === "Table"
-              ? "btn-primary"
-              : "btn-outline text-gray-400"
+              ? "bg-yellow-900/90 text-white"
+              : "bg-white text-neutral-900/20 hover:bg-gray-100"
           }`}
           onClick={() => setSelectedCategory("Table")}
         >
           Tables
         </button>
         <button
-          className={`btn ${
+          className={`h-9 px-6 rounded-xl transition-colors flex items-center justify-center border border-neutral-900/20 text-sm font-semibold font-['Poppins'] ${
             selectedCategory === "Sofa"
-              ? "btn-primary"
-              : "btn-outline text-gray-400"
+              ? "bg-yellow-900/90 text-white"
+              : "bg-white text-neutral-900/20 hover:bg-gray-100"
           }`}
           onClick={() => setSelectedCategory("Sofa")}
         >
           Sofas
         </button>
         <button
-          className={`btn ${
+          className={`h-9 px-6 rounded-xl transition-colors flex items-center justify-center border border-neutral-900/20 text-sm font-semibold font-['Poppins'] ${
             selectedCategory === "Storage"
-              ? "btn-primary"
-              : "btn-outline text-gray-400"
+              ? "bg-yellow-900/90 text-white"
+              : "bg-white text-neutral-900/20 hover:bg-gray-100"
           }`}
           onClick={() => setSelectedCategory("Storage")}
         >
           Storage
         </button>
         <button
-          className={`btn ${
+          className={`h-9 px-6 rounded-xl transition-colors flex items-center justify-center border border-neutral-900/20 text-sm font-semibold font-['Poppins'] ${
             selectedCategory === "Other"
-              ? "btn-primary"
-              : "btn-outline text-gray-400"
+              ? "bg-yellow-900/90 text-white"
+              : "bg-white text-neutral-900/20 hover:bg-gray-100"
           }`}
           onClick={() => setSelectedCategory("Other")}
         >

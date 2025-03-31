@@ -36,7 +36,7 @@ export default function Header() {
           router.push('/');
         }}>
           <Image
-            src="/logo_beta_removebg.png"
+            src="/homepage/logo_maple.png"
             alt="logo"
             fill
             priority

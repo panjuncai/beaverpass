@@ -2,13 +2,22 @@
 import Image from "next/image";
 import { trpc } from "@/lib/trpc/client";
 import { useRouter } from "next/navigation";  
-import { HeartOutline } from "antd-mobile-icons";
+import { HeartOutline, HeartFill } from "antd-mobile-icons";
 import { useState } from "react";
 import Loading from "@/components/utils/loading";
 
 export default function ProductsShow({selectedCategory,search}:{selectedCategory:string,search:string}) {
   const router = useRouter();
   const [isLoading,setIsLoading] = useState(false)
+  const [favorites, setFavorites] = useState<Record<string, boolean>>({});
+
+  const toggleFavorite = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setFavorites(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
 
   const { data: posts,isLoading:isLoadingPosts } = trpc.post.getPosts.useQuery({
     limit: 10,
@@ -37,6 +46,16 @@ export default function ProductsShow({selectedCategory,search}:{selectedCategory
                       priority={posts?.indexOf(post) < 4}
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                     />
+                    <button 
+                      className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-md z-10 hover:bg-white transition-all"
+                      onClick={(e) => toggleFavorite(post.id, e)}
+                    >
+                      {favorites[post.id] ? (
+                        <HeartFill fontSize={18} className="text-[#7EAC2D]" />
+                      ) : (
+                        <HeartOutline fontSize={18} className="text-gray-600 opacity-50" />
+                      )}
+                    </button>
                   </div>
                 </figure>
                 <div
@@ -48,14 +67,6 @@ export default function ProductsShow({selectedCategory,search}:{selectedCategory
                     ${post.amount.toString() === "0" ? "Free" : post.amount.toString()}{" "}
                     <em>{post.isNegotiable ? "Negotiable" : ""}</em>
                   </p>
-                  <button className="absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center">
-                    {/* {index % 2 === 0 ? (
-                      <HeartOutline fontSize={24} />
-                    ) : (
-                      <HeartFill color="#BED596" fontSize={24} />
-                    )} */}
-                    <HeartOutline fontSize={24} />
-                  </button>
                 </div>
               </div>
             ))}
