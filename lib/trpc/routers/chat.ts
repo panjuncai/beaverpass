@@ -140,7 +140,7 @@ export const chatRouter = router({
         }
         return chatRoom;
       } catch (error) {
-        console.error("Failed to create chat room:", error);
+        console.error("🙀🙀🙀Failed to create chat room:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to create chat room",
@@ -179,6 +179,7 @@ export const chatRouter = router({
         });
 
         if (!chatRoom) {
+          console.error("🙀🙀🙀Chat room not found");
           throw new TRPCError({
             code: "NOT_FOUND",
             message: "Chat room not found",
@@ -203,7 +204,7 @@ export const chatRouter = router({
           currentUserId: ctx.loginUser.id,
         };
       } catch (error) {
-        console.error("Failed to get chat room:", error);
+        console.error("🙀🙀🙀Failed to get chat room:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to get chat room",
@@ -216,6 +217,7 @@ export const chatRouter = router({
     .input(getChatRoomsSchema)
     .query(async ({ input, ctx }) => {
       try {
+        // console.log("🐱🐱🐱Getting chat rooms for user:", input.userId);
         const chatRooms = await ctx.prisma.chatRoom.findMany({
           where: {
             participants: {
@@ -248,7 +250,7 @@ export const chatRouter = router({
 
         return chatRooms;
       } catch (error) {
-        console.error("Failed to get chat rooms:", error);
+        console.error("🙀🙀🙀Failed to get chat rooms:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to get chat rooms",
@@ -274,6 +276,7 @@ export const chatRouter = router({
         });
 
         if (!isMember) {
+          console.error("🙀🙀🙀You are not a member of this chat room");
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "You are not a member of this chat room",
@@ -304,7 +307,7 @@ export const chatRouter = router({
 
         return messages;
       } catch (error) {
-        console.error("Failed to get messages:", error);
+        console.error("🙀🙀🙀Failed to get messages:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to get messages",
@@ -325,7 +328,7 @@ export const chatRouter = router({
         });
         return message;
       } catch (error) {
-        console.error("Failed to get messages by temporary id:", error);
+        console.error("🙀🙀🙀Failed to get messages by temporary id:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to get messages by temporary id",
@@ -350,6 +353,7 @@ export const chatRouter = router({
         });
 
         if (!chatRoom) {
+          console.error("🙀🙀🙀Chat room not found");
           throw new TRPCError({
             code: "NOT_FOUND",
             message: "Chat room not found",
@@ -362,6 +366,7 @@ export const chatRouter = router({
         );
 
         if (!isMember) {
+          console.error("🙀🙀🙀You are not a member of this chat room");
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "You are not a member of this chat room",
@@ -408,7 +413,7 @@ export const chatRouter = router({
 
           messageData.post_id = postId ?? null;
         }
-        console.log("🐱🐱🐱messageData:", messageData);
+        // console.log("🐱🐱🐱messageData:", messageData);
         // 使用supabase插入消息,触发realtime事件
         const message = await supabase.from('messages').insert(messageData).select().single();
         // const message = await ctx.prisma.message.create({
@@ -422,7 +427,7 @@ export const chatRouter = router({
         //     },
         //   },
         // });
-        console.log("🐱🐱🐱db response message:", message);
+        // console.log("🐱🐱🐱db response message:", message);
 
         // 更新聊天室最后活动时间
         await ctx.prisma.chatRoom.update({
@@ -438,7 +443,7 @@ export const chatRouter = router({
 
         return message;
       } catch (error) {
-        console.error("Failed to send message:", error);
+        console.error("🙀🙀🙀Failed to send message:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to send message",
@@ -467,6 +472,7 @@ export const chatRouter = router({
         });
 
         if (!message) {
+          console.error("🙀🙀🙀Message not found");
           throw new TRPCError({
             code: "NOT_FOUND",
             message: "Message not found",
@@ -479,6 +485,7 @@ export const chatRouter = router({
         );
 
         if (!isMember) {
+          console.error("🙀🙀🙀You are not a member of this chat room");
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "You are not a member of this chat room",
@@ -506,7 +513,7 @@ export const chatRouter = router({
         return readBy;
         
       } catch (error) {
-        console.error("Failed to mark message as read:", error);
+        console.error("🙀🙀🙀Failed to mark message as read:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to mark message as read",
@@ -531,6 +538,7 @@ export const chatRouter = router({
         });
         
         if (!participant) {
+          console.error("🙀🙀🙀User is not a participant of the chat room");
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "User is not a participant of the chat room",
@@ -545,7 +553,7 @@ export const chatRouter = router({
         
         return { success: true };
       } catch (error) {
-        console.error("Failed to join chat room:", error);
+        console.error("🙀🙀🙀Failed to join chat room:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to join chat room",
@@ -570,7 +578,7 @@ export const chatRouter = router({
         
         return { success: true };
       } catch (error) {
-        console.error("Failed to leave chat room:", error);
+        console.error("🙀🙀🙀Failed to leave chat room:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to leave chat room",
@@ -594,7 +602,7 @@ export const chatRouter = router({
         
         return { success: true };
       } catch (error) {
-        console.error("Failed to update typing status:", error);
+        console.error("🙀🙀🙀Failed to update typing status:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to update typing status",

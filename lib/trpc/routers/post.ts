@@ -8,28 +8,38 @@ export const postRouter = router({
   getPostById: publicProcedure
     .input(getPostByIdSchema)
     .query(async ({ input, ctx }) => {
-      const post = await ctx.prisma.post.findUnique({
-        where: { id: input.id },
-        include: {
+      try {
+        const post = await ctx.prisma.post.findUnique({
+          where: { id: input.id },
+          include: {
           images: true,
           poster: true,
         },
       });
       if (!post) {
+        console.error('🙀🙀🙀Post not found');
         throw new TRPCError({
           code: 'NOT_FOUND',
           message: 'Post not found',
         });
       }
       return post;
+      } catch (error) {
+        console.error('🙀🙀🙀Failed to get post:', error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error instanceof Error ? error.message : "Failed to get post",
+        });
+      }
     }),
   // 获取帖子列表
   getPosts: publicProcedure
     .input(getPostsSchema)
     .query(async ({ input, ctx }) => {
-      const posts = await ctx.prisma.post.findMany({
-        take: input.limit,
-        where: {
+      try {
+        const posts = await ctx.prisma.post.findMany({
+          take: input.limit,
+          where: {
           ...(input.posterId && { posterId: input.posterId }),
           ...(input.category && { category: input.category }),
           ...(input.search && {
@@ -51,6 +61,13 @@ export const postRouter = router({
         ...(input.cursor && { cursor: { id: input.cursor }, skip: 1 }),
       });
       return posts;
+      } catch (error) {
+        console.error('🙀🙀🙀Failed to get posts:', error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error instanceof Error ? error.message : "Failed to get posts",
+        });
+      }
     }),
   createPost: protectedProcedure
     .input(createPostSchema)
@@ -95,7 +112,7 @@ export const postRouter = router({
 
         return post;
       } catch (error) {
-        console.error('Failed to create post:', error);
+        console.error('🙀🙀🙀Failed to create post:', error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: error instanceof Error ? error.message : "Failed to create post",
@@ -105,11 +122,19 @@ export const postRouter = router({
   updatePost: protectedProcedure
     .input(updatePostSchema)
     .mutation(async ({ input, ctx }) => {
+      try{
       const { id, status } = input;
       const updatedPost = await ctx.prisma.post.update({
         where: { id },
         data: { status },
       });
       return updatedPost;
+      } catch (error) {
+        console.error('🙀🙀🙀Failed to update post:', error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error instanceof Error ? error.message : "Failed to update post",
+        });
+      }
     }),
 });
