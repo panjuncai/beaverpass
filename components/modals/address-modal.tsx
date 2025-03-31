@@ -102,6 +102,14 @@ export default function AddressModal({
             mapTypeControl: false,
           });
 
+          // 延迟触发地图重绘
+          setTimeout(() => {
+            if (mapRefs.current.map) {
+              google.maps.event.trigger(mapRefs.current.map, 'resize');
+              console.log('Triggered map resize');
+            }
+          }, 300);
+
           // 添加地图点击事件
           mapRefs.current.map.addListener('click', (e: google.maps.MapMouseEvent) => {
             if (e.latLng) {
@@ -272,6 +280,30 @@ export default function AddressModal({
     }
   }, [searchRange, googleMapsLoaded]);
 
+  // 当模态框打开时，确保地图正确渲染
+  useEffect(() => {
+    if (isOpen && mapRefs.current.map) {
+      // 短暂延迟后重绘地图，解决初始渲染问题
+      setTimeout(() => {
+        if (mapRefs.current.map) {
+          // 手动触发重新计算尺寸
+          window.dispatchEvent(new Event('resize'));
+          // 触发地图重绘
+          google.maps.event.trigger(mapRefs.current.map, 'resize');
+          console.log('Modal open, triggered map resize');
+          
+          // 如果有标记，确保地图居中在标记位置
+          if (mapRefs.current.marker) {
+            const position = mapRefs.current.marker.getPosition();
+            if (position) {
+              mapRefs.current.map.setCenter(position);
+            }
+          }
+        }
+      }, 100);
+    }
+  }, [isOpen]);
+
   const handleSaveAddress = async () => {
     if (!loginUser?.id) return;
     
@@ -318,7 +350,8 @@ export default function AddressModal({
           ) : (
             <div 
               ref={mapRef} 
-              className="w-full h-80 rounded-lg mb-4 bg-gray-100"
+              className="w-full h-80 rounded-lg bg-gray-100 mb-4"
+              style={{ minHeight: '320px', display: 'block' }}
             ></div>
           )}
           
