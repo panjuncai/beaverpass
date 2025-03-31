@@ -3,7 +3,12 @@ import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
 import {createClient} from "@/utils/supabase/server"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+if (!process.env.STRIPE_SECRET_KEY) {
+  console.error("🙀🙀🙀 [PAYMENT_INTENT] STRIPE_SECRET_KEY is not set in environment variables");
+  throw new Error('STRIPE_SECRET_KEY is not set in environment variables');
+}
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2023-08-16",
 });
 
@@ -41,11 +46,12 @@ export async function POST(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    if (!order.total || order.total.lessThan(0)) {
+    if (!order.total || Number(order.total) <= 0) {
       console.error("🙀🙀🙀 [PAYMENT_INTENT] Invalid order total:", order.total);
       return new NextResponse("Invalid order total", { status: 400 });
     }
 
+    console.log("🐱🐱🐱[PAYMENT_INTENT] Creating payment intent with amount:", order.total);
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(Number(order.total) * 100), // Stripe expects amount in cents
       currency: "cad",
