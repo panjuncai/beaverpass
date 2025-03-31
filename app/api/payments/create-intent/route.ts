@@ -11,25 +11,39 @@ export async function POST(req: Request) {
   try {
     const supabase = await createClient()
     const { data: { session } } = await supabase.auth.getSession()
-    // console.log(`session----------: ${JSON.stringify(session)}`);
+    
     if (!session?.user?.id) {
+      console.error("🙀🙀🙀 [PAYMENT_INTENT] No authenticated user found");
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { orderId} = await req.json();
-    // console.log(`orderId----------: ${orderId}`);
+    const { orderId } = await req.json();
+    if (!orderId) {
+      console.error("🙀🙀🙀 [PAYMENT_INTENT] No orderId provided");
+      return new NextResponse("Order ID is required", { status: 400 });
+    }
+
     const order = await prisma.order.findUnique({
       where: { id: orderId },
       include: { post: true },
     });
-    // console.log(`order----------: ${JSON.stringify(order)}`);
     
     if (!order) {
+      console.error("🙀🙀🙀 [PAYMENT_INTENT] Order not found:", orderId);
       return new NextResponse("Order not found", { status: 404 });
     }
 
     if (order.buyerId !== session.user.id) {
+      console.error("🙀🙀🙀 [PAYMENT_INTENT] Unauthorized access attempt:", {
+        orderBuyerId: order.buyerId,
+        sessionUserId: session.user.id
+      });
       return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    if (!order.total || order.total.lessThan(0)) {
+      console.error("🙀🙀🙀 [PAYMENT_INTENT] Invalid order total:", order.total);
+      return new NextResponse("Invalid order total", { status: 400 });
     }
 
     const paymentIntent = await stripe.paymentIntents.create({
@@ -56,7 +70,10 @@ export async function POST(req: Request) {
       data: { clientSecret: paymentIntent.client_secret! }
     });
   } catch (error) {
-    console.error("[PAYMENT_INTENT]", error);
+    console.error("🙀🙀🙀 [PAYMENT_INTENT] Error:", error);
+    if (error instanceof Stripe.errors.StripeError) {
+      return new NextResponse(error.message, { status: 400 });
+    }
     return new NextResponse("Internal Error", { status: 500 });
   }
 } 

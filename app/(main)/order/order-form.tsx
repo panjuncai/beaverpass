@@ -66,7 +66,7 @@ export function OrderForm({ postId, sellerId, total }: OrderFormProps) {
 
   return (
     <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6">创建订单</h2>
+      <h2 className="text-2xl font-bold mb-6">Create Order</h2>
       
       {error && (
         <div className="p-3 mb-4 text-sm text-red-500 bg-red-100 rounded-md">
@@ -78,7 +78,7 @@ export function OrderForm({ postId, sellerId, total }: OrderFormProps) {
         {/* 收货地址 */}
         <div>
           <label htmlFor="shippingAddress" className="block text-sm font-medium text-gray-700">
-            收货地址
+            Shipping Address
           </label>
           <input
             type="text"
@@ -94,7 +94,7 @@ export function OrderForm({ postId, sellerId, total }: OrderFormProps) {
         {/* 收货人 */}
         <div>
           <label htmlFor="shippingReceiver" className="block text-sm font-medium text-gray-700">
-            收货人
+            Shipping Receiver
           </label>
           <input
             type="text"
@@ -110,7 +110,7 @@ export function OrderForm({ postId, sellerId, total }: OrderFormProps) {
         {/* 联系电话 */}
         <div>
           <label htmlFor="shippingPhone" className="block text-sm font-medium text-gray-700">
-            联系电话
+            Shipping Phone
           </label>
           <input
             type="tel"
@@ -126,7 +126,7 @@ export function OrderForm({ postId, sellerId, total }: OrderFormProps) {
         {/* 支付方式 */}
         <div>
           <label htmlFor="paymentMethod" className="block text-sm font-medium text-gray-700">
-            支付方式
+            Payment Method
           </label>
           <select
             id="paymentMethod"
@@ -147,23 +147,23 @@ export function OrderForm({ postId, sellerId, total }: OrderFormProps) {
         {/* 订单金额信息 */}
         <div className="border-t pt-4 mt-6">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-gray-600">商品总价</span>
+            <span className="text-gray-600">Total Price</span>
             <span className="font-medium">${total}</span>
           </div>
           <div className="flex justify-between items-center mb-2">
-            <span className="text-gray-600">配送费</span>
+            <span className="text-gray-600">Delivery Fee</span>
             <span className="font-medium">${0}</span>
           </div>
           <div className="flex justify-between items-center mb-2">
-            <span className="text-gray-600">服务费</span>
+            <span className="text-gray-600">Service Fee</span>
             <span className="font-medium">${0}</span>
           </div>
           <div className="flex justify-between items-center mb-2">
-            <span className="text-gray-600">税费</span>
+            <span className="text-gray-600">Tax</span>
             <span className="font-medium">${0}</span>
           </div>
           <div className="flex justify-between items-center font-bold text-lg border-t pt-2">
-            <span>总计</span>
+            <span>Total</span>
             <span>${total}</span>
           </div>
         </div>
@@ -173,7 +173,7 @@ export function OrderForm({ postId, sellerId, total }: OrderFormProps) {
           disabled={isLoading}
           className="w-full btn btn-primary"
         >
-          {isLoading ? '提交中...' : '提交订单'}
+          {isLoading ? 'Submitting...' : 'Submit Order'}
         </button>
       </form>
     </div>

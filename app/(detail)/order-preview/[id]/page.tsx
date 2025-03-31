@@ -112,18 +112,25 @@ export default function OrderPage() {
       console.log('Submitting order with data:', orderData);
       const order = await createOrderMutation.mutateAsync(orderData);
 
-      const { data: paymentData } = await fetch("/api/payments/create-intent", {
+      const response = await fetch("/api/payments/create-intent", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ orderId: order.id }),
-      }).then((res) => res.json());
+      });
 
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error("Payment intent creation failed:", errorData);
+        throw new Error("Failed to create payment intent");
+      }
+
+      const { data: paymentData } = await response.json();
       setClientSecret(paymentData.clientSecret);
     } catch (error) {
       console.error("Error creating order:", error);
-      setError("Failed to create order");
+      setError(error instanceof Error ? error.message : "Failed to create order");
     }
   };
 
