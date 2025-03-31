@@ -14,7 +14,8 @@ export default function Header() {
       '/inbox': 'Inbox',
       '/chat': 'Chat',
       '/deals': 'Deals',
-      '/post':'Post'
+      '/post':'Post',
+      '/profile':'Profile'
     };
     
     // 检查当前路径是否需要显示标题
@@ -50,7 +51,7 @@ export default function Header() {
   // 判断是否显示返回按钮
   const shouldShowBackButton = () => {
     // 在这些路径下显示返回按钮
-    const pathsWithBackButton = ['/chat'];
+    const pathsWithBackButton = ['/chat', '/profile'];
     
     return pathsWithBackButton.some(path => 
       pathname === path || pathname?.startsWith(`${path}/`)

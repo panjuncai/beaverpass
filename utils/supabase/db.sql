@@ -170,3 +170,64 @@ alter publication supabase_realtime add table messages, chat_room_participants, 
 --       WHERE user_id = auth.uid()
 --     )
 --   );
+
+-- 用户创建触发器函数
+CREATE OR REPLACE FUNCTION public.handle_user_create()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.users (
+    id,
+    first_name,
+    last_name,
+    phone,
+    address,
+    avatar,
+    email,
+    created_at,
+    updated_at
+  ) VALUES (
+    NEW.id,
+    (NEW.raw_user_meta_data->>'firstName'),
+    (NEW.raw_user_meta_data->>'lastName'),
+    (NEW.raw_user_meta_data->>'phone'),
+    (NEW.raw_user_meta_data->>'address'),
+    (NEW.raw_user_meta_data->>'avatar'),
+    NEW.email,
+    NOW(),
+    NOW()
+  );
+  
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 创建触发器
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_user_create();
+
+-- 首先创建触发器函数
+CREATE OR REPLACE FUNCTION public.handle_user_update()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- 更新 public.users 表中对应的记录
+  UPDATE public.users
+  SET 
+    first_name = (NEW.raw_user_meta_data->>'firstName'),
+    last_name = (NEW.raw_user_meta_data->>'lastName'),
+    phone = (NEW.raw_user_meta_data->>'phone'),
+    address = (NEW.raw_user_meta_data->>'address'),
+    avatar = (NEW.raw_user_meta_data->>'avatar'),
+    updated_at = NOW()
+  WHERE id = NEW.id;
+  
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 然后创建触发器
+CREATE TRIGGER on_auth_user_updated
+  AFTER UPDATE ON auth.users
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_user_update();

@@ -22,7 +22,6 @@ export const authRouter = router({
             message: error.message || 'Login failed, please check your credentials',
           });
         }
-
         if (data.user && data.session) {
           // 使用 access_token 作为缓存的 key
           userCache.set(data.session.access_token, data.user);
