@@ -12,11 +12,6 @@
   "env": {
     "NPM_FLAGS": ""
   },
-  "functions": {
-    "app/api/*": {
-      "maxDuration": 10
-    }
-  },
   "headers": [
     {
       "source": "/(.*)",
