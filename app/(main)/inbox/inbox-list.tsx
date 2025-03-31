@@ -75,7 +75,7 @@ export default function InboxList() {
     
     return firstName || lastName 
       ? `${firstName} ${lastName}`.trim()
-      : 'Unknown user';
+      : otherParticipant.user.email;
   };
   
   // 获取最后一条消息的预览
@@ -128,7 +128,7 @@ export default function InboxList() {
                 content={Badge.dot}
               >
                 <Avatar
-                  src={chatRoom.participants.find((p) => p.userId !== loginUser?.id)?.user?.avatar || ''}
+                  src={chatRoom.participants.find((p) => p.userId !== loginUser?.id)?.user?.avatar || '1'}
                   style={{ '--size': '48px' }}
                 />
               </Badge>

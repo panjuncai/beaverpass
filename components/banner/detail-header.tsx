@@ -18,7 +18,7 @@ export default function DetailHeader({
   const router = useRouter();
 
   return (
-    <header className="navbar shadow-sm">
+    <header className="sticky top-0 z-10 pt-safe navbar shadow-sm">
       <div className="flex-none w-[24px]">
         {isShowBack && (
           <button 

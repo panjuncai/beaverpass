@@ -24,13 +24,17 @@ export default function ChatHeader() {
     if (pathname === '/chat') {
       return 'Inbox';
     } else if (pathname.includes('/chat/') && otherParticipant) {
-      return otherParticipant.firstName + ' ' + otherParticipant.lastName || 'Chat';
+      if (otherParticipant.firstName && otherParticipant.lastName) {
+        return otherParticipant.firstName + ' ' + otherParticipant.lastName;
+      } else {
+        return otherParticipant.email;
+      }
     }
-    return 'Chat';
+    return '';
   };
 
   return (
-    <header className="sticky top-0 z-10 navbar shadow-sm border-b border-gray-200 bg-white">
+    <header className="sticky top-0 z-10 pt-safe navbar shadow-sm border-b border-gray-200 bg-white">
       <div className="flex-none w-[24px]">
         {/* <LeftOutline 
           className="cursor-pointer" 
