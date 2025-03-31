@@ -11,10 +11,9 @@ import PaymentForm from "./payment-form";
 import MessageModal from "@/components/modals/message-modal";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { trpc } from "@/lib/trpc/client";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { CreateOrderInput, createOrderSchema } from "@/lib/validations/order";
+import { CreateOrderInput } from "@/lib/validations/order";
 import { PaymentMethod } from "@/lib/types/enum";
+import { Button, Form } from 'antd-mobile';
 
 // 替换为您的 Stripe 公钥
 const stripePromise = loadStripe(
@@ -28,22 +27,7 @@ export default function OrderPage() {
   const router = useRouter();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<CreateOrderInput>({
-    resolver: zodResolver(createOrderSchema),
-    defaultValues: {
-      shippingAddress: "",
-      shippingPhone: "",
-      shippingReceiver: "",
-      paymentMethod: PaymentMethod.STRIPE,
-    }
-  });
-
-  console.log('Form errors:', errors);
+  const [form] = Form.useForm<CreateOrderInput>();
 
   const createOrderMutation = trpc.order.createOrder.useMutation({
     onError: (error) => {
@@ -82,8 +66,7 @@ export default function OrderPage() {
     fees.tax +
     fees.paymentFee;
 
-  const onSubmit = async (data: CreateOrderInput) => {
-    console.log('onSubmit called with data:', data);
+  const onSubmit = async (values: CreateOrderInput) => {
     if (!loginUser?.id) {
       dialogRef.current?.showModal();
       return;
@@ -98,7 +81,7 @@ export default function OrderPage() {
       setError(null);
       // 构建完整的订单数据
       const orderData = {
-        ...data,
+        ...values,
         postId: previewPost.id,
         sellerId: previewPost.posterId,
         total: fees.total,
@@ -146,10 +129,6 @@ export default function OrderPage() {
     setClientSecret("");
   };
 
-  // const handleFormSubmit = (e: React.FormEvent) => {
-  //   console.log('Form submit event triggered');
-  // };
-
   return (
     <>
       <MessageModal
@@ -158,16 +137,26 @@ export default function OrderPage() {
         dialogRef={dialogRef}
         redirectUrl="/login"
       />
-      <form 
-        onSubmit={(e) => {
-          e.preventDefault();
-          console.log('Raw form submit');
-          handleSubmit((data) => {
-            console.log('Form data:', data);
-            void onSubmit(data);
-          })(e);
-        }}
-        className="p-4 space-y-6"
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={onSubmit}
+        className="p-4 space-y-6 pb-24"
+        footer={
+          <div className="fixed bottom-4 left-0 right-0 px-4">
+            <Button
+              block
+              color="primary"
+              size="large"
+              type="submit"
+              loading={createOrderMutation.isLoading}
+              disabled={createOrderMutation.isLoading}
+              className="rounded-full"
+            >
+              {createOrderMutation.isLoading ? "Processing..." : "Confirm Order"}
+            </Button>
+          </div>
+        }
       >
         {error && (
           <div className="alert alert-error">
@@ -175,20 +164,10 @@ export default function OrderPage() {
           </div>
         )}
         <OrderPostDetail post={previewPost} />
-        <OrderDelivery register={register} errors={errors} />
+        <OrderDelivery />
         <OrderFeedetail fees={fees} />
         <div className="h-20"></div>
-        <div className="fixed bottom-4 left-0 right-0 flex justify-center">
-          <button
-            type="submit"
-            className="btn btn-primary btn-xl w-4/5 rounded-full shadow-md"
-            disabled={isSubmitting}
-            onClick={() => console.log('Button clicked')}
-          >
-            {isSubmitting ? "Processing..." : "Confirm Order"}
-          </button>
-        </div>
-      </form>
+      </Form>
       {clientSecret && (
         <Elements stripe={stripePromise} options={{ clientSecret }}>
           <PaymentForm

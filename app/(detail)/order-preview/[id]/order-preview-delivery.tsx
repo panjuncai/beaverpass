@@ -1,45 +1,45 @@
-import { UseFormRegister, FieldErrors } from 'react-hook-form';
-import { CreateOrderInput } from '@/lib/validations/order';
+import { Form } from 'antd-mobile';
 
-interface OrderDeliveryProps {
-  register: UseFormRegister<CreateOrderInput>;
-  errors: FieldErrors<CreateOrderInput>;
-}
-
-export default function OrderDelivery({ register, errors }: OrderDeliveryProps) {
+export default function OrderDelivery() {
   return (
     <div className="card bg-base-100 shadow">
       <div className="card-body">
         <h2 className="card-title">Shipping Information</h2>
-        <input
-          type="text"
-          placeholder="Address"
-          className="input input-bordered w-full"
-          {...register("shippingAddress")}
-        />
-        {errors.shippingAddress && (
-          <p className="text-red-500 text-sm mt-1">{errors.shippingAddress.message}</p>
-        )}
+        <Form.Item
+          name="shippingAddress"
+          label="Address"
+          rules={[{ required: true, message: 'Please enter shipping address' }]}
+        >
+          <input
+            type="text"
+            placeholder="Address"
+            className="input input-bordered w-full"
+          />
+        </Form.Item>
         
-        <input
-          type="text"
-          placeholder="Phone"
-          className="input input-bordered w-full"
-          {...register("shippingPhone")}
-        />
-        {errors.shippingPhone && (
-          <p className="text-red-500 text-sm mt-1">{errors.shippingPhone.message}</p>
-        )}
+        <Form.Item
+          name="shippingPhone"
+          label="Phone"
+          rules={[{ required: true, message: 'Please enter phone number' }]}
+        >
+          <input
+            type="text"
+            placeholder="Phone"
+            className="input input-bordered w-full"
+          />
+        </Form.Item>
         
-        <input
-          type="text"
-          placeholder="Receiver Name"
-          className="input input-bordered w-full"
-          {...register("shippingReceiver")}
-        />
-        {errors.shippingReceiver && (
-          <p className="text-red-500 text-sm mt-1">{errors.shippingReceiver.message}</p>
-        )}
+        <Form.Item
+          name="shippingReceiver"
+          label="Receiver Name"
+          rules={[{ required: true, message: 'Please enter receiver name' }]}
+        >
+          <input
+            type="text"
+            placeholder="Receiver Name"
+            className="input input-bordered w-full"
+          />
+        </Form.Item>
       </div>
     </div>
   );

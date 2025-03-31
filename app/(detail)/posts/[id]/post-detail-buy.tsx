@@ -5,6 +5,7 @@ import { useRef } from 'react'
 import { usePostStore } from '@/lib/store/post-store'
 import { useAuthStore } from '@/lib/store/auth-store'
 import MessageModal from '@/components/modals/message-modal'
+import { Button } from 'antd-mobile'
 
 export default function PostDetailBuy() {
     const {loginUser,isLoading}=useAuthStore()
@@ -23,10 +24,12 @@ export default function PostDetailBuy() {
       redirectUrl="/login"
     />
 
-    <div className="fixed bottom-4 left-0 right-0 flex justify-center">
-            <button 
+    <div className="fixed bottom-4 left-4 right-4 flex justify-center">
+            <Button 
               disabled={loginUser?.id === post?.posterId}
-              className="btn btn-primary btn-xl w-4/5 sm:w-1/2 rounded-full shadow-md" 
+              block
+              color="primary"
+              size="large"
               onClick={() => {
                 if (!loginUser?.id) {
                   dialogRef.current?.showModal()
@@ -39,7 +42,7 @@ export default function PostDetailBuy() {
               }}
             >
               Buy now
-            </button>
+            </Button>
           </div>
     </>
   )
