@@ -3,17 +3,22 @@ import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
 import {createClient} from "@/utils/supabase/server"
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  console.error("🙀🙀🙀 [PAYMENT_INTENT] STRIPE_SECRET_KEY is not set in environment variables");
-  throw new Error('STRIPE_SECRET_KEY is not set in environment variables');
-}
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-08-16",
-});
+let stripe: Stripe | null = null;
 
 export async function POST(req: Request) {
   try {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.error("🙀🙀🙀 [PAYMENT_INTENT] STRIPE_SECRET_KEY is not set in environment variables");
+      return new NextResponse("Stripe configuration error", { status: 500 });
+    }
+
+    // 延迟初始化 Stripe 实例
+    if (!stripe) {
+      stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+        apiVersion: "2023-08-16",
+      });
+    }
+
     const supabase = await createClient()
     const { data: { session } } = await supabase.auth.getSession()
     
