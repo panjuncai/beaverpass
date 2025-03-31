@@ -11,9 +11,10 @@ interface AuthState {
   setLoginUser: (user: User | null) => void;
   setLoading: (isLoading: boolean) => void;
   initialize: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   supabase: createClient(),
   loginUser: null,
   session: null,
@@ -40,6 +41,21 @@ export const useAuthStore = create<AuthState>((set) => ({
       });
     } catch (error) {
       console.error('Auth initialization error:', error);
+    }
+  },
+  refreshUser: async () => {
+    try {
+      const supabase = get().supabase;
+      const { data: { user }, error } = await supabase.auth.getUser();
+      
+      if (error) {
+        console.error('Error refreshing user:', error);
+        return;
+      }
+
+      set({ loginUser: user });
+    } catch (error) {
+      console.error('Error refreshing user:', error);
     }
   }
 }));

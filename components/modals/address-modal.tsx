@@ -22,7 +22,7 @@ export default function AddressModal({
   initialAddress = '',
   showSaveButton = false,
 }: AddressModalProps) {
-  const { loginUser } = useAuthStore();
+  const { loginUser, refreshUser } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [address, setAddress] = useState(initialAddress);
   const [searchRange, setSearchRange] = useState(5);
@@ -45,14 +45,16 @@ export default function AddressModal({
   // 更新用户资料mutation
   const updateProfile = trpc.user.updateProfile.useMutation({
     onSuccess: () => {
-      Dialog.alert({
-        content: 'Address updated successfully',
-      });
+      // Dialog.alert({
+      //   content: 'Address updated successfully',
+      // });
+      console.log('Address updated successfully');
     },
     onError: (error) => {
-      Dialog.alert({
-        content: error.message || 'Update failed, please try again later',
-      });
+      // Dialog.alert({
+      //   content: error.message || 'Update failed, please try again later',
+      // });
+      console.error('Update failed:', error.message || 'Update failed, please try again later');
     }
   });
 
@@ -280,6 +282,9 @@ export default function AddressModal({
         address: address,
         phone: loginUser.user_metadata?.phone || '',
       });
+      
+      // 刷新用户状态
+      await refreshUser();
       
       onSelect(address);
       onClose();
