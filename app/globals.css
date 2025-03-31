@@ -127,6 +127,14 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+  overflow-y: auto;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+body::-webkit-scrollbar {
+  display: none;
 }
 
 .page-title {
@@ -145,4 +153,42 @@ body {
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
   }
+}
+
+/* Comprehensive scrollbar hiding for all elements */
+html, body, div, main, section, article, aside, nav, header, footer {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE and Edge */
+}
+
+html::-webkit-scrollbar, 
+body::-webkit-scrollbar,
+div::-webkit-scrollbar,
+main::-webkit-scrollbar,
+section::-webkit-scrollbar,
+article::-webkit-scrollbar,
+aside::-webkit-scrollbar,
+nav::-webkit-scrollbar,
+header::-webkit-scrollbar,
+footer::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+  background: transparent !important;
+}
+
+/* Target the specific vertical scrollbar in the container */
+::-webkit-scrollbar {
+  width: 0 !important;
+  display: none !important;
+}
+
+/* Target the scrollbar track */
+::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+/* Target the scrollbar thumb */
+::-webkit-scrollbar-thumb {
+  background: transparent !important;
 }

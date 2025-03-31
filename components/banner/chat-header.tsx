@@ -49,7 +49,7 @@ export default function ChatHeader() {
           </button>
       </div>
       <div className="flex-1 flex items-center justify-center">
-        <h1 className="text-lg font-semibold">{getPageTitle()}</h1>
+        <h1 className="text-center justify-start text-zinc-600 text-base font-semibold font-['Poppins'] tracking-wide">{getPageTitle()}</h1>
       </div>
         {/* 预留右侧按钮空间，保持对称 */}
         <NavRight />

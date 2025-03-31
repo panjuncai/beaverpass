@@ -27,7 +27,7 @@ export default function Header() {
     if (currentPathKey) {
       // 显示路径对应的标题
       return (
-        <div className="page-title">{pathTitles[currentPathKey]}</div>
+        <div className="text-center justify-start text-zinc-600 text-base font-semibold font-['Poppins'] tracking-wide">{pathTitles[currentPathKey]}</div>
       );
     } else {
       // 显示默认的Logo

@@ -30,7 +30,7 @@ export default function DetailHeader({
         )}
       </div>
       <div className="flex-1 flex items-center justify-center">
-        <h1 className="text-xl font-semibold">{pageTitle}</h1>
+        <h1 className="text-center justify-start text-zinc-600 text-base font-semibold font-['Poppins'] tracking-wide">{pageTitle}</h1>
       </div>
         {isShowRight && (
           <NavRight />

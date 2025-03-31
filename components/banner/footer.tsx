@@ -26,17 +26,19 @@ export default function Footer() {
   ]
 
   return (
-    <div className="pb-safe fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white">
-      <TabBar activeKey={pathname}>
-        {tabs.map(item => (
-          <TabBar.Item
-            key={item.key}
-            icon={item.icon}
-            title={item.title}
-            onClick={() => router.push(item.key)}
-          />
-        ))}
-      </TabBar>
+    <div className="pb-safe fixed bottom-0 left-0 right-0 bg-[#FFFFFF] shadow-[0px_2px_48px_0px_rgba(0,0,0,0.12)] h-[3.6rem] flex justify-center">
+      <div className="w-full max-w-screen-md mx-auto h-[3.6rem] bg-[#FFFFFF] flex items-center justify-center">
+        <TabBar activeKey={pathname} className="w-full">
+          {tabs.map(item => (
+            <TabBar.Item
+              key={item.key}
+              icon={item.icon}
+              title={item.title}
+              onClick={() => router.push(item.key)}
+            />
+          ))}
+        </TabBar>
+      </div>
     </div>
   )
 }
