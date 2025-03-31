@@ -2,6 +2,7 @@
 import { useRouter, usePathname, useParams } from 'next/navigation';
 import { LeftOutline } from 'antd-mobile-icons';
 import { trpc } from '@/lib/trpc/client';
+import NavRight from './nav-right';
 
 export default function ChatHeader() {
   const router = useRouter();
@@ -31,18 +32,23 @@ export default function ChatHeader() {
   return (
     <header className="sticky top-0 z-10 navbar shadow-sm border-b border-gray-200 bg-white">
       <div className="flex-none w-[24px]">
-        <LeftOutline 
+        {/* <LeftOutline 
           className="cursor-pointer" 
           fontSize={20} 
           onClick={() => pathname === '/chat' ? router.push('/search') : router.back()} 
-        />
+        /> */}
+        <button 
+            className="btn btn-ghost btn-circle"
+            onClick={() => router.back()}
+          >
+            <LeftOutline fontSize={24} />
+          </button>
       </div>
       <div className="flex-1 flex items-center justify-center">
         <h1 className="text-lg font-semibold">{getPageTitle()}</h1>
       </div>
-      <div className="flex-none w-[24px]">
         {/* 预留右侧按钮空间，保持对称 */}
-      </div>
+        <NavRight />
     </header>
   );
 } 

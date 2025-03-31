@@ -1,25 +1,14 @@
-'use client';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { ChatRoomOutput, trpc } from '@/lib/trpc/client';
-import { useAuthStore } from '@/lib/store/auth-store';
 import { Empty, List, Avatar, Badge } from 'antd-mobile';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
 import { MessageType } from '@/lib/types/enum';
-
-export default function ChatRoomsPage() {
-  const router = useRouter();
-  const { loginUser } = useAuthStore();
-  
-  // 如果没有登录，重定向到登录页
-  useEffect(() => {
-    if (!loginUser) {
-      router.push('/login');
-    }
-  }, [loginUser, router]);
-  
-  // 获取聊天室列表
+import { useAuthStore } from '@/lib/store/auth-store';
+import { useRouter } from 'next/navigation';
+export default function InboxList() {
+    const { loginUser } = useAuthStore();
+    const router = useRouter();
+    // 获取聊天室列表
   const { data: chatRooms, isLoading } = trpc.chat.getChatRooms.useQuery(
     { userId: loginUser?.id || '' },
     { enabled: !!loginUser?.id }
@@ -123,9 +112,8 @@ export default function ChatRoomsPage() {
   //   const readBy = lastMessage.readBy || [];
   //   return !readBy.some((read: any) => read.userId === loginUser?.id);
   // };
-
   return (
-    <div className="pb-safe">
+<div className="pb-safe">
       <List>
         {chatRooms?.map(chatRoom => (
           <List.Item
@@ -161,5 +149,5 @@ export default function ChatRoomsPage() {
         ))}
       </List>
     </div>
-  );
-} 
+  )
+}

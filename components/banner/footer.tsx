@@ -16,7 +16,7 @@ export default function Footer() {
   const tabs = [
     { key: '/search', title: 'Search', icon: <SearchOutline /> },
     { key: '/post', title: 'Post', icon: <CameraOutline /> },
-    { key: '/chat', title:'Inbox', icon:<MessageOutline />},
+    { key: '/inbox', title:'Inbox', icon:<MessageOutline />},
     { key: '/deals', title: 'Deals', icon: <ReceivePaymentOutline /> },
     // {
     //   key: '/recycle',
