@@ -6,6 +6,7 @@ import { useAuthStore } from '@/lib/store/auth-store';
 import { Form, Input, Button } from 'antd-mobile';
 import { SpinLoading } from 'antd-mobile';
 import AddressModal from '@/components/modals/address-modal';
+import { LocationFill } from 'antd-mobile-icons';
 
 interface ProfileFormValues {
   firstName: string;
@@ -136,17 +137,11 @@ export default function ProfileForm() {
         
         <Form.Item
           name="address"
-          label="Address"
-          extra={
-            <Button
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                showAddressModal();
-              }}
-            >
-              Select address
-            </Button>
+          label={
+            <div className="flex items-center gap-2">
+              <LocationFill className="text-lg" />
+              <span>Address</span>
+            </div>
           }
         >
           <Input 
@@ -162,6 +157,7 @@ export default function ProfileForm() {
         onClose={() => setIsAddressModalOpen(false)}
         onSelect={handleAddressSelect}
         initialAddress={form.getFieldValue('address')}
+        showSaveButton={false}
       />
     </div>
   );

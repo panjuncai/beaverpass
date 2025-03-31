@@ -64,6 +64,24 @@ a {
   text-decoration: none;
 }
 
+/* 地图弹框占满宽度，提高高度 */
+.adm-center-popup-wrap {
+  position: fixed;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  min-width: var(--min-width);
+  transform: translate(-50%, -50%);
+}
+.adm-dialog-body{
+  width: 100%;
+  max-height: 100vh;
+  font-size: var(--adm-font-size-6);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
 
 .adm-toast-mask .adm-toast-main-icon .adm-toast-icon {
   display: flex;

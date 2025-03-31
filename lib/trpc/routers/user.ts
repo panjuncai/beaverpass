@@ -1,7 +1,7 @@
 import { TRPCError } from '@trpc/server';
 import { protectedProcedure, router } from '..';
 import { z } from 'zod';
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@/utils/supabase/client';
 
 // 用户资料更新验证模式
 const updateProfileSchema = z.object({
@@ -9,7 +9,7 @@ const updateProfileSchema = z.object({
   lastName: z.string().min(1, 'Last name is required'),
   address: z.string().optional(),
   phone: z.string().optional(),
-  avatar: z.string().url().optional(),
+  avatar: z.string().optional(),
 });
 
 export const userRouter = router({
@@ -18,7 +18,7 @@ export const userRouter = router({
     if (!ctx.loginUser) {
       throw new TRPCError({
         code: 'UNAUTHORIZED',
-        message: '用户未登录',
+        message: 'User not logged in',
       });
     }
     
@@ -28,71 +28,46 @@ export const userRouter = router({
   // 更新用户资料
   updateProfile: protectedProcedure
     .input(updateProfileSchema)
-    .mutation(async ({ ctx, input }) => {
+    .mutation(async ({ input }) => {
       try {
-        if (!ctx.loginUser?.id) {
-          throw new TRPCError({
-            code: 'UNAUTHORIZED',
-            message: '未登录用户无法更新资料',
-          });
-        }
-        
         const supabase = await createClient();
         
-        // 更新Supabase用户元数据
-        const { data, error } = await supabase.auth.updateUser({
-          data: {
-            firstName: input.firstName,
-            lastName: input.lastName,
-            address: input.address,
-            phone: input.phone,
-            avatar: input.avatar,
-          }
-        });
+        // 获取当前用户数据
+        const { data: currentUser, error: fetchError } = await supabase.auth.getUser();
+        if (fetchError) throw fetchError;
+
+        // 获取现有的用户元数据
+        const currentMetadata = currentUser.user.user_metadata || {};
         
-        if (error || !data.user) {
-          throw new TRPCError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: error?.message || '更新用户资料失败',
-          });
-        }
+        // 创建新的元数据对象，只包含有值的字段
+        const newMetadata: Record<string, string> = {};
         
-        // 同时更新数据库中的用户记录
-        // const updatedDbUser = await ctx.prisma.user.upsert({
-        //   where: { id: ctx.loginUser.id },
-        //   update: {
-        //     firstName: input.firstName,
-        //     lastName: input.lastName,
-        //     address: input.address || null,
-        //     phone: input.phone || null,
-        //     avatar: input.avatar || null,
-        //     updatedAt: new Date(),
-        //   },
-        //   create: {
-        //     id: ctx.loginUser.id,
-        //     email: ctx.loginUser.email!,
-        //     firstName: input.firstName,
-        //     lastName: input.lastName,
-        //     address: input.address || null,
-        //     phone: input.phone || null,
-        //     avatar: input.avatar || null,
-        //   },
-        // });
-        
-        return {
-          success: true,
-          user: data.user,
-        //   dbUser: updatedDbUser
+        // 检查每个字段，只添加非空值
+        if (input.firstName) newMetadata.firstName = input.firstName;
+        if (input.lastName) newMetadata.lastName = input.lastName;
+        if (input.address) newMetadata.address = input.address;
+        if (input.phone) newMetadata.phone = input.phone;
+        if (input.avatar) newMetadata.avatar = input.avatar;
+
+        // 合并现有元数据和新元数据
+        const updatedMetadata = {
+          ...currentMetadata,
+          ...newMetadata
         };
+
+        // 更新用户
+        const { data, error } = await supabase.auth.updateUser({
+          data: updatedMetadata
+        });
+
+        if (error) throw error;
+
+        return data;
       } catch (error) {
-        if (error instanceof TRPCError) {
-          throw error;
-        }
-        
-        console.error('更新用户资料失败:', error);
+        console.error('Error updating profile:', error);
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: error instanceof Error ? error.message : '更新用户资料失败',
+          message: error instanceof Error ? error.message : 'Update profile failed',
         });
       }
     }),

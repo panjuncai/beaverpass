@@ -12,13 +12,15 @@ interface AddressModalProps {
   onClose: () => void;
   onSelect: (address: string) => void;
   initialAddress?: string;
+  showSaveButton?: boolean;
 }
 
 export default function AddressModal({
   isOpen,
   onClose,
   onSelect,
-  initialAddress = ''
+  initialAddress = '',
+  showSaveButton = false,
 }: AddressModalProps) {
   const { loginUser } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
@@ -44,12 +46,12 @@ export default function AddressModal({
   const updateProfile = trpc.user.updateProfile.useMutation({
     onSuccess: () => {
       Dialog.alert({
-        content: '地址更新成功',
+        content: 'Address updated successfully',
       });
     },
     onError: (error) => {
       Dialog.alert({
-        content: error.message || '更新失败，请稍后重试',
+        content: error.message || 'Update failed, please try again later',
       });
     }
   });
@@ -251,7 +253,7 @@ export default function AddressModal({
       } catch (error) {
         console.error("Error loading Google Maps:", error);
         Dialog.alert({
-          content: '加载地图失败，请稍后重试',
+          content: 'Failed to load map, please try again later',
         });
       } finally {
         setIsLoading(false);
@@ -282,7 +284,7 @@ export default function AddressModal({
       onSelect(address);
       onClose();
     } catch (error) {
-      console.error('更新地址失败:', error);
+      console.error('Update address failed:', error);
     }
   };
 
@@ -294,11 +296,11 @@ export default function AddressModal({
       content={
         <div className="p-2">
           <div className="mb-4">
-            <div className="mb-2 font-medium">地址</div>
+            <div className="mb-2 font-medium">Address</div>
             <input
               id="address-input"
               className="w-full p-2 border rounded"
-              placeholder="输入地址、地标或十字路口"
+              placeholder="Enter address, landmark or intersection"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
             />
@@ -317,7 +319,7 @@ export default function AddressModal({
           
           <div className="mb-4">
             <div className="flex justify-between">
-              <span>搜索范围</span>
+              <span>Search range</span>
               <span>{searchRange} km</span>
             </div>
             <input 
@@ -339,27 +341,30 @@ export default function AddressModal({
       }
       closeOnAction
       actions={[
+        ...(showSaveButton ? [
+          {
+            key: 'save',
+            text: 'Save to my profile',
+            bold: true,
+            disabled: !address || updateProfile.isLoading,
+            onClick: handleSaveAddress
+          }
+        ] : [
+          {
+            key: 'confirm',
+            text: 'Confirm selection',
+            bold: true,
+            disabled: !address,
+            onClick: () => {
+              onSelect(address);
+              onClose();
+            }
+          }
+        ]),
         {
           key: 'cancel',
-          text: '取消',
+          text: 'Cancel',
           onClick: onClose
-        },
-        {
-          key: 'confirm',
-          text: '确认选择',
-          bold: true,
-          disabled: !address,
-          onClick: () => {
-            onSelect(address);
-            onClose();
-          }
-        },
-        {
-          key: 'save',
-          text: '保存到我的资料',
-          bold: true,
-          disabled: !address || updateProfile.isLoading,
-          onClick: handleSaveAddress
         }
       ]}
     />
