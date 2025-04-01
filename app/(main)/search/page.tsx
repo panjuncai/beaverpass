@@ -4,7 +4,6 @@ import ProductsShow from "@/app/(main)/search/search-show";
 import SearchCategory from "@/app/(main)/search/search-category";
 import { useState } from "react";
 import AddressModal from "@/components/modals/address-modal";
-import { LocationFill } from "antd-mobile-icons";
 import { useAuthStore } from "@/lib/store/auth-store";
 export default function SearchPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
