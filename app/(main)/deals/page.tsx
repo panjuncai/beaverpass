@@ -105,41 +105,40 @@ export default function DealsPage() {
       <div className="w-full flex justify-center mb-4 relative">
         <button 
           onClick={() => setActiveTab('buy')}
-          className={`flex-1 max-w-[384px] rounded-[10px] transition-all duration-200 hover:bg-zinc-50 ${
-            activeTab === 'buy' ? 'bg-white' : 'hover:bg-opacity-50'
-          }`}
+          className="flex-1 max-w-[384px] rounded-[10px] relative"
         >
-          <div className="h-9 text-center relative">
-            <span className={`text-base font-bold font-['Poppins'] leading-10 transition-colors duration-200 ${
-              activeTab === 'buy' 
-                ? 'text-yellow-950' 
-                : 'text-zinc-400 hover:text-zinc-600'
+          <div className="h-9 text-center">
+            <span className={`text-base font-bold font-['Poppins'] leading-10 ${
+              activeTab === 'buy' ? 'text-yellow-950' : 'text-zinc-400'
             }`}>
               Buy
             </span>
           </div>
+          {activeTab === 'buy' && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-950"></div>
+          )}
+          {activeTab !== 'buy' && (
+            <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-zinc-200"></div>
+          )}
         </button>
         <button 
           onClick={() => setActiveTab('sell')}
-          className={`flex-1 max-w-[384px] rounded-[10px] transition-all duration-200 hover:bg-zinc-50 ${
-            activeTab === 'sell' ? 'bg-white' : 'hover:bg-opacity-50'
-          }`}
+          className="flex-1 max-w-[384px] rounded-[10px] relative"
         >
-          <div className="h-9 text-center relative">
-            <span className={`text-base font-bold font-['Poppins'] leading-10 transition-colors duration-200 ${
-              activeTab === 'sell' 
-                ? 'text-yellow-950' 
-                : 'text-zinc-400 hover:text-zinc-600'
+          <div className="h-9 text-center">
+            <span className={`text-base font-bold font-['Poppins'] leading-10 ${
+              activeTab === 'sell' ? 'text-yellow-950' : 'text-zinc-400'
             }`}>
               Sell
             </span>
           </div>
+          {activeTab === 'sell' && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-950"></div>
+          )}
+          {activeTab !== 'sell' && (
+            <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-zinc-200"></div>
+          )}
         </button>
-        <div 
-          className={`absolute bottom-0 h-0.5 bg-yellow-950 rounded-tl-[3px] rounded-tr-[3px] transition-all duration-300 w-1/2 ${
-            activeTab === 'buy' ? 'left-0' : 'left-1/2'
-          }`}
-        ></div>
       </div>
 
       {/* Sub Tabs */}
@@ -152,7 +151,7 @@ export default function DealsPage() {
               className={`flex-1 h-10 relative ${
                 activeSubTab === 'active' 
                   ? 'bg-[#89C149] rounded-tl-[10px] rounded-tr-[10px]' 
-                  : 'bg-white border-b border-zinc-100'
+                  : 'bg-white border border-zinc-100 rounded-tl-[10px] rounded-tr-[10px] rounded-bl-[0px] rounded-br-[0px]'
               }`}
             >
               <span className={`w-full h-10 flex items-center justify-center text-sm font-medium font-['Poppins'] tracking-wide ${
@@ -163,10 +162,10 @@ export default function DealsPage() {
             </button>
             <button 
               onClick={() => setActiveSubTab('history')}
-              className={`flex-1 h-10 relative ${
+              className={`flex-1 h-10 relative ml-2 ${
                 activeSubTab === 'history' 
                   ? 'bg-[#89C149] rounded-tl-[10px] rounded-tr-[10px]' 
-                  : 'bg-white border-b border-zinc-100'
+                  : 'bg-white border border-zinc-100 rounded-tl-[10px] rounded-tr-[10px] rounded-bl-[0px] rounded-br-[0px]'
               }`}
             >
               <span className={`w-full h-10 flex items-center justify-center text-sm font-medium font-['Poppins'] tracking-wide ${
@@ -184,7 +183,7 @@ export default function DealsPage() {
               className={`flex-1 h-10 relative ${
                 activeSubTab === 'active' 
                   ? 'bg-[#89C149] rounded-tl-[10px] rounded-tr-[10px]' 
-                  : 'bg-white border border-zinc-100 rounded-[10px]'
+                  : 'bg-white border border-zinc-100 rounded-tl-[10px] rounded-tr-[10px] rounded-bl-[0px] rounded-br-[0px]'
               }`}
             >
               <span className={`w-full h-10 flex items-center justify-center text-sm font-medium font-['Poppins'] tracking-wide ${
@@ -198,7 +197,7 @@ export default function DealsPage() {
               className={`flex-1 h-10 relative mx-2 ${
                 activeSubTab === 'inactive' 
                   ? 'bg-[#89C149] rounded-tl-[10px] rounded-tr-[10px]' 
-                  : 'bg-white border border-zinc-100 rounded-[10px]'
+                  : 'bg-white border border-zinc-100 rounded-tl-[10px] rounded-tr-[10px] rounded-bl-[0px] rounded-br-[0px]'
               }`}
             >
               <span className={`w-full h-10 flex items-center justify-center text-sm font-medium font-['Poppins'] tracking-wide ${
@@ -212,7 +211,7 @@ export default function DealsPage() {
               className={`flex-1 h-10 relative ${
                 activeSubTab === 'sold' 
                   ? 'bg-[#89C149] rounded-tl-[10px] rounded-tr-[10px]' 
-                  : 'bg-white border border-zinc-100 rounded-[10px]'
+                  : 'bg-white border border-zinc-100 rounded-tl-[10px] rounded-tr-[10px] rounded-bl-[0px] rounded-br-[0px]'
               }`}
             >
               <span className={`w-full h-10 flex items-center justify-center text-sm font-medium font-['Poppins'] tracking-wide ${
