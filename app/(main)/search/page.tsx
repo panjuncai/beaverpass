@@ -21,9 +21,9 @@ export default function SearchPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="px-4 pt-4 pb-2">
+      <div className="px-4 pt-6 pb-4">
         <div
-          className="relative w-80 h-5 cursor-pointer mb-3"
+          className="relative w-80 h-5 cursor-pointer mb-4"
           onClick={() => showAddressModal()}
         >
           <div className="w-4 h-3.5 left-0 top-[3px] absolute overflow-hidden">
@@ -43,7 +43,7 @@ export default function SearchPage() {
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
       />
-      <div className="flex-1 overflow-auto px-4 pt-4 pb-20">
+      <div className="flex-1 overflow-auto px-4 pt-3 pb-20">
         <ProductsShow selectedCategory={selectedCategory} search={search} />
       </div>
       {/* 地址选择模态框 */}

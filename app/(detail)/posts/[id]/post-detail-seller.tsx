@@ -71,14 +71,14 @@ export default function PostDetailMainSeller({
             <span className="text-lg">4.0</span>
           </div>
           <button
-            className="btn btn-sm btn-primary"
+            className="w-20 h-5 bg-yellow-900 rounded-3xl flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={loginUser?.id === post?.poster?.id || createChatRoomMutation.isLoading}
             onClick={() => void handleChatClick()}
           >
             {createChatRoomMutation.isLoading ? (
               <span className="loading loading-spinner loading-xs"></span>
             ) : (
-              "Chat"
+              <span className="text-center text-white text-xs font-bold font-['Poppins'] uppercase tracking-wide">chat</span>
             )}
           </button>
         </div>

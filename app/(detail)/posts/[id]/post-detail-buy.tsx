@@ -5,7 +5,6 @@ import { useRef } from 'react'
 import { usePostStore } from '@/lib/store/post-store'
 import { useAuthStore } from '@/lib/store/auth-store'
 import MessageModal from '@/components/modals/message-modal'
-import { Button } from 'antd-mobile'
 
 export default function PostDetailBuy() {
     const {loginUser,isLoading}=useAuthStore()
@@ -24,25 +23,25 @@ export default function PostDetailBuy() {
       redirectUrl="/login"
     />
 
-    <div className="fixed bottom-4 left-4 right-4 flex justify-center">
-            <Button 
-              disabled={loginUser?.id === post?.posterId}
-              block
-              color="primary"
-              size="large"
-              onClick={() => {
-                if (!loginUser?.id) {
-                  dialogRef.current?.showModal()
-                  return;
-                }
-                if (post) {
-                  setPreviewPost(post)
-                  void router.push(`/order-preview/${post.id}`)
-                }
-              }}
-            >
-              Buy now
-            </Button>
+    <div className="fixed bottom-4 left-0 right-0 flex justify-center">
+            <div className="w-full md:w-[768px] px-4">
+              <button 
+                disabled={loginUser?.id === post?.posterId}
+                className="w-full h-12 relative bg-yellow-900 rounded-3xl text-center text-white text-base font-semibold font-['Poppins'] transition-all duration-300 hover:bg-yellow-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={() => {
+                  if (!loginUser?.id) {
+                    dialogRef.current?.showModal()
+                    return;
+                  }
+                  if (post) {
+                    setPreviewPost(post)
+                    void router.push(`/order-preview/${post.id}`)
+                  }
+                }}
+              >
+                Buy now
+              </button>
+            </div>
           </div>
     </>
   )
