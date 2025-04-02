@@ -33,7 +33,7 @@ export default function SearchPage() {
           </div>
           <div className="left-[22px] top-0 absolute justify-start text-yellow-950 text-sm font-semibold font-['Poppins']">
             {loginUser?.user_metadata.address 
-              ? `${loginUser.user_metadata.address.substring(0, 30)}... < 5km`
+              ? `${loginUser.user_metadata.address.substring(0, 30)}... < ${loginUser.user_metadata.searchRange || 5}km`
               : "Please select address"}
           </div>
         </div>

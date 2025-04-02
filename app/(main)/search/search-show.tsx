@@ -29,7 +29,7 @@ export default function ProductsShow({selectedCategory,search}:{selectedCategory
   <>
     <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             {posts?.map((post) => (
-              <div key={post.id} className="card bg-base-100 shadow-md">
+              <div key={post.id} className="card bg-base-100 shadow-md transition-colors duration-300 hover:bg-gray-100 cursor-pointer group">
                 <figure
                   onClick={() => {
                     setIsLoading(true)
@@ -47,7 +47,7 @@ export default function ProductsShow({selectedCategory,search}:{selectedCategory
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                     />
                     <button 
-                      className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-md z-10 hover:bg-white transition-all"
+                      className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-md z-10 hover:bg-white transition-colors duration-300"
                       onClick={(e) => toggleFavorite(post.id, e)}
                     >
                       {favorites[post.id] ? (
@@ -62,10 +62,10 @@ export default function ProductsShow({selectedCategory,search}:{selectedCategory
                   className="card-body"
                   style={{ "--padding-card": "0.5rem" } as React.CSSProperties}
                 >
-                  <h2 className="card-title">{post.title}</h2>
-                  <p>
+                  <h2 className="card-title text-black text-sm md:text-base font-normal font-['Poppins'] truncate">{post.title}</h2>
+                  <p className="text-black text-sm md:text-base font-medium font-['Poppins']">
                     ${post.amount.toString() === "0" ? "Free" : post.amount.toString()}{" "}
-                    <em>{post.isNegotiable ? "Negotiable" : ""}</em>
+                    <em className="text-xs text-gray-500">{post.isNegotiable ? "Negotiable" : ""}</em>
                   </p>
                 </div>
               </div>

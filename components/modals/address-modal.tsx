@@ -305,23 +305,23 @@ export default function AddressModal({
   }, [isOpen]);
 
   const handleSaveAddress = async () => {
-    if (!loginUser?.id) return;
+    if (!address) return;
     
     try {
       await updateProfile.mutateAsync({
-        firstName: loginUser.user_metadata?.firstName || '',
-        lastName: loginUser.user_metadata?.lastName || '',
+        firstName: loginUser.user_metadata?.firstName || 'User',
+        lastName: loginUser.user_metadata?.lastName || 'User',
         address: address,
-        phone: loginUser.user_metadata?.phone || '',
+        searchRange: searchRange
       });
       
-      // 刷新用户状态
+      // Refresh user data to update the UI
       await refreshUser();
       
       onSelect(address);
       onClose();
     } catch (error) {
-      console.error('Update address failed:', error);
+      console.error('Failed to save address:', error);
     }
   };
 
