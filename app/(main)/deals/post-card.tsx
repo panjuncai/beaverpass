@@ -48,7 +48,7 @@ export default function PostCard({post}: {post: SerializedPost}) {
               <h3 className="card-title">{post.title}</h3>
               <div className="badge badge-outline">{post.status}</div>
               <p className="text-xl font-bold mt-2">
-                ${post.amount===0 ? 'Free' : post.amount}
+                ${post.amount === 0 ? 'Free' : Number(post.amount).toFixed(2)}
                 {post.isNegotiable && <span className="text-sm ml-2">Negotiable</span>}
               </p>
             </div>

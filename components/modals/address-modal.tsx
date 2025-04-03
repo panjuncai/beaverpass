@@ -309,8 +309,8 @@ export default function AddressModal({
     
     try {
       await updateProfile.mutateAsync({
-        firstName: loginUser.user_metadata?.firstName || 'User',
-        lastName: loginUser.user_metadata?.lastName || 'User',
+        firstName: loginUser?.user_metadata?.firstName || 'User',
+        lastName: loginUser?.user_metadata?.lastName || 'User',
         address: address,
         searchRange: searchRange
       });

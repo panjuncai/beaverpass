@@ -39,6 +39,12 @@ export function useSupabaseChat(userId: string, chatRoomId: string) {
   const [pendingMessages, setPendingMessages, clearPendingMessages] =
     useLocalStorage<DatabaseMessage[]>(`pending_messages_${userId}`, []);
 
+  // 清理所有本地消息的方法
+  const clearAllPendingMessages = useCallback(() => {
+    clearPendingMessages();
+    console.log("🧹🧹🧹 清理所有本地消息");
+  }, [clearPendingMessages]);
+
   // 占个坑后续改
   useEffect(() => {
     setIsReconnecting(false);
@@ -48,13 +54,7 @@ export function useSupabaseChat(userId: string, chatRoomId: string) {
     return () => {
       clearAllPendingMessages();
     };
-  }, []); // 空依赖项数组
-
-  // 清理所有本地消息的方法
-  const clearAllPendingMessages = useCallback(() => {
-    clearPendingMessages();
-    console.log("🧹🧹🧹 清理所有本地消息");
-  }, [clearPendingMessages]);
+  }, [clearAllPendingMessages]);
 
   // Supabase客户端
   const supabase = createClientComponentClient();
@@ -69,21 +69,6 @@ export function useSupabaseChat(userId: string, chatRoomId: string) {
     setIsConnected(true);
     setError(null);
   }, [userId, chatRoomId, supabase]);
-
-  // 离开聊天室时清理本地消息
-  //   useEffect(() => {
-  //     // 组件卸载时清理
-  //     return () => {
-  //       // 仅清理 sent 或 delivered 状态的消息，保留 failed 和 sending 状态的消息，以便重新进入时可以重试
-  //       setPendingMessages(prev =>
-  //         prev.filter(msg =>
-  //           msg.status === MessageStatus.FAILED ||
-  //           msg.status === MessageStatus.SENDING
-  //         )
-  //       );
-  //       console.log("🧹🧹🧹 清理已发送的本地消息");
-  //     };
-  //   }, [setPendingMessages]);
 
   // 订阅聊天室变更
   useEffect(() => {
@@ -212,6 +197,31 @@ export function useSupabaseChat(userId: string, chatRoomId: string) {
     },
     [userId, setPendingMessages, sendMessageMutation]
   );
+
+  useEffect(() => {
+    if (chatRoomId) {
+      const channel = supabase
+        .channel(`chat:${chatRoomId}`)
+        .on('presence', { event: 'sync' }, () => {
+          const newState = channel.presenceState();
+          console.log("👥👥👥 Online users:", Object.keys(newState).length);
+        })
+        .on('broadcast', { event: 'typing' }, ({ payload }) => {
+          console.log("💬💬💬 Typing users:", payload.userIds);
+        })
+        .subscribe(async (status) => {
+          if (status === 'SUBSCRIBED') {
+            await channel.track({ userId: userId });
+          }
+        });
+
+      return () => {
+        channel.unsubscribe();
+        clearAllPendingMessages();
+      };
+    }
+  }, [chatRoomId, userId, clearAllPendingMessages, supabase]);
+
   return {
     isConnected,
     isReconnecting,

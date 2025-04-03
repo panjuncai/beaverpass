@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { OrderStatus, PostStatus } from "@/lib/types/enum";
+import { OrderStatus } from "@/lib/types/enum";
 import NoLogin from "@/components/utils/no-login";
 import { useAuthStore } from "@/lib/store/auth-store";
 import Loading from "@/components/utils/loading";
@@ -63,24 +63,6 @@ export default function DealsPage() {
     OrderStatus.REFUNDED,
   ] as const;
 
-  const getFilteredPosts = (
-    types: (typeof PostStatus)[keyof typeof PostStatus][]
-  ): SerializedPost[] => {
-    if (!loginUserPosts) return [];
-    return loginUserPosts
-      .filter(
-        (post) =>
-          post.status &&
-          types.includes(
-            post.status as (typeof PostStatus)[keyof typeof PostStatus]
-          )
-      )
-      .map((post) => ({
-        ...post,
-        amount: Number(post.amount),
-      }));
-  };
-
   const isActiveOrder = (status: string | null) => {
     return (
       status &&
@@ -99,6 +81,41 @@ export default function DealsPage() {
     );
   };
 
+  const mapPosts = (
+    loginUserPosts: SerializedPost[] | undefined,
+    activeSubTab: string
+  ): SerializedPost[] => {
+    if (!loginUserPosts) return [];
+    return loginUserPosts
+      .filter(
+        (post) =>
+          post.status &&
+          (activeSubTab === "active"
+            ? post.status === "ACTIVE"
+            : activeSubTab === "inactive"
+            ? post.status === "INACTIVE"
+            : post.status === "SOLD")
+      )
+      .map((post) => {
+        const mappedPost: SerializedPost = {
+          ...post,
+          amount: post.amount ? Number(post.amount) : 0,
+          poster: post.poster
+            ? {
+                id: post.poster.id,
+                email: post.poster.email,
+                firstName: post.poster.firstName || null,
+                lastName: post.poster.lastName || null,
+                avatar: post.poster.avatar,
+                phone: post.poster.phone,
+                address: post.poster.address
+              }
+            : null,
+        };
+        return mappedPost;
+      });
+  };
+
   return (
     <div className="flex flex-col items-center w-full max-w-screen-md mx-auto px-4 pt-4">
       {/* Buy/Sell Tabs */}
@@ -108,7 +125,7 @@ export default function DealsPage() {
           className="flex-1 max-w-[384px] rounded-[10px] relative"
         >
           <div className="h-9 text-center">
-            <span className={`text-base font-bold font-['Poppins'] leading-10 ${
+            <span className={`text-base font-bold font-poppins leading-10 ${
               activeTab === 'buy' ? 'text-yellow-950' : 'text-zinc-400'
             }`}>
               Buy
@@ -126,7 +143,7 @@ export default function DealsPage() {
           className="flex-1 max-w-[384px] rounded-[10px] relative"
         >
           <div className="h-9 text-center">
-            <span className={`text-base font-bold font-['Poppins'] leading-10 ${
+            <span className={`text-base font-bold font-poppins leading-10 ${
               activeTab === 'sell' ? 'text-yellow-950' : 'text-zinc-400'
             }`}>
               Sell
@@ -154,7 +171,7 @@ export default function DealsPage() {
                   : 'bg-white border border-zinc-100 rounded-tl-[10px] rounded-tr-[10px] rounded-bl-[0px] rounded-br-[0px]'
               }`}
             >
-              <span className={`w-full h-10 flex items-center justify-center text-sm font-medium font-['Poppins'] tracking-wide ${
+              <span className={`w-full h-10 flex items-center justify-center text-sm font-medium font-poppins tracking-wide ${
                 activeSubTab === 'active' ? 'text-white' : 'text-zinc-400'
               }`}>
                 Active Orders
@@ -168,7 +185,7 @@ export default function DealsPage() {
                   : 'bg-white border border-zinc-100 rounded-tl-[10px] rounded-tr-[10px] rounded-bl-[0px] rounded-br-[0px]'
               }`}
             >
-              <span className={`w-full h-10 flex items-center justify-center text-sm font-medium font-['Poppins'] tracking-wide ${
+              <span className={`w-full h-10 flex items-center justify-center text-sm font-medium font-poppins tracking-wide ${
                 activeSubTab === 'history' ? 'text-white' : 'text-zinc-400'
               }`}>
                 History
@@ -186,7 +203,7 @@ export default function DealsPage() {
                   : 'bg-white border border-zinc-100 rounded-tl-[10px] rounded-tr-[10px] rounded-bl-[0px] rounded-br-[0px]'
               }`}
             >
-              <span className={`w-full h-10 flex items-center justify-center text-sm font-medium font-['Poppins'] tracking-wide ${
+              <span className={`w-full h-10 flex items-center justify-center text-sm font-medium font-poppins tracking-wide ${
                 activeSubTab === 'active' ? 'text-white' : 'text-zinc-400'
               }`}>
                 Active
@@ -200,7 +217,7 @@ export default function DealsPage() {
                   : 'bg-white border border-zinc-100 rounded-tl-[10px] rounded-tr-[10px] rounded-bl-[0px] rounded-br-[0px]'
               }`}
             >
-              <span className={`w-full h-10 flex items-center justify-center text-sm font-medium font-['Poppins'] tracking-wide ${
+              <span className={`w-full h-10 flex items-center justify-center text-sm font-medium font-poppins tracking-wide ${
                 activeSubTab === 'inactive' ? 'text-white' : 'text-zinc-400'
               }`}>
                 Inactive
@@ -214,7 +231,7 @@ export default function DealsPage() {
                   : 'bg-white border border-zinc-100 rounded-tl-[10px] rounded-tr-[10px] rounded-bl-[0px] rounded-br-[0px]'
               }`}
             >
-              <span className={`w-full h-10 flex items-center justify-center text-sm font-medium font-['Poppins'] tracking-wide ${
+              <span className={`w-full h-10 flex items-center justify-center text-sm font-medium font-poppins tracking-wide ${
                 activeSubTab === 'sold' ? 'text-white' : 'text-zinc-400'
               }`}>
                 Sold
@@ -266,12 +283,12 @@ export default function DealsPage() {
           <div>
             {activeSubTab === 'active' && (
               <div>
-                {getFilteredPosts([PostStatus.ACTIVE]).length === 0 ? (
+                {mapPosts(loginUserPosts, 'active').length === 0 ? (
                   <div className="text-center text-gray-500 mt-8">
                     <NoDeal />
                   </div>
                 ) : (
-                  getFilteredPosts([PostStatus.ACTIVE]).map((post) => (
+                  mapPosts(loginUserPosts, 'active').map((post) => (
                     <PostCard key={post.id} post={post} />
                   ))
                 )}
@@ -279,12 +296,12 @@ export default function DealsPage() {
             )}
             {activeSubTab === 'inactive' && (
               <div>
-                {getFilteredPosts([PostStatus.INACTIVE]).length === 0 ? (
+                {mapPosts(loginUserPosts, 'inactive').length === 0 ? (
                   <div className="text-center text-gray-500 mt-8">
                     <NoDeal />
                   </div>
                 ) : (
-                  getFilteredPosts([PostStatus.INACTIVE]).map((post) => (
+                  mapPosts(loginUserPosts, 'inactive').map((post) => (
                     <PostCard key={post.id} post={post} />
                   ))
                 )}
@@ -292,12 +309,12 @@ export default function DealsPage() {
             )}
             {activeSubTab === 'sold' && (
               <div>
-                {getFilteredPosts([PostStatus.SOLD]).length === 0 ? (
+                {mapPosts(loginUserPosts, 'sold').length === 0 ? (
                   <div className="text-center text-gray-500 mt-8">
                     <NoDeal />
                   </div>
                 ) : (
-                  getFilteredPosts([PostStatus.SOLD]).map((post) => (
+                  mapPosts(loginUserPosts, 'sold').map((post) => (
                     <PostCard key={post.id} post={post} />
                   ))
                 )}

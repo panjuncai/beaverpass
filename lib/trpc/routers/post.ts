@@ -1,7 +1,18 @@
 import { TRPCError } from "@trpc/server";
 import { protectedProcedure, publicProcedure, router } from "..";
 import { createPostSchema, getPostByIdSchema, getPostsSchema, updatePostSchema } from "@/lib/validations/post";
+import { z } from 'zod';
+import { PostStatus } from '@/lib/types/enum';
 
+interface User {
+  id: string;
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
+  avatar: string | null;
+  phone: string | null;
+  address: string | null;
+}
 
 export const postRouter = router({
   // 获取单个帖子
@@ -9,8 +20,7 @@ export const postRouter = router({
     .input(getPostByIdSchema)
     .query(async ({ input, ctx }) => {
       try {
-        // Define a mapping function to handle nullable fields
-        const mapUser = (user: any) => {
+        const mapUser = (user: User | null) => {
           if (!user) return null;
           return {
             id: user.id,
@@ -26,25 +36,25 @@ export const postRouter = router({
         const post = await ctx.prisma.post.findUnique({
           where: { id: input.id },
           include: {
-          images: true,
-          poster: true,
-        },
-      });
-      if (!post) {
-        console.error('🙀🙀🙀Post not found');
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'Post not found',
+            images: true,
+            poster: true,
+          },
         });
-      }
-      
-      // Map the post to handle nullable fields
-      const mappedPost = {
-        ...post,
-        poster: mapUser(post.poster)
-      };
-      
-      return mappedPost;
+        
+        if (!post) {
+          console.error('🙀🙀🙀Post not found');
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Post not found',
+          });
+        }
+        
+        const mappedPost = {
+          ...post,
+          poster: mapUser(post.poster)
+        };
+        
+        return mappedPost;
       } catch (error) {
         console.error('🙀🙀🙀Failed to get post:', error);
         throw new TRPCError({
@@ -58,8 +68,7 @@ export const postRouter = router({
     .input(getPostsSchema)
     .query(async ({ input, ctx }) => {
       try {
-        // Define a mapping function to handle nullable fields
-        const mapUser = (user: any) => {
+        const mapUser = (user: User | null) => {
           if (!user) return null;
           return {
             id: user.id,
@@ -75,34 +84,33 @@ export const postRouter = router({
         const posts = await ctx.prisma.post.findMany({
           take: input.limit,
           where: {
-          ...(input.posterId && { posterId: input.posterId }),
-          ...(input.category && { category: input.category }),
-          ...(input.search && {
-            OR: [
-              { title: { contains: input.search, mode: 'insensitive' } },
-              { description: { contains: input.search, mode: 'insensitive' } },
-            ],
-          }),
-          ...(input.minPrice && { amount: { gte: input.minPrice } }),
-          ...(input.maxPrice && { amount: { lte: input.maxPrice } }),
-        },
-        orderBy: {
-          [input.sortBy]: input.sortOrder,
-        },
-        include: {
-          images: true,
-          poster: true,
-        },
-        ...(input.cursor && { cursor: { id: input.cursor }, skip: 1 }),
-      });
-      
-      // Map the posts to handle nullable fields
-      const mappedPosts = posts.map(post => ({
-        ...post,
-        poster: mapUser(post.poster)
-      }));
-      
-      return mappedPosts;
+            ...(input.posterId && { posterId: input.posterId }),
+            ...(input.category && { category: input.category }),
+            ...(input.search && {
+              OR: [
+                { title: { contains: input.search, mode: 'insensitive' } },
+                { description: { contains: input.search, mode: 'insensitive' } },
+              ],
+            }),
+            ...(input.minPrice && { amount: { gte: input.minPrice } }),
+            ...(input.maxPrice && { amount: { lte: input.maxPrice } }),
+          },
+          orderBy: {
+            [input.sortBy]: input.sortOrder,
+          },
+          include: {
+            images: true,
+            poster: true,
+          },
+          ...(input.cursor && { cursor: { id: input.cursor }, skip: 1 }),
+        });
+        
+        const mappedPosts = posts.map(post => ({
+          ...post,
+          poster: mapUser(post.poster)
+        }));
+        
+        return mappedPosts;
       } catch (error) {
         console.error('🙀🙀🙀Failed to get posts:', error);
         throw new TRPCError({
@@ -113,71 +121,32 @@ export const postRouter = router({
     }),
   createPost: protectedProcedure
     .input(createPostSchema)
-    .mutation(async ({ input, ctx }) => {
+    .mutation(async ({ ctx, input }) => {
       try {
-        // Define a mapping function to handle nullable fields
-        const mapUser = (user: any) => {
-          if (!user) return null;
-          return {
-            id: user.id,
-            email: user.email,
-            firstName: user.firstName || "",
-            lastName: user.lastName || "",
-            avatar: user.avatar || null,
-            phone: user.phone || null,
-            address: user.address || null
-          };
-        };
-        
-        // 使用事务来确保帖子和图片同时保存
-        const post = await ctx.prisma.$transaction(async (tx) => {
-          // 创建帖子
-          const newPost = await tx.post.create({
-            data: {
-              category: input.category,
-              title: input.title,
-              description: input.description,
-              condition: input.condition,
-              amount: input.amount,
-              isNegotiable: input.isNegotiable,
-              deliveryType: input.deliveryType,
-              posterId: ctx.loginUser.id,
-            },
-          });
-
-          // 创建图片记录
-          if (input.images.length > 0) {
-            await tx.postImage.createMany({
-              data: input.images.map(image => ({
-                postId: newPost.id,
+        const post = await ctx.prisma.post.create({
+          data: {
+            title: input.title,
+            description: input.description,
+            amount: input.amount,
+            isNegotiable: input.isNegotiable,
+            category: input.category,
+            condition: input.condition,
+            deliveryType: input.deliveryType,
+            images: {
+              create: input.images.map(image => ({
                 imageUrl: image.imageUrl,
                 imageType: image.imageType,
               })),
-            });
-          }
-
-          // 返回包含图片的完整帖子
-          return tx.post.findUnique({
-            where: { id: newPost.id },
-            include: {
-              images: true,
-              poster: true,
             },
-          });
+            posterId: ctx.loginUser.id,
+          },
         });
-
-        // Map the post to handle nullable fields
-        const mappedPost = post ? {
-          ...post,
-          poster: mapUser(post.poster)
-        } : null;
-
-        return mappedPost;
+        return post;
       } catch (error) {
-        console.error('🙀🙀🙀Failed to create post:', error);
+        console.error("Error creating post:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: error instanceof Error ? error.message : "Failed to create post",
+          message: "Failed to create post",
         });
       }
     }),
@@ -196,6 +165,75 @@ export const postRouter = router({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: error instanceof Error ? error.message : "Failed to update post",
+        });
+      }
+    }),
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        title: z.string().optional(),
+        description: z.string().optional(),
+        amount: z.number().optional(),
+        category: z.string().optional(),
+        images: z.array(z.string()).optional(),
+        condition: z.string().optional(),
+        status: z.nativeEnum(PostStatus).optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const post = await ctx.prisma.post.update({
+          where: { id: input.id },
+          data: {
+            title: input.title,
+            description: input.description,
+            amount: input.amount,
+            category: input.category,
+            images: input.images ? {
+              deleteMany: {},
+              create: input.images.map(imageUrl => ({
+                imageUrl,
+                imageType: 'image',
+              })),
+            } : undefined,
+            condition: input.condition,
+            status: input.status,
+          },
+        });
+        return post;
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error.message,
+          });
+        }
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'An unknown error occurred',
+        });
+      }
+    }),
+
+  delete: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const post = await ctx.prisma.post.delete({
+          where: { id: input.id },
+        });
+        return post;
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error.message,
+          });
+        }
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'An unknown error occurred',
         });
       }
     }),
