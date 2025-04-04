@@ -54,25 +54,45 @@ export const authRouter = router({
     .input(registerSchema)
     .mutation(async ({ input }) => {
       try {
+        console.log('Starting registration process for:', input.email);
         const supabase = await createClient();
+        
+        console.log('Attempting to sign up user with Supabase...');
         const { data, error } = await supabase.auth.signUp({
           email: input.email,
           password: input.password,
           options: {
-            // 开启邮箱确认
             emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
           }
         });
 
         if (error) {
+          console.error('Supabase signup error:', {
+            error: error.message,
+            code: error.status,
+            name: error.name,
+            timestamp: new Date().toISOString()
+          });
           throw new TRPCError({
             code: 'BAD_REQUEST',
             message: error.message || 'Sign up failed',
           });
         }
 
+        console.log('User registration successful:', {
+          userId: data.user?.id,
+          email: data.user?.email,
+          timestamp: new Date().toISOString()
+        });
+
         return { success: true, user: data.user };
       } catch (error) {
+        console.error('Unexpected error during registration:', {
+          error: error instanceof Error ? error.message : error,
+          stack: error instanceof Error ? error.stack : undefined,
+          timestamp: new Date().toISOString()
+        });
+        
         if (error instanceof TRPCError) {
           throw error;
         }

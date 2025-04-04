@@ -2,7 +2,7 @@
 import SearchBar from "@/app/(main)/search/search-bar";
 import ProductsShow from "@/app/(main)/search/search-show";
 import SearchCategory from "@/app/(main)/search/search-category";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import AddressModal from "@/components/modals/address-modal";
 import { useAuthStore } from "@/lib/store/auth-store";
 export default function SearchPage() {
@@ -10,10 +10,9 @@ export default function SearchPage() {
   const [search, setSearch] = useState("");
   const { loginUser } = useAuthStore();
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearch(value);
-  };
+  const memoizedProductsShow = useMemo(() => (
+    <ProductsShow selectedCategory={selectedCategory} search={search} />
+  ), [selectedCategory, search]);
   // 打开地址选择模态框
   const showAddressModal = () => {
     setIsAddressModalOpen(true);
@@ -37,14 +36,14 @@ export default function SearchPage() {
               : "Please select address"}
           </div>
         </div>
-        <SearchBar handleSearch={handleSearch} />
+        <SearchBar handleSearch={(value) => setSearch(value)} />
       </div>
       <SearchCategory
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
       />
       <div className="flex-1 overflow-auto px-4 pt-3 pb-20">
-        <ProductsShow selectedCategory={selectedCategory} search={search} />
+        {memoizedProductsShow}
       </div>
       {/* 地址选择模态框 */}
       <AddressModal

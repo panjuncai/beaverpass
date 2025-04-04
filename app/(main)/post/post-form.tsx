@@ -513,6 +513,7 @@ E.g., Solid wood dining table with minor scratches on the top surface. Dimension
       {errors.images && (
         <div className="text-error text-sm mt-2">{errors.images.message}</div>
       )}
+      <div className="h-30"></div>
     </>
   );
 

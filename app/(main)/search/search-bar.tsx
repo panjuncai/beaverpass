@@ -1,4 +1,15 @@
-export default function SearchBar({ handleSearch }: { handleSearch: (e: React.ChangeEvent<HTMLInputElement>) => void }) {
+import { useState } from "react";
+import { useDebounce } from 'use-debounce';
+import { useEffect } from "react";
+
+export default function SearchBar({ handleSearch }: { handleSearch: (value: string) => void }) {
+  const [searchValue, setSearchValue] = useState("");
+  const [debouncedSearch] = useDebounce(searchValue, 500);
+
+  useEffect(() => {
+    handleSearch(debouncedSearch);
+  }, [debouncedSearch]);
+
   return (
     <div className="relative w-full">
       <div className="w-full h-12 relative bg-white rounded-[10px] border border-neutral-300 flex items-center px-4">
@@ -15,7 +26,7 @@ export default function SearchBar({ handleSearch }: { handleSearch: (e: React.Ch
           type="text"
           className="ml-2 w-full bg-transparent focus:outline-none text-zinc-700 placeholder-zinc-400 text-sm font-normal font-['Poppins'] tracking-wide"
           placeholder="What do you need?"
-          onChange={handleSearch}
+          onChange={(e) => setSearchValue(e.target.value)}
         />
         
         {/* Equalizer Icon */}

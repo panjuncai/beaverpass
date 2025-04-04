@@ -7,8 +7,9 @@ import { Form, Input, Button, Avatar, ImageUploader } from 'antd-mobile';
 import { SpinLoading } from 'antd-mobile';
 import AddressModal from '@/components/modals/address-modal';
 import { CameraOutline, LocationFill } from 'antd-mobile-icons';
-import { compressImage } from '@/lib/utils/image-compression';
 import type { ImageUploadItem } from 'antd-mobile/es/components/image-uploader';
+import { useFileUpload } from '@/hooks/useFileUpload';
+import { useRouter } from 'next/navigation';
 
 interface ProfileFormValues {
   firstName: string;
@@ -19,28 +20,40 @@ interface ProfileFormValues {
 }
 
 export default function ProfileForm() {
+  const router = useRouter();
   const { loginUser } = useAuthStore();
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [tempAvatar, setTempAvatar] = useState<string | null>(null);
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
   const [fileList, setFileList] = useState<ImageUploadItem[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const { uploadImage } = useFileUpload();
   
   // 表单初始值
   const [form] = Form.useForm();
+  const [shouldResetForm, setShouldResetForm] = useState(true);
   
   // 获取当前用户信息
   const { isLoading: isLoadingUser } = trpc.user.getCurrentUser.useQuery(undefined, {
     enabled: !!loginUser?.id,
     // 当获取到用户信息后，设置表单初始值
     onSuccess: (data) => {
-      if (data) {
+      // 只在组件初始化或明确需要重置表单时才设置表单值
+      if (data && shouldResetForm) {
+        const avatar = data.user_metadata?.avatar || '';
         form.setFieldsValue({
           firstName: data.user_metadata?.firstName || '',
           lastName: data.user_metadata?.lastName || '',
           address: data.user_metadata?.address || '',
           phone: data.user_metadata?.phone || '',
-          avatar: data.user_metadata?.avatar || '',
+          avatar: avatar,
         });
+        // 同时设置临时头像，确保界面显示
+        if (avatar) {
+          setTempAvatar(avatar);
+        }
+        // 设置完成后，将标志设为 false
+        setShouldResetForm(false);
       }
     }
   });
@@ -48,13 +61,12 @@ export default function ProfileForm() {
   // 更新用户资料mutation
   const updateProfile = trpc.user.updateProfile.useMutation({
     onSuccess: () => {
-      // Toast.show({
-      //   icon: 'success',
-      //   content: '更新成功',
-      // });
-      // 更新成功后，将临时头像设为 null
+      // 更新成功后，将标志设为 true，允许重新加载表单数据
+      setShouldResetForm(true);
       setTempAvatar(null);
       setFileList([]);
+      // 跳转到 search 页面
+      router.push('/search');
     },
     onError: (error) => {
       // Toast.show({
@@ -89,36 +101,42 @@ export default function ProfileForm() {
   
   // 处理地址选择
   const handleAddressSelect = (selectedAddress: string) => {
-    form.setFieldsValue({ address: selectedAddress });
+    // 获取当前表单所有值
+    const currentValues = form.getFieldsValue();
+    // 更新地址，同时保留其他字段的值
+    form.setFieldsValue({
+      ...currentValues,
+      address: selectedAddress
+    });
     setIsAddressModalOpen(false);
   };
 
   // 处理图片上传
   const handleImageUpload = async (file: File) => {
-    const compressedFile = await compressImage(file, {
-      maxSizeMB: 1,
-      maxWidthOrHeight: 800,
-    });
-    
-    // 将压缩后的文件转换为 base64
-    const reader = new FileReader();
-    const base64Promise = new Promise<string>((resolve, reject) => {
-      reader.onload = () => {
-        const base64String = reader.result as string;
-        resolve(base64String);
+    try {
+      setIsUploading(true);
+      const imageUrl = await uploadImage(file);
+      
+      // 更新临时头像 URL 和表单值
+      setTempAvatar(imageUrl);
+      const currentValues = form.getFieldsValue();
+      form.setFieldsValue({
+        ...currentValues,
+        avatar: imageUrl
+      });
+      setIsUploading(false);
+      
+      // 上传成功后自动关闭模态框
+      setIsAvatarModalOpen(false);
+      
+      return {
+        url: imageUrl
       };
-      reader.onerror = reject;
-    });
-    
-    reader.readAsDataURL(compressedFile);
-    const base64String = await base64Promise;
-    
-    // 设置临时头像为 base64 字符串
-    setTempAvatar(base64String);
-    
-    return {
-      url: base64String,
-    };
+    } catch (error) {
+      setIsUploading(false);
+      console.error('Error uploading avatar:', error);
+      throw new Error('Upload failed');
+    }
   };
 
   // 打开头像上传模态框
@@ -128,6 +146,7 @@ export default function ProfileForm() {
 
   // 关闭头像上传模态框
   const closeAvatarModal = () => {
+    // 只关闭模态框，不重置表单值
     setIsAvatarModalOpen(false);
   };
 
@@ -226,48 +245,59 @@ export default function ProfileForm() {
       
       {/* 头像上传模态框 */}
       <div className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ${isAvatarModalOpen ? 'block' : 'hidden'}`}>
-        <div className="bg-white rounded-lg p-4 w-full max-w-md mx-4">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold">Change avatar</h2>
+        <div className="bg-white rounded-lg p-4 w-[280px]">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-lg font-medium">Change avatar</h2>
             <button 
               onClick={closeAvatarModal}
-              className="btn btn-ghost btn-circle"
+              className="p-1"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
           
-          <ImageUploader
-            value={fileList}
-            onChange={setFileList}
-            upload={handleImageUpload}
-            maxCount={1}
-            accept="image/*"
-            onDelete={() => {
-              setTempAvatar(null);
-              setFileList([]);
-            }}
-          />
+          <div className="flex justify-center mb-6">
+            <div className="w-[100px]">
+              <ImageUploader
+                value={fileList}
+                onChange={setFileList}
+                upload={handleImageUpload}
+                maxCount={1}
+                accept="image/*"
+                deletable={true}
+                onDelete={() => {
+                  setTempAvatar(null);
+                  setFileList([]);
+                }}
+              />
+            </div>
+            {isUploading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80 z-10">
+                <span className="text-gray-600">Uploading...</span>
+              </div>
+            )}
+          </div>
           
-          <div className="mt-4 flex justify-end gap-2">
+          {/* <div className="flex justify-end gap-3">
             <Button 
               onClick={closeAvatarModal}
-              className="mr-2"
+              className="px-4"
+              fill="none"
             >
               Cancel
             </Button>
             <Button 
               color="primary"
+              className="px-4"
               onClick={() => {
                 closeAvatarModal();
-                // 头像会在表单提交时一起保存
               }}
             >
               Confirm
             </Button>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
