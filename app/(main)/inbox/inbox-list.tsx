@@ -1,10 +1,11 @@
 import { ChatRoomOutput, trpc } from '@/lib/trpc/client';
-import { Empty, List, Avatar, Badge } from 'antd-mobile';
+import { Empty, List, Avatar, Badge, Skeleton } from 'antd-mobile';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
 import { MessageType } from '@/lib/types/enum';
 import { useAuthStore } from '@/lib/store/auth-store';
 import { useRouter } from 'next/navigation';
+
 export default function InboxList() {
     const { loginUser } = useAuthStore();
     const router = useRouter();
@@ -95,25 +96,64 @@ export default function InboxList() {
     }
   };
   
-  // 检查是否有未读消息
-  // const hasUnreadMessages = (chatRoom: ChatRoomOutput) => {
-  //   if (!chatRoom.messages || chatRoom.messages.length === 0) {
-  //     return false;
-  //   }
-    
-  //   const lastMessage = chatRoom.messages[0];
-    
-  //   // 如果最后一条消息是自己发的，则没有未读消息
-  //   if (lastMessage.senderId === loginUser?.id) {
-  //     return false;
-  //   }
-    
-  //   // 检查是否已读
-  //   const readBy = lastMessage.readBy || [];
-  //   return !readBy.some((read: any) => read.userId === loginUser?.id);
-  // };
+  // 渲染骨架屏
+  const renderSkeleton = () => {
+    return (
+      <div className="pb-safe">
+        <List>
+          {[1, 2, 3, 4, 5].map((index) => (
+            <List.Item
+              key={index}
+              prefix={
+                <Skeleton
+                  animated
+                  style={{
+                    '--width': '48px',
+                    '--height': '48px',
+                    '--border-radius': '50%',
+                  }}
+                />
+              }
+              description={
+                <Skeleton
+                  animated
+                  style={{
+                    '--width': '60%',
+                    '--height': '16px',
+                  }}
+                />
+              }
+              extra={
+                <Skeleton
+                  animated
+                  style={{
+                    '--width': '60px',
+                    '--height': '16px',
+                  }}
+                />
+              }
+            >
+              <Skeleton
+                animated
+                style={{
+                  '--width': '120px',
+                  '--height': '20px',
+                }}
+              />
+            </List.Item>
+          ))}
+        </List>
+      </div>
+    );
+  };
+
+  // 如果正在加载，显示骨架屏
+  if (isLoading) {
+    return renderSkeleton();
+  }
+  
   return (
-<div className="pb-safe">
+    <div className="pb-safe">
       <List>
         {chatRooms?.map(chatRoom => (
           <List.Item
