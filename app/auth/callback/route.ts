@@ -35,7 +35,6 @@ export async function GET(request: Request) {
         console.error('Session exchange error:', {
           error: error.message,
           code: error.status,
-          details: error.details
         });
         return NextResponse.redirect(new URL('/auth/error', origin))
       }
