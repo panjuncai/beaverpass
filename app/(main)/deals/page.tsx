@@ -3,12 +3,12 @@ import { useEffect, useState } from 'react';
 import { OrderStatus } from "@/lib/types/enum";
 import NoLogin from "@/components/utils/no-login";
 import { useAuthStore } from "@/lib/store/auth-store";
-import Loading from "@/components/utils/loading";
 import { trpc } from "@/lib/trpc/client";
 import { SerializedPost } from "@/lib/types/post";
 import DealsOrderCard from "./deals-order-card";
 import NoDeal from "@/components/utils/no-deal";
 import PostCard from "./post-card";
+import { Skeleton } from "antd-mobile";
 
 export default function DealsPage() {
   const { loginUser, isLoading } = useAuthStore();
@@ -48,8 +48,46 @@ export default function DealsPage() {
     );
   }
 
+  // 渲染骨架屏
+  const renderSkeleton = () => {
+    return (
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 p-4">
+        {[1, 2, 3, 4 ].map((index) => (
+          <div key={index} className="card bg-base-100 shadow-md">
+            <figure className="h-[200px] w-full">
+              <Skeleton
+                animated
+                style={{
+                  '--width': '100%',
+                  '--height': '200px',
+                }}
+              />
+            </figure>
+            <div className="card-body" style={{ "--padding-card": "0.5rem" } as React.CSSProperties}>
+              <Skeleton
+                animated
+                style={{
+                  '--width': '80%',
+                  '--height': '20px',
+                }}
+                className="mb-2"
+              />
+              <Skeleton
+                animated
+                style={{
+                  '--width': '60%',
+                  '--height': '16px',
+                }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   if (isLoading || isLoadingOrders || isLoadingPosts) {
-    return <Loading />;
+    return renderSkeleton();
   }
 
   const activeOrderStatuses = [
