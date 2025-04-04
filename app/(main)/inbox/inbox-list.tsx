@@ -101,7 +101,7 @@ export default function InboxList() {
     return (
       <div className="pb-safe">
         <List>
-          {[1, 2, 3, 4, 5].map((index) => (
+          {[1, 2, 3, 4].map((index) => (
             <List.Item
               key={index}
               prefix={
@@ -110,8 +110,9 @@ export default function InboxList() {
                   style={{
                     '--width': '48px',
                     '--height': '48px',
-                    '--border-radius': '50%',
+                    '--border-radius': '20%',
                   }}
+                  className='mb-2 mt-2'
                 />
               }
               description={
@@ -133,13 +134,13 @@ export default function InboxList() {
                 />
               }
             >
-              <Skeleton
+              {/* <Skeleton
                 animated
                 style={{
                   '--width': '120px',
                   '--height': '20px',
                 }}
-              />
+              /> */}
             </List.Item>
           ))}
         </List>

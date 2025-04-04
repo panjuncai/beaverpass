@@ -4,7 +4,7 @@ import { trpc } from "@/lib/trpc/client";
 import { useRouter } from "next/navigation";  
 import { HeartOutline, HeartFill } from "antd-mobile-icons";
 import { useState } from "react";
-import Loading from "@/components/utils/loading";
+import { Skeleton } from "antd-mobile";
 
 export default function ProductsShow({selectedCategory,search}:{selectedCategory:string,search:string}) {
   const router = useRouter();
@@ -24,7 +24,44 @@ export default function ProductsShow({selectedCategory,search}:{selectedCategory
     search: search,
     category: selectedCategory==="All" ? "" : selectedCategory,
   });
-  if(isLoading||isLoadingPosts) return <Loading />
+  // 渲染骨架屏
+  const renderSkeleton = () => {
+    return (
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        {[1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
+          <div key={index} className="card bg-base-100 shadow-md">
+            <figure className="h-[200px] w-full">
+              <Skeleton
+                animated
+                style={{
+                  '--width': '100%',
+                  '--height': '200px',
+                }}
+              />
+            </figure>
+            <div className="card-body" style={{ "--padding-card": "0.5rem" } as React.CSSProperties}>
+              <Skeleton
+                animated
+                style={{
+                  '--width': '80%',
+                  '--height': '20px',
+                }}
+                className="mb-2"
+              />
+              <Skeleton
+                animated
+                style={{
+                  '--width': '60%',
+                  '--height': '16px',
+                }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+  if(isLoading||isLoadingPosts) return renderSkeleton()
   return (
   <>
     <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
