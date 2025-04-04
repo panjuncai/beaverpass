@@ -99,41 +99,63 @@ export const orderRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      try {
-        const order = await ctx.prisma.order.findFirst({
-          where: {
-            paymentTransactionId: input.paymentIntentId,
-          },
-        });
+      const maxRetries = 3;
+      let retryCount = 0;
+      let lastError = null;
 
-        if (!order) {
+      while (retryCount < maxRetries) {
+        try {
+          const order = await ctx.prisma.order.findFirst({
+            where: {
+              paymentTransactionId: input.paymentIntentId,
+            },
+          });
+
+          if (!order) {
+            throw new TRPCError({
+              code: "NOT_FOUND",
+              message: "Order not found",
+            });
+          }
+
+          // 验证订单所有者
+          if (order.buyerId !== ctx.loginUser.id) {
+            throw new TRPCError({
+              code: "UNAUTHORIZED",
+              message: "Not authorized to update this order",
+            });
+          }
+
+          // 更新订单状态
+          const updatedOrder = await ctx.prisma.order.update({
+            where: { id: order.id },
+            data: { status: input.status },
+          });
+
+          return updatedOrder;
+        } catch (error) {
+          lastError = error;
+          retryCount++;
+          
+          if (error instanceof TRPCError) {
+            throw error; // 直接抛出业务逻辑错误
+          }
+          
+          // 如果是数据库连接错误，等待后重试
+          if (retryCount < maxRetries) {
+            await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+            console.log(`Retrying order status update (attempt ${retryCount + 1}/${maxRetries})`);
+            continue;
+          }
+          
+          console.error("Failed to update order status after retries:", error);
           throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Order not found",
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to update order status after multiple attempts",
           });
         }
-
-        // 验证订单所有者
-        if (order.buyerId !== ctx.loginUser.id) {
-          throw new TRPCError({
-            code: "UNAUTHORIZED",
-            message: "Not authorized to update this order",
-          });
-        }
-
-        // 更新订单状态
-        const updatedOrder = await ctx.prisma.order.update({
-          where: { id: order.id },
-          data: { status: input.status },
-        });
-
-        return updatedOrder;
-      } catch (error) {
-        console.error("Failed to update order status:", error);
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: error instanceof Error ? error.message : "Failed to update order status",
-        });
       }
+
+      throw lastError;
     }),
 });

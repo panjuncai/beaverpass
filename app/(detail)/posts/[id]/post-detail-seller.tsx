@@ -5,6 +5,8 @@ import { Avatar, Rate } from "antd-mobile";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
+import MessageModal from "@/components/modals/message-modal";
+import { useRef } from "react";
 
 export default function PostDetailMainSeller({
   post,
@@ -14,7 +16,7 @@ export default function PostDetailMainSeller({
   const router = useRouter();
   const { loginUser } = useAuthStore();
   const utils = trpc.useUtils();
-
+  const dialogRef = useRef<HTMLDialogElement>(null)
   // 创建聊天室的 mutation
   const createChatRoomMutation = trpc.chat.createChatRoom.useMutation({
     onSuccess: (chatRoom) => {
@@ -52,6 +54,12 @@ export default function PostDetailMainSeller({
   };
 
   return (
+    <><MessageModal 
+    title="Please login first"
+    content="You need to login to buy the product"
+    dialogRef={dialogRef}
+    redirectUrl="/login"
+  />
     <div className="mt-4 flex gap-4 shadow-sm p-2">
       <Avatar src={post?.poster?.avatar || '1'} style={{ '--size': '64px' }}  />
       <div className="flex-1 flex flex-col">
@@ -73,7 +81,13 @@ export default function PostDetailMainSeller({
           <button
             className="w-20 h-5 bg-yellow-900 rounded-3xl flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={loginUser?.id === post?.poster?.id || createChatRoomMutation.isLoading}
-            onClick={() => void handleChatClick()}
+            onClick={() => {
+              if (!loginUser?.id) {
+                dialogRef.current?.showModal()
+                return;
+              }
+              void handleChatClick()
+            }}
           >
             {createChatRoomMutation.isLoading ? (
               <span className="loading loading-spinner loading-xs"></span>
@@ -84,5 +98,6 @@ export default function PostDetailMainSeller({
         </div>
       </div>
     </div>
+    </>
   );
 }

@@ -9,14 +9,10 @@ console.log("🔥🔥🔥 Available env keys:", Object.keys(process.env).filter(
 ));
 
 // 获取 Stripe 密钥
-let stripeSecretKey = process.env.STRIPE_SECRET_KEY || '';
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY || '';
 
 // 如果在 Vercel 上遇到问题，可以在这里配置一个硬编码的测试键（仅用于开发环境）
 // !!!注意：这仅适用于开发/调试，不应在生产环境使用!!!
-if (stripeSecretKey) {
-  stripeSecretKey = 'sk_test_51QYfmnCcbR3U95qJuCdoSGfNlinwCkRAjAEGxo0X5YoDAjCNRnD3PEU6601xd12v8L5G20akoYqJiM8xTM0SW2Ns004qDD4GQH'; // 替换为你的测试密钥
-  console.log("🔥🔥🔥 Using fallback test key for development"+stripeSecretKey.substring(0, 20));
-}
 
 // 初始化 Stripe 实例（延迟初始化）
 let stripeInstance: Stripe | null = null;
