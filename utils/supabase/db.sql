@@ -172,40 +172,40 @@ alter publication supabase_realtime add table messages, chat_room_participants, 
 --   );
 
 -- 用户创建触发器函数
-CREATE OR REPLACE FUNCTION public.handle_user_create()
-RETURNS TRIGGER AS $$
-BEGIN
-  INSERT INTO public.users (
-    id,
-    first_name,
-    last_name,
-    phone,
-    address,
-    avatar,
-    email,
-    created_at,
-    updated_at
-  ) VALUES (
-    NEW.id,
-    (NEW.raw_user_meta_data->>'firstName'),
-    (NEW.raw_user_meta_data->>'lastName'),
-    (NEW.raw_user_meta_data->>'phone'),
-    (NEW.raw_user_meta_data->>'address'),
-    (NEW.raw_user_meta_data->>'avatar'),
-    NEW.email,
-    NOW(),
-    NOW()
-  );
+-- CREATE OR REPLACE FUNCTION public.handle_user_create()
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--   INSERT INTO public.users (
+--     id,
+--     first_name,
+--     last_name,
+--     phone,
+--     address,
+--     avatar,
+--     email,
+--     created_at,
+--     updated_at
+--   ) VALUES (
+--     NEW.id,
+--     (NEW.raw_user_meta_data->>'firstName'),
+--     (NEW.raw_user_meta_data->>'lastName'),
+--     (NEW.raw_user_meta_data->>'phone'),
+--     (NEW.raw_user_meta_data->>'address'),
+--     (NEW.raw_user_meta_data->>'avatar'),
+--     NEW.email,
+--     NOW(),
+--     NOW()
+--   );
   
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+--   RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- 创建触发器
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW
-  EXECUTE FUNCTION public.handle_user_create();
+-- -- 创建触发器
+-- CREATE TRIGGER on_auth_user_created
+--   AFTER INSERT ON auth.users
+--   FOR EACH ROW
+--   EXECUTE FUNCTION public.handle_user_create();
 
 -- 首先创建触发器函数
 CREATE OR REPLACE FUNCTION public.handle_user_update()
@@ -231,3 +231,86 @@ CREATE TRIGGER on_auth_user_updated
   AFTER UPDATE ON auth.users
   FOR EACH ROW
   EXECUTE FUNCTION public.handle_user_update();
+
+
+-- 用户创建触发器函数
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+DECLARE
+  first_name_val TEXT;
+  last_name_val TEXT;
+  avatar_url_val TEXT;
+BEGIN
+  -- 调试信息，可以在生产环境中移除
+  RAISE NOTICE 'Raw user meta data: %', NEW.raw_user_meta_data;
+
+  -- 尝试从不同来源获取名字
+  first_name_val := 
+    COALESCE(
+      -- 邮件注册时的自定义字段
+      NEW.raw_user_meta_data->>'firstName',
+      NEW.raw_user_meta_data->>'first_name',
+      
+      -- 社交登录时的字段
+      split_part(NEW.raw_user_meta_data->>'full_name', ' ', 1),
+      split_part(NEW.raw_user_meta_data->>'name', ' ', 1),
+      
+      -- 默认值
+      ''
+    );
+    
+  -- 尝试从不同来源获取姓氏
+  last_name_val := 
+    COALESCE(
+      -- 邮件注册时的自定义字段
+      NEW.raw_user_meta_data->>'lastName',
+      NEW.raw_user_meta_data->>'last_name',
+      
+      -- 社交登录时的字段
+      split_part(NEW.raw_user_meta_data->>'full_name', ' ', 2),
+      split_part(NEW.raw_user_meta_data->>'name', ' ', 2),
+      
+      -- 默认值
+      ''
+    );
+    
+  -- 尝试从不同来源获取头像
+  avatar_url_val := 
+    COALESCE(
+      -- 不同提供商可能使用的字段
+      NEW.raw_user_meta_data->>'avatar_url',
+      NEW.raw_user_meta_data->>'picture',
+      NEW.raw_user_meta_data->>'avatar',
+      
+      -- 默认值
+      ''
+    );
+
+  -- 插入到 public.users 表
+  INSERT INTO public.users (
+    id,
+    email,
+    first_name,
+    last_name,
+    avatar,
+    created_at
+  ) VALUES (
+    NEW.id,
+    NEW.email,
+    first_name_val,
+    last_name_val,
+    avatar_url_val,
+    NEW.created_at
+  );
+  
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 用户创建触发器
+CREATE TRIGGER on_auth_user_created 
+AFTER INSERT ON auth.users 
+FOR EACH ROW EXECUTE FUNCTION handle_new_user()

@@ -114,7 +114,7 @@ export default function ChatRoomPage({ params }: PageProps) {
           <span className="text-sm text-gray-500"> </span>
           <span className="text-lg font-bold">{otherParticipant?.user?.lastName}</span>
           <span className="flex items-center">
-            <Verified />
+            <Verified verified={true}/>
             <span className="text-sm text-green-600">Verified</span>
           </span>
         </div>

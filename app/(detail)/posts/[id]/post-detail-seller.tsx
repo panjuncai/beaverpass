@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import MessageModal from "@/components/modals/message-modal";
 import { useRef } from "react";
+import isEduEmail from "@/utils/tools/isEduEmail";
 
 export default function PostDetailMainSeller({
   post,
@@ -67,12 +68,19 @@ export default function PostDetailMainSeller({
           <span className="text-lg font-bold">{post?.poster?.firstName}</span>
           <span className="text-sm text-gray-500"> </span>
           <span className="text-lg font-bold">{post?.poster?.lastName}</span>
-          <span className="flex items-center">
-            <Verified />
-            <span className="text-sm text-green-600">Verified</span>
-          </span>
+          {post?.poster?.email && isEduEmail(post?.poster?.email) ? (
+            <span className="flex items-center">
+              <Verified verified={true} />
+              <span className="text-sm text-green-600">Verified</span>
+            </span>
+          ) : (
+            <span className="flex items-center">
+              <Verified verified={false} />
+              <span className="text-sm text-gray-200">Unverified</span>
+            </span>
+          )}
         </div>
-        <div className="text-sx text-gray-700">from Algonquin College</div>
+        <div className="text-sx text-gray-700"></div>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Rate allowHalf readOnly defaultValue={4} />
