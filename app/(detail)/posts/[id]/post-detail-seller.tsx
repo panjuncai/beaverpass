@@ -1,7 +1,7 @@
 'use client';
 import { SerializedPost } from "@/lib/types/post";
 import Verified from "@/components/icons/verified";
-import { Avatar, Rate } from "antd-mobile";
+import { Avatar, Rate, Button } from "antd-mobile";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
@@ -86,8 +86,11 @@ export default function PostDetailMainSeller({
             <Rate allowHalf readOnly defaultValue={4} />
             <span className="text-lg">4.0</span>
           </div>
-          <button
-            className="w-20 h-5 bg-yellow-900 rounded-3xl flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+          <Button
+            color='primary'
+            size='mini'
+            className='rounded-full'
+            loading={createChatRoomMutation.isLoading}
             disabled={loginUser?.id === post?.poster?.id || createChatRoomMutation.isLoading}
             onClick={() => {
               if (!loginUser?.id) {
@@ -97,12 +100,8 @@ export default function PostDetailMainSeller({
               void handleChatClick()
             }}
           >
-            {createChatRoomMutation.isLoading ? (
-              <span className="loading loading-spinner loading-xs"></span>
-            ) : (
-              <span className="text-center text-white text-xs font-bold font-['Poppins'] uppercase tracking-wide">chat</span>
-            )}
-          </button>
+            Chat
+          </Button>
         </div>
       </div>
     </div>
