@@ -1,10 +1,9 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { OrderStatus } from "@/lib/types/enum";
+import { OrderStatus, PostStatus } from "@/lib/types/enum";
 import NoLogin from "@/components/utils/no-login";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { trpc } from "@/lib/trpc/client";
-import { SerializedPost } from "@/lib/types/post";
 import DealsOrderCard from "./deals-order-card";
 import NoDeal from "@/components/utils/no-deal";
 import PostCard from "./post-card";
@@ -119,40 +118,40 @@ export default function DealsPage() {
     );
   };
 
-  const mapPosts = (
-    loginUserPosts: SerializedPost[] | undefined,
-    activeSubTab: string
-  ): SerializedPost[] => {
-    if (!loginUserPosts) return [];
-    return loginUserPosts
-      .filter(
-        (post) =>
-          post.status &&
-          (activeSubTab === "active"
-            ? post.status === "ACTIVE"
-            : activeSubTab === "inactive"
-            ? post.status === "INACTIVE"
-            : post.status === "SOLD")
-      )
-      .map((post) => {
-        const mappedPost: SerializedPost = {
-          ...post,
-          amount: post.amount ? Number(post.amount) : 0,
-          poster: post.poster
-            ? {
-                id: post.poster.id,
-                email: post.poster.email,
-                firstName: post.poster.firstName || null,
-                lastName: post.poster.lastName || null,
-                avatar: post.poster.avatar,
-                phone: post.poster.phone,
-                address: post.poster.address
-              }
-            : null,
-        };
-        return mappedPost;
-      });
-  };
+  // const mapPosts = (
+  //   loginUserPosts: SerializedPost[] | undefined,
+  //   activeSubTab: string
+  // ): SerializedPost[] => {
+  //   if (!loginUserPosts) return [];
+  //   return loginUserPosts
+  //     .filter(
+  //       (post) =>
+  //         post.status &&
+  //         (activeSubTab === "active"
+  //           ? post.status === "ACTIVE"
+  //           : activeSubTab === "inactive"
+  //           ? post.status === "INACTIVE"
+  //           : post.status === "SOLD")
+  //     )
+  //     .map((post) => {
+  //       const mappedPost: SerializedPost = {
+  //         ...post,
+  //         amount: post.amount ? Number(post.amount) : 0,
+  //         poster: post.poster
+  //           ? {
+  //               id: post.poster.id,
+  //               email: post.poster.email,
+  //               firstName: post.poster.firstName || null,
+  //               lastName: post.poster.lastName || null,
+  //               avatar: post.poster.avatar,
+  //               phone: post.poster.phone,
+  //               address: post.poster.address
+  //             }
+  //           : null,
+  //       };
+  //       return mappedPost;
+  //     });
+  // };
 
   return (
     <div className="flex flex-col items-center w-full max-w-screen-md mx-auto px-4 pt-4">
@@ -321,40 +320,46 @@ export default function DealsPage() {
           <div>
             {activeSubTab === 'active' && (
               <div>
-                {mapPosts(loginUserPosts, 'active').length === 0 ? (
+                {loginUserPosts?.items.filter((post) => post.status === PostStatus.ACTIVE).length === 0 ? (
                   <div className="text-center text-gray-500 mt-8">
                     <NoDeal />
                   </div>
                 ) : (
-                  mapPosts(loginUserPosts, 'active').map((post) => (
-                    <PostCard key={post.id} post={post} />
-                  ))
+                  loginUserPosts?.items
+                    ?.filter((post) => post.status === PostStatus.ACTIVE)
+                    .map((post) => (
+                      <PostCard key={post.id} post={post} />
+                    ))
                 )}
               </div>
             )}
             {activeSubTab === 'inactive' && (
               <div>
-                {mapPosts(loginUserPosts, 'inactive').length === 0 ? (
+                {loginUserPosts?.items.filter((post) => post.status === PostStatus.INACTIVE).length === 0 ? (
                   <div className="text-center text-gray-500 mt-8">
                     <NoDeal />
                   </div>
                 ) : (
-                  mapPosts(loginUserPosts, 'inactive').map((post) => (
-                    <PostCard key={post.id} post={post} />
-                  ))
+                  loginUserPosts?.items
+                    ?.filter((post) => post.status === PostStatus.INACTIVE)
+                    .map((post) => (
+                      <PostCard key={post.id} post={post} />
+                    ))
                 )}
               </div>
             )}
             {activeSubTab === 'sold' && (
               <div>
-                {mapPosts(loginUserPosts, 'sold').length === 0 ? (
+                {loginUserPosts?.items.filter((post) => post.status === PostStatus.SOLD).length === 0 ? (
                   <div className="text-center text-gray-500 mt-8">
                     <NoDeal />
                   </div>
                 ) : (
-                  mapPosts(loginUserPosts, 'sold').map((post) => (
-                    <PostCard key={post.id} post={post} />
-                  ))
+                  loginUserPosts?.items
+                    ?.filter((post) => post.status === PostStatus.SOLD)
+                    .map((post) => (
+                      <PostCard key={post.id} post={post} />
+                    ))
                 )}
               </div>
             )}
