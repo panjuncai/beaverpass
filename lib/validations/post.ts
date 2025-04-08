@@ -13,7 +13,7 @@ export const createPostSchema = z.object({
     title: z.string().min(1, 'Title is required'),
     description: z.string().min(1, 'Description is required'),
     condition: z.string().min(1, 'Condition is required'),
-    amount: z.coerce.number().min(0, 'Amount must be greater than 0'),
+    amount: z.coerce.number().min(0, 'Amount must be greater than 0').or(z.string().min(1, 'Amount is required')),
     isNegotiable: z.boolean().optional(),
     deliveryType: z.string().min(1, 'Delivery type is required'),
     images: z.array(imageSchema),

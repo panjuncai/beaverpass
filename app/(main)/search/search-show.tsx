@@ -125,7 +125,7 @@ export default function ProductsShow({selectedCategory,search}:{selectedCategory
             >
               <h2 className="card-title text-black text-sm md:text-base font-normal font-['Poppins'] truncate">{post.title}</h2>
               <p className="text-black text-sm md:text-base font-medium font-['Poppins']">
-                ${post.amount.toString() === "0" ? "Free" : post.amount.toString()}{" "}
+                {post.amount.toString() === "0" ? "Free" : "$" + post.amount.toString()}{" "}
                 <em className="text-xs text-gray-500">{post.isNegotiable ? "Negotiable" : ""}</em>
               </p>
             </div>

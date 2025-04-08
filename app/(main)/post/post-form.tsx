@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -517,71 +517,92 @@ E.g., Solid wood dining table with minor scratches on the top surface. Dimension
     </>
   );
 
-  const StepFive = () => (
-    <>
-      <div className="flex justify-center mt-6 text-yellow-900 text-xl font-semibold font-['Poppins']">
-        Step 5: Set Your Price
-      </div>
-      <div className="flex flex-col justify-center mt-4 p-8">
-        <div className="form-control">
-          <label className="label cursor-pointer justify-start gap-2">
-            <input
-              type="radio"
-              name="price-type"
-              className="radio checked:bg-primary"
-              checked={!isFree}
-              onChange={() => setValue("amount", isFree ? 10 : 0)}
-            />
-            <div className="relative">
+  const StepFive = () => {
+    const [localAmount, setLocalAmount] = useState((watch("amount") || "").toString());
+    
+    const handleLocalAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = formatPrice(e.target.value);
+      setLocalAmount(value);
+    };
+    
+    const handleAmountBlur = () => {
+      if (localAmount === "") {
+        setLocalAmount("0");
+        handlePriceChange({ amount: "0" });
+      } else {
+        handlePriceChange({ amount: localAmount });
+      }
+    };
+    
+    // 当表单值改变时更新本地状态
+    useEffect(() => {
+      setLocalAmount((watch("amount") || "").toString());
+    }, [watch("amount")]);
+    
+    return (
+      <>
+        <div className="flex justify-center mt-6 text-yellow-900 text-xl font-semibold font-['Poppins']">
+          Step 5: Set Your Price
+        </div>
+        <div className="flex flex-col justify-center mt-4 p-8">
+          <div className="form-control">
+            <label className="label cursor-pointer justify-start gap-2">
               <input
-                type="text"
-                placeholder="Price"
-                className="input input-bordered w-full max-w-xs"
-                value={isFree ? "0" : watch("amount") || ""}
-                onChange={(e) => {
-                  const value = formatPrice(e.target.value);
-                  handlePriceChange({ amount: value });
-                }}
+                type="radio"
+                name="price-type"
+                className="radio checked:bg-primary"
+                checked={!isFree}
+                onChange={() => setValue("amount", isFree ? "" : 0)}
+              />
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Price"
+                  className="input input-bordered w-full max-w-xs"
+                  value={isFree ? "0" : localAmount}
+                  onChange={handleLocalAmountChange}
+                  onBlur={handleAmountBlur}
+                  disabled={isFree}
+                />
+              </div>
+            </label>
+            {errors.amount && (
+              <div className="text-error text-sm mt-2">
+                {errors.amount.message}
+              </div>
+            )}
+          </div>
+          <div className="form-control">
+            <label className="label cursor-pointer justify-start gap-6">
+              <input
+                type="radio"
+                name="price-type"
+                className="radio checked:bg-primary"
+                checked={isFree}
+                onChange={() => setValue("amount", isFree ? "" : 0)}
+              />
+              <span className="label-text text-lg">Free</span>
+            </label>
+          </div>
+          <hr className="border-gray-200 mt-4" />
+          <div className="form-control">
+            <label className="label cursor-pointer justify-start gap-6">
+              <input
+                type="checkbox"
+                className="checkbox"
+                checked={isNegotiable}
+                onChange={(e) =>
+                  handlePriceChange({ isNegotiable: e.target.checked })
+                }
                 disabled={isFree}
               />
-            </div>
-          </label>
-          {errors.amount && (
-            <div className="text-error text-sm mt-2">
-              {errors.amount.message}
-            </div>
-          )}
+              <span className="label-text text-lg">Price is negotiable</span>
+            </label>
+          </div>
         </div>
-        <div className="form-control">
-          <label className="label cursor-pointer justify-start gap-6">
-            <input
-              type="radio"
-              name="price-type"
-              className="radio checked:bg-primary"
-              checked={isFree}
-              onChange={() => setValue("amount", isFree ? 10 : 0)}
-            />
-            <span className="label-text text-lg">Free</span>
-          </label>
-        </div>
-        <hr className="border-gray-200 mt-4" />
-        <div className="form-control">
-          <label className="label cursor-pointer justify-start gap-6">
-            <input
-              type="checkbox"
-              className="checkbox"
-              checked={isNegotiable}
-              onChange={(e) =>
-                handlePriceChange({ isNegotiable: e.target.checked })
-              }
-              disabled={isFree}
-            />
-            <span className="label-text text-lg">Price is negotiable</span>
-          </label>
-        </div>
-      </div>
-    </>
-  );
+      </>
+    );
+  };
 
   const StepSix = () => (
     <>
