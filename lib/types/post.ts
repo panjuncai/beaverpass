@@ -42,10 +42,18 @@ export interface SerializedPost {
 export interface PostQueryParams {
   limit?: number;
   cursor?: string;
+  posterId?: string;
   category?: string;
   search?: string;
   minPrice?: number;
   maxPrice?: number;
   sortBy?: 'createdAt' | 'amount';
   sortOrder?: 'asc' | 'desc';
+  pageParam?: number;
+}
+
+export interface PostsResponse {
+  items: SerializedPost[];
+  nextCursor?: { id: string };
+  total: number;
 } 

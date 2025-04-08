@@ -4,15 +4,15 @@ import { createPostSchema, getPostByIdSchema, getPostsSchema, updatePostSchema }
 import { z } from 'zod';
 import { PostStatus } from '@/lib/types/enum';
 
-interface User {
-  id: string;
-  email: string;
-  firstName: string | null;
-  lastName: string | null;
-  avatar: string | null;
-  phone: string | null;
-  address: string | null;
-}
+// interface User {
+//   id: string;
+//   email: string;
+//   firstName: string | null;
+//   lastName: string | null;
+//   avatar: string | null;
+//   phone: string | null;
+//   address: string | null;
+// }
 
 export const postRouter = router({
   // 获取单个帖子
@@ -20,18 +20,18 @@ export const postRouter = router({
     .input(getPostByIdSchema)
     .query(async ({ input, ctx }) => {
       try {
-        const mapUser = (user: User | null) => {
-          if (!user) return null;
-          return {
-            id: user.id,
-            email: user.email,
-            firstName: user.firstName || "",
-            lastName: user.lastName || "",
-            avatar: user.avatar || null,
-            phone: user.phone || null,
-            address: user.address || null
-          };
-        };
+        // const mapUser = (user: User | null) => {
+        //   if (!user) return null;
+        //   return {
+        //     id: user.id,
+        //     email: user.email,
+        //     firstName: user.firstName || "",
+        //     lastName: user.lastName || "",
+        //     avatar: user.avatar || null,
+        //     phone: user.phone || null,
+        //     address: user.address || null
+        //   };
+        // };
         
         const post = await ctx.prisma.post.findUnique({
           where: { id: input.id },
@@ -49,12 +49,12 @@ export const postRouter = router({
           });
         }
         
-        const mappedPost = {
-          ...post,
-          poster: mapUser(post.poster)
-        };
+        // const mappedPost = {
+        //   ...post,
+        //   poster: mapUser(post.poster)
+        // };
         
-        return mappedPost;
+        return post;
       } catch (error) {
         console.error('🙀🙀🙀Failed to get post:', error);
         throw new TRPCError({
@@ -68,33 +68,25 @@ export const postRouter = router({
     .input(getPostsSchema)
     .query(async ({ input, ctx }) => {
       try {
-        const mapUser = (user: User | null) => {
-          if (!user) return null;
-          return {
-            id: user.id,
-            email: user.email,
-            firstName: user.firstName || "",
-            lastName: user.lastName || "",
-            avatar: user.avatar || null,
-            phone: user.phone || null,
-            address: user.address || null
-          };
+        // 构建查询条件
+        const where = {
+          ...(input.posterId && { posterId: input.posterId }),
+          ...(input.category && { category: input.category }),
+          ...(input.search && {
+            OR: [
+              { title: { contains: input.search, mode: 'insensitive' as const } },
+              { description: { contains: input.search, mode: 'insensitive' as const } },
+            ],
+          }),
+          ...(input.minPrice && { amount: { gte: input.minPrice } }),
+          ...(input.maxPrice && { amount: { lte: input.maxPrice } }),
         };
-        
+
+        // 获取数据
         const posts = await ctx.prisma.post.findMany({
           take: input.limit,
-          where: {
-            ...(input.posterId && { posterId: input.posterId }),
-            ...(input.category && { category: input.category }),
-            ...(input.search && {
-              OR: [
-                { title: { contains: input.search, mode: 'insensitive' } },
-                { description: { contains: input.search, mode: 'insensitive' } },
-              ],
-            }),
-            ...(input.minPrice && { amount: { gte: input.minPrice } }),
-            ...(input.maxPrice && { amount: { lte: input.maxPrice } }),
-          },
+          ...(input.cursor && { skip: 1, cursor: { id: input.cursor } }),
+          where,
           orderBy: {
             [input.sortBy]: input.sortOrder,
           },
@@ -102,15 +94,18 @@ export const postRouter = router({
             images: true,
             poster: true,
           },
-          ...(input.cursor && { cursor: { id: input.cursor }, skip: 1 }),
         });
         
-        const mappedPosts = posts.map(post => ({
-          ...post,
-          poster: mapUser(post.poster)
-        }));
+        // 获取下一页的游标
+        let nextCursor: string | undefined = undefined;
+        if (posts.length === input.limit) {
+          nextCursor = posts[posts.length - 1].id;
+        }
         
-        return mappedPosts;
+        return {
+          items: posts,
+          nextCursor: nextCursor ? { id: nextCursor } : undefined,
+        };
       } catch (error) {
         console.error('🙀🙀🙀Failed to get posts:', error);
         throw new TRPCError({
