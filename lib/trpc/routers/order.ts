@@ -3,6 +3,7 @@ import { protectedProcedure, publicProcedure, router } from "..";
 import { createOrderSchema, getOrdersSchema } from "@/lib/validations/order";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
+import { OrderStatus, PostStatus } from "@/lib/types/enum";
 
 type OrderWithRelations = Prisma.OrderGetPayload<{
   include: {
@@ -109,6 +110,9 @@ export const orderRouter = router({
             where: {
               paymentTransactionId: input.paymentIntentId,
             },
+            include: {
+              post: true, // 获取关联的post信息
+            },
           });
 
           if (!order) {
@@ -126,12 +130,30 @@ export const orderRouter = router({
             });
           }
 
-          // 更新订单状态
-          const updatedOrder = await ctx.prisma.order.update({
-            where: { id: order.id },
-            data: { status: input.status },
-          });
-
+          let updatedOrder;
+          
+          // 如果订单状态更新为已支付，同时更新post状态为已售出
+          if (input.status === OrderStatus.PAID && order.post) {
+            // 更新订单状态
+            updatedOrder = await ctx.prisma.order.update({
+              where: { id: order.id },
+              data: { status: input.status },
+            });
+            
+            // 更新商品状态为已售出
+            await ctx.prisma.post.update({
+              where: { id: order.post.id },
+              data: { status: PostStatus.SOLD },
+            });
+          } else {
+            // 只更新订单状态
+            updatedOrder = await ctx.prisma.order.update({
+              where: { id: order.id },
+              data: { status: input.status },
+            });
+          }
+          
+          // 操作成功，返回更新后的订单并退出函数
           return updatedOrder;
         } catch (error) {
           lastError = error;

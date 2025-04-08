@@ -160,7 +160,6 @@ export default function ProfileForm() {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-6">Edit profile</h1>
       
       {/* 头像部分 */}
       <div className="flex flex-col items-center mb-8">

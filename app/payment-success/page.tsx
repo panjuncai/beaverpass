@@ -4,7 +4,6 @@ import { useEffect, Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import { OrderStatus } from "@/lib/types/enum";
-import { Toast } from 'antd-mobile';
 
 function PaymentSuccessContent() {
   const router = useRouter();
@@ -16,10 +15,10 @@ function PaymentSuccessContent() {
   const updateOrderMutation = trpc.order.updateOrderStatus.useMutation({
     onSuccess: () => {
       setIsProcessing(false);
-      Toast.show({
-        icon: 'success',
-        content: 'Payment successful!',
-      });
+      // Toast.show({
+      //   icon: 'success',
+      //   content: 'Payment successful!',
+      // });
       // 成功后跳转到订单列表页
       router.push("/deals");
     },

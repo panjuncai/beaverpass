@@ -15,7 +15,7 @@ export default function Header() {
       '/chat': 'Chat',
       '/deals': 'Deals',
       '/post':'Post',
-      '/profile':'Profile'
+      '/profile':'Edit Profile'
     };
     
     // 检查当前路径是否需要显示标题
@@ -27,7 +27,7 @@ export default function Header() {
     if (currentPathKey) {
       // 显示路径对应的标题
       return (
-        <div className="text-center justify-start text-zinc-600 text-base font-semibold font-['Poppins'] tracking-wide">{pathTitles[currentPathKey]}</div>
+        <div className="text-center justify-start text-zinc-600 text-xl font-semibold font-['Poppins'] tracking-wide">{pathTitles[currentPathKey]}</div>
       );
     } else {
       // 显示默认的Logo
