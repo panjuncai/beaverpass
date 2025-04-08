@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { HeartOutline, HeartFill } from "antd-mobile-icons";
 import { useState } from "react";
 import { Skeleton, InfiniteScroll } from "antd-mobile";
+import { PostStatus } from "@/lib/types/enum";
 
 export default function ProductsShow({selectedCategory,search}:{selectedCategory:string,search:string}) {
   const router = useRouter();
@@ -25,6 +26,7 @@ export default function ProductsShow({selectedCategory,search}:{selectedCategory
       limit: 10,
       search: search,
       category: selectedCategory === "All" ? "" : selectedCategory,
+      status: PostStatus.ACTIVE,
     },
     {
       getNextPageParam: (lastPage) => {

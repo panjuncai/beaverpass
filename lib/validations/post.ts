@@ -34,6 +34,7 @@ export const getPostsSchema = z.object({
     search: z.string().optional(),
     minPrice: z.number().optional(),
     maxPrice: z.number().optional(),
+    status: z.nativeEnum(PostStatus).optional(),
     sortBy: z.enum(['createdAt', 'amount']).optional().default('createdAt'),
     sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
 }) satisfies z.ZodType<PostQueryParams>

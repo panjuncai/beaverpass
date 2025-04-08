@@ -72,6 +72,7 @@ export const postRouter = router({
         const where = {
           ...(input.posterId && { posterId: input.posterId }),
           ...(input.category && { category: input.category }),
+          ...(input.status && { status: input.status }),
           ...(input.search && {
             OR: [
               { title: { contains: input.search, mode: 'insensitive' as const } },
