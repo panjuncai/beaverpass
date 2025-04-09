@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { trpc } from '@/lib/trpc/client';
 import { Result, SpinLoading } from 'antd-mobile';
@@ -8,7 +8,7 @@ import { SmileOutline, CloseOutline } from 'antd-mobile-icons';
 import { useAuthStore } from '@/lib/store/auth-store';
 import { createClient } from '@/utils/supabase/client';
 
-export default function VerifySchoolEmailPage() {
+function VerifySchoolEmailContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { loginUser, setLoginUser, setSession } = useAuthStore();
@@ -114,5 +114,24 @@ export default function VerifySchoolEmailPage() {
         }
       />
     </div>
+  );
+}
+
+// 加载状态组件
+function LoadingState() {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <SpinLoading />
+      <p className="mt-4 text-gray-600">Loading...</p>
+    </div>
+  );
+}
+
+// 主页面组件
+export default function VerifySchoolEmailPage() {
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <VerifySchoolEmailContent />
+    </Suspense>
   );
 } 

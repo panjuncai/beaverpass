@@ -230,12 +230,15 @@ export default function ProfileForm() {
             extra={
               <div className="flex items-center gap-2">
                 <Button 
-                  color='primary' 
+                  color={loginUser?.user_metadata?.schoolEmailVerified ? 'success' : 'primary'} 
                   className='rounded-full' 
                   size='mini'
                   loading={verifyEmailMutation.isLoading}
                   disabled={!form.getFieldValue('schoolEmail') || verifyEmailMutation.isLoading}
                   onClick={() => {
+                    if (loginUser?.user_metadata?.schoolEmailVerified) {
+                      return;
+                    }
                     const email = form.getFieldValue('schoolEmail');
                     if (email) {
                       verifyEmailMutation.mutate({ schoolEmail: email });
@@ -257,7 +260,7 @@ export default function ProfileForm() {
               { validator: checkEmail }
             ]}
           >
-            <Input placeholder='Please enter school email' clearable />
+            <Input placeholder='Please enter school email' disabled={loginUser?.user_metadata?.schoolEmailVerified} clearable={!loginUser?.user_metadata?.schoolEmailVerified} />
           </Form.Item>
 
         

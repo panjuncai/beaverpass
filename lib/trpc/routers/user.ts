@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { protectedProcedure, router, publicProcedure } from "..";
+import { protectedProcedure, router } from "..";
 import { z } from "zod";
 import { createClient } from "@/utils/supabase/server";
 import crypto from "crypto";
