@@ -45,7 +45,7 @@ export const userRouter = router({
         // console.log('🙋‍♀️🙋‍♀️🙋‍♀️currentMetadata',currentMetadata);
         
         // 创建新的元数据对象，只包含有值的字段
-        const newMetadata: Record<string, string> = {};
+        const newMetadata: Record<string, string | boolean> = {};
         
         // 检查每个字段，只添加非空值
         if (input.firstName) newMetadata.firstName = input.firstName;
@@ -55,7 +55,7 @@ export const userRouter = router({
         if (input.avatar) newMetadata.avatar = input.avatar;
         if (input.searchRange) newMetadata.searchRange = input.searchRange.toString();
         if (input.schoolEmail) newMetadata.schoolEmail = input.schoolEmail;
-        if (input.schoolEmailVerified) newMetadata.schoolEmailVerified = input.schoolEmailVerified.toString();
+        if (input.schoolEmailVerified) newMetadata.schoolEmailVerified = input.schoolEmailVerified;
         // console.log('🙋‍♀️🙋‍♀️🙋‍♀️newMetadata',newMetadata);
         // 合并现有元数据和新元数据
         const updatedMetadata = {
