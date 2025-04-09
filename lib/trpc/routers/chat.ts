@@ -96,6 +96,7 @@ export const chatRouter = router({
         }
 
         // 如果提供了商品ID，自动发送商品消息
+        console.log("🐱🐱🐱postId:", postId);
         if (postId) {
           const post = await ctx.prisma.post.findUnique({
             where: { id: postId },
@@ -108,12 +109,19 @@ export const chatRouter = router({
             });
           }
           // 使用supabase插入消息,触发realtime事件
-          await supabase.from('messages').insert({
-            chatRoomId: chatRoom.id,
-            senderId: ctx.loginUser.id,
-            postId: postId,
-            messageType: MessageType.POST,
+          const {error}=await supabase.from('messages').insert({
+            chat_room_id: chatRoom.id,
+            sender_id: ctx.loginUser.id,
+            post_id: postId,
+            message_type: MessageType.POST,
           });
+          if(error){
+            console.error("🙀🙀🙀Failed to send post message via Supabase:", error);
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "Failed to send message",
+            });
+          }
           // const message = await ctx.prisma.message.create({
           //   data: {
           //     chatRoomId: chatRoom.id,
@@ -415,7 +423,14 @@ export const chatRouter = router({
         }
         // console.log("🐱🐱🐱messageData:", messageData);
         // 使用supabase插入消息,触发realtime事件
-        const message = await supabase.from('messages').insert(messageData).select().single();
+        const {data:message,error}=await supabase.from('messages').insert(messageData).select().single();
+        if(error){
+          console.error("🙀🙀🙀Failed to send post message via Supabase:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to send message",
+          });
+        }
         // const message = await ctx.prisma.message.create({
         //   data: messageData,
         //   include: {
