@@ -27,6 +27,23 @@ export default function isEduEmail(email: string) {
         domain.includes('.institute.') ||
         domain.includes('-edu.') ||
         // 中国高校特殊域名
-        domain.endsWith('.edu.cn')
+        domain.endsWith('.edu.cn')||
+        // 加拿大高校特殊域名
+        domain.includes('uwaterloo')||
+        domain.includes('utoronto')||
+        domain.includes('ubc')||
+        domain.includes('mcgill')||
+        domain.includes('queensu')||
+        domain.includes('dal')||
+        domain.includes('algonquin')||
+        domain.includes('sheridancollege')||
+        domain.includes('durhamcollege')||
+        domain.includes('yorku')||
+        domain.includes('ryerson')||
+        domain.includes('conestogacollege')||
+        domain.includes('fanshawec')||
+        domain.includes('senecacollege')||
+        domain.includes('stclaircollege')||
+        domain.includes('stlawrence')
     );
 }

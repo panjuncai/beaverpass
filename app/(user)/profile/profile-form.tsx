@@ -11,7 +11,8 @@ import type { ImageUploadItem } from 'antd-mobile/es/components/image-uploader';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import { useRouter } from 'next/navigation';
 import isEduEmail from '@/utils/tools/isEduEmail';
-const checkEmail = (_:any, value: string) => {
+
+const checkEmail = (_: unknown, value: string) => {
   if (isEduEmail(value)) {
     return Promise.resolve()
   }
@@ -161,6 +162,8 @@ export default function ProfileForm() {
     setIsAvatarModalOpen(false);
   };
 
+  const verifyEmailMutation = trpc.user.verifySchoolEmail.useMutation();
+
   if (isLoadingUser || !loginUser) {
     return (
       <div className="flex justify-center items-center h-full">
@@ -225,7 +228,29 @@ export default function ProfileForm() {
             name="schoolEmail"
             label='School email'
             extra={
-                <Button color='primary' className='rounded-full' size='mini'>Verify Email</Button>
+              <div className="flex items-center gap-2">
+                <Button 
+                  color='primary' 
+                  className='rounded-full' 
+                  size='mini'
+                  loading={verifyEmailMutation.isLoading}
+                  disabled={!form.getFieldValue('schoolEmail') || verifyEmailMutation.isLoading}
+                  onClick={() => {
+                    const email = form.getFieldValue('schoolEmail');
+                    if (email) {
+                      verifyEmailMutation.mutate({ schoolEmail: email });
+                    }
+                  }}
+                >
+                  {loginUser?.user_metadata?.schoolEmailVerified ? 'Verified' : 'Verify Email'}
+                </Button>
+                {verifyEmailMutation.isSuccess && (
+                  <span className="text-green-600 text-sm">Verification email sent!</span>
+                )}
+                {verifyEmailMutation.isError && (
+                  <span className="text-red-600 text-sm">{verifyEmailMutation.error.message}</span>
+                )}
+              </div>
             }
             rules={[
               { required: false },
