@@ -10,6 +10,13 @@ import { CameraOutline, LocationFill } from 'antd-mobile-icons';
 import type { ImageUploadItem } from 'antd-mobile/es/components/image-uploader';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import { useRouter } from 'next/navigation';
+import isEduEmail from '@/utils/tools/isEduEmail';
+const checkEmail = (_:any, value: string) => {
+  if (isEduEmail(value)) {
+    return Promise.resolve()
+  }
+  return Promise.reject(new Error('Please enter school email'))
+}
 
 interface ProfileFormValues {
   firstName: string;
@@ -17,6 +24,7 @@ interface ProfileFormValues {
   address?: string;
   phone?: string;
   avatar?: string;
+  schoolEmail?: string;
 }
 
 export default function ProfileForm() {
@@ -47,6 +55,7 @@ export default function ProfileForm() {
           address: data.user_metadata?.address || '',
           phone: data.user_metadata?.phone || '',
           avatar: avatar,
+          schoolEmail: data.user_metadata?.schoolEmail || '',
         });
         // 同时设置临时头像，确保界面显示
         if (avatar) {
@@ -212,10 +221,15 @@ export default function ProfileForm() {
         </Form.Item>
 
         <Form.Item
+            name="schoolEmail"
             label='School email'
             extra={
                 <Button className='text-sm' fill='outline'>Verify</Button>
             }
+            rules={[
+              { required: false },
+              { validator: checkEmail }
+            ]}
           >
             <Input placeholder='Please enter school email' clearable />
           </Form.Item>

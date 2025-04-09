@@ -221,6 +221,7 @@ BEGIN
     phone = (NEW.raw_user_meta_data->>'phone'),
     address = (NEW.raw_user_meta_data->>'address'),
     avatar = (NEW.raw_user_meta_data->>'avatar'),
+    school_email = (NEW.raw_user_meta_data->>'schoolEmail'),
     updated_at = NOW()
   WHERE id = NEW.id;
   
