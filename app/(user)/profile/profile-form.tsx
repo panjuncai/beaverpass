@@ -49,6 +49,7 @@ export default function ProfileForm() {
       // 只在组件初始化或明确需要重置表单时才设置表单值
       if (data && shouldResetForm) {
         const avatar = data.user_metadata?.avatar || '';
+        // console.log('data.user_metadata🌻🌻🌻', data.user_metadata);
         form.setFieldsValue({
           firstName: data.user_metadata?.firstName || '',
           lastName: data.user_metadata?.lastName || '',
@@ -224,7 +225,7 @@ export default function ProfileForm() {
             name="schoolEmail"
             label='School email'
             extra={
-                <Button className='text-sm' fill='outline'>Verify</Button>
+                <Button color='primary' className='rounded-full' size='mini'>Verify Email</Button>
             }
             rules={[
               { required: false },
