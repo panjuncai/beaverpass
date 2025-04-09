@@ -88,6 +88,7 @@ export default function ProfileForm() {
         address: values.address,
         phone: values.phone,
         avatar: tempAvatar || values.avatar,
+        schoolEmail: values.schoolEmail,
       });
     } catch (error) {
       console.error('Update profile failed:', error);
@@ -209,6 +210,16 @@ export default function ProfileForm() {
         >
           <Input placeholder="Please enter last name" />
         </Form.Item>
+
+        <Form.Item
+            label='School email'
+            extra={
+                <Button className='text-sm' fill='outline'>Verify</Button>
+            }
+          >
+            <Input placeholder='Please enter school email' clearable />
+          </Form.Item>
+
         
         <Form.Item
           name="phone"

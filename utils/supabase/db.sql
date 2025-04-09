@@ -23,6 +23,8 @@ CREATE TABLE users (
   avatar TEXT,
   address TEXT,
   phone TEXT,
+  school_email TEXT,
+  school_email_verified BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );

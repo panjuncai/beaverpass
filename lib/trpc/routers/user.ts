@@ -11,6 +11,7 @@ const updateProfileSchema = z.object({
   phone: z.string().optional(),
   avatar: z.string().optional(),
   searchRange: z.number().optional(),
+  schoolEmail: z.string().optional()
 });
 
 export const userRouter = router({
@@ -52,7 +53,7 @@ export const userRouter = router({
         if (input.phone) newMetadata.phone = input.phone;
         if (input.avatar) newMetadata.avatar = input.avatar;
         if (input.searchRange) newMetadata.searchRange = input.searchRange.toString();
-
+        if (input.schoolEmail) newMetadata.schoolEmail = input.schoolEmail;
         // console.log('🙋‍♀️🙋‍♀️🙋‍♀️newMetadata',newMetadata);
         // 合并现有元数据和新元数据
         const updatedMetadata = {
