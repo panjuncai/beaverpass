@@ -180,4 +180,113 @@ export const orderRouter = router({
 
       throw lastError;
     }),
+  // 重新进入支付界面
+  reenterPayment: protectedProcedure
+    .input(
+      z.object({
+        orderId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const order = await ctx.prisma.order.findUnique({
+          where: { id: input.orderId },
+          include: { post: true },
+        });
+
+        if (!order) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Order not found",
+          });
+        }
+
+        // 验证订单所有者
+        if (order.buyerId !== ctx.loginUser.id) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Not authorized to access this order",
+          });
+        }
+
+        // 检查订单状态是否为待支付
+        if (order.status !== OrderStatus.PENDING_PAYMENT) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Order is not in pending payment status",
+          });
+        }
+
+        // 只返回订单信息，不进行更新
+        return order;
+      } catch (error) {
+        console.error('Failed to reenter payment:', error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error instanceof Error ? error.message : "Failed to reenter payment",
+        });
+      }
+    }),
+  // 取消超时未支付的订单
+  cancelExpiredOrder: protectedProcedure
+    .input(
+      z.object({
+        orderId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const order = await ctx.prisma.order.findUnique({
+          where: { id: input.orderId },
+          include: { post: true },
+        });
+
+        if (!order) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Order not found",
+          });
+        }
+
+        // 验证订单所有者
+        if (order.buyerId !== ctx.loginUser.id) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Not authorized to cancel this order",
+          });
+        }
+
+        // 检查订单状态，只有非终态订单才能取消
+        if (order.status === OrderStatus.COMPLETED || 
+            order.status === OrderStatus.CANCELLED || 
+            order.status === OrderStatus.REFUNDED) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "This order cannot be cancelled",
+          });
+        }
+
+        // 更新订单状态为已取消
+        const updatedOrder = await ctx.prisma.order.update({
+          where: { id: order.id },
+          data: { status: OrderStatus.CANCELLED },
+        });
+
+        // 如果有关联的商品，将商品状态更新为活跃
+        if (order.post) {
+          await ctx.prisma.post.update({
+            where: { id: order.post.id },
+            data: { status: PostStatus.ACTIVE },
+          });
+        }
+
+        return updatedOrder;
+      } catch (error) {
+        console.error('Failed to cancel expired order:', error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error instanceof Error ? error.message : "Failed to cancel order",
+        });
+      }
+    }),
 });
