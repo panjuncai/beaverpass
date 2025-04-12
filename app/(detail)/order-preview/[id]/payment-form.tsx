@@ -1,20 +1,27 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   PaymentElement,
   useStripe,
   useElements,
-} from '@stripe/react-stripe-js';
-import { Button, Toast } from 'antd-mobile';
-import PropTypes from 'prop-types';
-
+} from "@stripe/react-stripe-js";
+import { Button, Toast } from "antd-mobile";
+import PropTypes from "prop-types";
+import { LeftOutline } from "antd-mobile-icons";
 interface PaymentFormProps {
   onSuccess: () => void;
   onError: (error: string) => void;
   amount: number;
+  email:string;
   onClose: () => void;
 }
 
-const PaymentForm: React.FC<PaymentFormProps> = ({ onSuccess, onError, amount, onClose }) => {
+const PaymentForm: React.FC<PaymentFormProps> = ({
+  onSuccess,
+  onError,
+  amount,
+  email,
+  onClose,
+}) => {
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -37,24 +44,24 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ onSuccess, onError, amount, o
       });
 
       if (error) {
-        onError(error.message || 'Payment failed, please try again');
+        onError(error.message || "Payment failed, please try again");
         Toast.show({
-          icon: 'fail',
-          content: error.message || 'Payment failed, please try again',
+          icon: "fail",
+          content: error.message || "Payment failed, please try again",
         });
       } else {
         onSuccess();
         Toast.show({
-          icon: 'success',
-          content: 'Payment successful!',
+          icon: "success",
+          content: "Payment successful!",
         });
       }
     } catch (err) {
-      console.error('Payment processing error:', err);
-      onError('Payment processing error');
+      console.error("Payment processing error:", err);
+      onError("Payment processing error");
       Toast.show({
-        icon: 'fail',
-        content: 'Payment processing error',
+        icon: "fail",
+        content: "Payment processing error",
       });
     }
 
@@ -62,48 +69,57 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ onSuccess, onError, amount, o
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-50 bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Payment Details</h2>
-          <button 
-            onClick={onClose}
-            className="btn btn-ghost btn-circle"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-        
-        <form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
-          <div className="bg-gray-50 p-4 rounded-lg mb-4">
-            <div className="text-lg font-semibold text-right">
-              Amount to pay: ${amount.toFixed(2)}
+    <>
+      <div className="fixed inset-0 bg-gray-50 bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <div className="flex items-center">
+              <LeftOutline
+                className="cursor-pointer"
+                fontSize={24}
+                onClick={() => onClose()}
+              />
+              <div className="text-xl font-bold ml-2">BeaverPass</div>
             </div>
-          </div>
-
-          <PaymentElement className="mb-6" />
           
-          <Button
-            disabled={!stripe || isProcessing}
-            block
-            color='primary'
-            size='large'
-            className='flex-1 rounded-full'
-          >
-            {isProcessing ? (
-              <span className="flex items-center">
-                <span className="loading loading-spinner"></span>
-                Processing...
-              </span>
-            ) : (
-              'Confirm Payment'
-            )}
-          </Button>
-        </form>
+          <form onSubmit={(e) => void handleSubmit(e)} className="space-y-2">
+            <div className="pt-4 rounded-lg">
+              <div className="text-4xl font-semibold text-left">
+                ${amount.toFixed(2)}
+              </div>
+            </div>
+
+            <div className="flex bg-gray-50 p-2 rounded-lg gap-2">
+              <div className="flex-none text-lg">Email</div>
+              <div className="flex-1 text-lg">{email}</div>
+            </div>
+
+            <PaymentElement className="mb-6" />
+
+            <Button
+              disabled={!stripe || isProcessing}
+              block
+              color="success"
+              size="large"
+              className="flex-1 rounded-full"
+            >
+              {isProcessing ? (
+                <span className="flex items-center">
+                  <span className="loading loading-spinner"></span>
+                  Processing...
+                </span>
+              ) : (
+                "Pay"
+              )}
+            </Button>
+          </form>
+          <span className="flex mt-4">
+            <span className="flex-1 text-right">
+              Powered by <span className="font-bold text-lg text-blue-500">Stripe</span>
+            </span>
+          </span>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
@@ -114,4 +130,4 @@ PaymentForm.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-export default PaymentForm; 
+export default PaymentForm;

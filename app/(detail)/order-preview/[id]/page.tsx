@@ -97,12 +97,12 @@ export default function OrderPage() {
   const fees = {
     amount: Number(previewPost.amount) || 0,
     deliveryFee: deliveryFee,
-    serviceFee: previewPost.isNegotiable ? 10 : 0,
-    tax: (Number(previewPost.amount) || 0) * 0.13,
+    serviceFee: Number(previewPost.amount)*0.1<1?1:Number(previewPost.amount)*0.1,
+    tax: (Number(previewPost.amount) || 0+Number(previewPost.amount)*0.1<1?1:Number(previewPost.amount)*0.1) * 0.13,
     paymentFee:
       ((Number(previewPost.amount) || 0) +
         deliveryFee +
-        (previewPost.isNegotiable ? 10 : 0)) *
+        (Number(previewPost.amount)*0.1<1?1:Number(previewPost.amount)*0.1)) *
         0.029 +
       0.3,
     total: 0,
@@ -404,6 +404,7 @@ export default function OrderPage() {
             onSuccess={handlePaymentSuccess}
             onError={handlePaymentError}
             onClose={handleClosePayment}
+            email={loginUser?.email || ""}
           />
         </Elements>
       )}
