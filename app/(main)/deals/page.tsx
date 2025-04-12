@@ -39,6 +39,11 @@ export default function DealsPage() {
     console.log('Auth State:', { loginUser, isLoading });
   }, [loginUser, isLoading]);
 
+  // 监听标签变化，重置子标签
+  useEffect(() => {
+    setActiveSubTab('active');
+  }, [activeTab]);
+
   if (!loginUser) {
     return (
       <div className="flex flex-col h-full justify-center">
