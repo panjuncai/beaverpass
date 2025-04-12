@@ -245,7 +245,7 @@ export default function OrderPage() {
                     <div>
                       <p className="font-medium">In person</p>
                       <p className="text-sm text-gray-500">
-                        Meet the seller and pay in cash.
+                        Meet the seller and pick up by yourself.
                       </p>
                     </div>
                   </div>
