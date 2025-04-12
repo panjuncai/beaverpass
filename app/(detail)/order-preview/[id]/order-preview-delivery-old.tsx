@@ -2,7 +2,7 @@ import { Form } from 'antd-mobile';
 
 export default function OrderDelivery() {
   return (
-    <div className="card bg-base-100 shadow">
+    <div className="card bg-base-100">
       <div className="card-body">
         <h2 className="card-title">Shipping Information</h2>
         <Form.Item

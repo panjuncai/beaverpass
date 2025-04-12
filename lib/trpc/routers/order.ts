@@ -66,7 +66,7 @@ export const orderRouter = router({
   // 创建订单
   createOrder: protectedProcedure.input(createOrderSchema).mutation(async ({ ctx, input }) => {
     try {
-      const { sellerId, postId, total, ...rest } = input;
+      const { sellerId, postId, total, shippingPhone, ...rest } = input;
       if (!sellerId || !postId || total === undefined) {
         throw new TRPCError({
           code: "BAD_REQUEST",
@@ -80,6 +80,7 @@ export const orderRouter = router({
           postId,
           total,
           buyerId: ctx.loginUser.id,
+          shippingPhone: shippingPhone || "",
         },
       });
       return order;
@@ -256,14 +257,11 @@ export const orderRouter = router({
           });
         }
 
-        // 检查订单状态，只有非终态订单才能取消
-        if (order.status === OrderStatus.COMPLETED || 
-            order.status === OrderStatus.CANCELLED || 
-            order.status === OrderStatus.REFUNDED) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "This order cannot be cancelled",
-          });
+        // 检查订单状态，只有Pending_Payment状态的订单才能取消
+        if (order.status !== OrderStatus.PENDING_PAYMENT) {
+          // 如果订单已经是终态，直接返回订单，不抛出错误
+          console.log(`Order ${order.id} already in final state: ${order.status}`);
+          return order;
         }
 
         // 更新订单状态为已取消

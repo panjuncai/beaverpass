@@ -74,6 +74,9 @@ export default function DealsOrderCard({ order }: { order: SerializedOrder }) {
             return;
         }
 
+        // 避免重复尝试取消订单
+        let hasTriedCancelling = false;
+
         const updateRemainingTime = () => {
             const now = new Date();
             // 设置30分钟倒计时（从订单创建时间开始）
@@ -84,8 +87,9 @@ export default function DealsOrderCard({ order }: { order: SerializedOrder }) {
             if (diffMs <= 0) {
                 setRemainingTime("Expired");
                 setIsExpired(true);
-                // 自动取消订单
-                if (order.status === OrderStatus.PENDING_PAYMENT) {
+                // 自动取消订单 - 只尝试一次
+                if (order.status === OrderStatus.PENDING_PAYMENT && !hasTriedCancelling) {
+                    hasTriedCancelling = true;
                     cancelExpiredOrderMutation.mutate({ orderId: order.id });
                 }
                 return;
@@ -104,7 +108,7 @@ export default function DealsOrderCard({ order }: { order: SerializedOrder }) {
         const interval = setInterval(updateRemainingTime, 1000);
         
         return () => clearInterval(interval);
-    }, [order.status, order.id, cancelExpiredOrderMutation, order.createdAt]);
+    }, [order.status, order.id, order.createdAt]);
 
     if (!order.post) {
         return null;

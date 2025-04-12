@@ -5,7 +5,7 @@ import { PaymentMethod } from '@/lib/types/enum';
 export const createOrderSchema = z.object({
   shippingAddress: z.string().min(1, "Address is required"),
   shippingReceiver: z.string().min(1, "Receiver is required"),
-  shippingPhone: z.string().min(1, "Phone is required"),
+  shippingPhone: z.string().optional(),
   paymentMethod: z.nativeEnum(PaymentMethod),
   postId: z.string().uuid("Invalid post ID").optional(),
   sellerId: z.string().uuid("Invalid seller ID").optional(),

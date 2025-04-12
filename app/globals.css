@@ -29,6 +29,11 @@
   .ant-bubble-footer {
     margin-top: 0px;
   }
+
+  .adm-list-default .adm-list-body {
+    border-top: none;
+    border-bottom: none;
+  }
 } 
 
 

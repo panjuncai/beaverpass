@@ -14,7 +14,7 @@ export default function OrderPreviewPostDetail({ post }: OrderPreviewPostDetailP
   }
 
   return (
-    <div className="card bg-base-100 shadow">
+    <div className="card bg-base-100">
       <div className="card-body">
       <h2 className="card-title">{post?.title}</h2>
         <div className="relative w-full h-60 rounded-xl">

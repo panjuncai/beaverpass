@@ -4,7 +4,7 @@ import {
   useStripe,
   useElements,
 } from '@stripe/react-stripe-js';
-import { Toast } from 'antd-mobile';
+import { Button, Toast } from 'antd-mobile';
 import PropTypes from 'prop-types';
 
 interface PaymentFormProps {
@@ -85,10 +85,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ onSuccess, onError, amount, o
 
           <PaymentElement className="mb-6" />
           
-          <button
-            type="submit"
+          <Button
             disabled={!stripe || isProcessing}
-            className="btn btn-primary w-full"
+            block
+            color='primary'
+            size='large'
+            className='flex-1 rounded-full'
           >
             {isProcessing ? (
               <span className="flex items-center">
@@ -98,7 +100,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ onSuccess, onError, amount, o
             ) : (
               'Confirm Payment'
             )}
-          </button>
+          </Button>
         </form>
       </div>
     </div>
