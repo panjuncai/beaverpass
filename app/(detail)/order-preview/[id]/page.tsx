@@ -13,7 +13,7 @@ import { PaymentMethod } from "@/lib/types/enum";
 import { Button, Form } from 'antd-mobile';
 import { Radio } from "antd-mobile";
 import { DeliveryType } from "@/lib/types/enum";
-import { UserOutline } from "antd-mobile-icons";
+import { LocationFill, UserOutline } from "antd-mobile-icons";
 import DeliveryHome from "@/components/icons/delivery-home";
 import AddressModal from "@/components/modals/address-modal";
 
@@ -288,8 +288,8 @@ export default function OrderPage() {
             {selectedDelivery === DeliveryType.HOME_DELIVERY && (
               <>
                 <div className="mt-3 bg-gray-30 rounded-xl">
-                  <div className="flex gap-3">
-                    <div className="w-5 h-5 rounded-full bg-amber-900 flex items-center justify-center flex-shrink-0">
+                  <div className="flex gap-1">
+                    {/* <div className="w-5 h-5 rounded-full bg-amber-900 flex items-center justify-center flex-shrink-0">
                       <svg
                         width="13"
                         height="12"
@@ -302,7 +302,8 @@ export default function OrderPage() {
                           fill="white"
                         />
                       </svg>
-                    </div>
+                    </div> */}
+                    <LocationFill fontSize={24} color='var(--adm-color-primary)'/>
                     <div className="flex-1">
                       <p className="font-semibold text-sm text-yellow-950">
                         Home

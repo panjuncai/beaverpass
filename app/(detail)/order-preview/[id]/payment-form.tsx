@@ -89,7 +89,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             </div>
 
             <div className="flex bg-gray-50 p-2 rounded-lg gap-2">
-              <div className="flex-none text-lg">Email</div>
+              <div className="flex-none text-lg">Email:</div>
               <div className="flex-1 text-lg">{email}</div>
             </div>
 
