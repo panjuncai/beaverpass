@@ -68,17 +68,12 @@ export default function PostDetailMainSeller({
           <span className="text-lg font-bold">{post?.poster?.firstName}</span>
           <span className="text-sm text-gray-500"> </span>
           <span className="text-lg font-bold">{post?.poster?.lastName}</span>
-          {post?.poster?.email && isEduEmail(post?.poster?.email) ? (
+          {post?.poster?.email && (isEduEmail(post?.poster?.email) || post?.poster?.schoolEmailVerified) ? (
             <span className="flex items-center">
               <Verified verified={true} />
               <span className="text-sm text-green-600">Verified</span>
             </span>
-          ) : (
-            <span className="flex items-center">
-              <Verified verified={false} />
-              <span className="text-sm text-gray-200">Unverified</span>
-            </span>
-          )}
+          ) : null}
         </div>
         <div className="text-sx text-gray-700"></div>
         <div className="flex items-center justify-between">

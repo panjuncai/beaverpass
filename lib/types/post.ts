@@ -35,6 +35,8 @@ export interface SerializedPost {
     avatar: string | null;
     phone: string | null;
     address: string | null;
+    schoolEmail: string | null;
+    schoolEmailVerified: boolean | null;
   } | null;
 }
 

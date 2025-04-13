@@ -2,6 +2,7 @@ import PostDetail from "@/app/(detail)/posts/[id]/post-detail";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { PostStoreUpdater } from "./post-store-updater";
+import { SerializedPost } from "@/lib/types/post";
 
 interface PageProps {
   params: Promise<{ id: string }> | undefined;
@@ -26,12 +27,11 @@ export default async function PostDetailPage({ params }: PageProps) {
   if (!post) {
     notFound();
   }
-
   // Convert Decimal to number
   const serializedPost = {
     ...post,
     amount: Number(post.amount),
-  };
+  } as unknown as SerializedPost;
 
   return (
     <>

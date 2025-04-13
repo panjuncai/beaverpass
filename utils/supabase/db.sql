@@ -23,6 +23,8 @@ CREATE TABLE users (
   avatar TEXT,
   address TEXT,
   phone TEXT,
+  school_email TEXT,
+  school_email_verified BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -219,6 +221,8 @@ BEGIN
     phone = (NEW.raw_user_meta_data->>'phone'),
     address = (NEW.raw_user_meta_data->>'address'),
     avatar = (NEW.raw_user_meta_data->>'avatar'),
+    school_email = (NEW.raw_user_meta_data->>'schoolEmail'),
+    school_email_verified = (NEW.raw_user_meta_data->>'schoolEmailVerified')::boolean,
     updated_at = NOW()
   WHERE id = NEW.id;
   

@@ -22,7 +22,7 @@ export default function SearchPage() {
     <div className="flex flex-col h-full">
       <div className="px-4 pt-6 pb-4">
         <div
-          className="relative w-80 h-5 cursor-pointer mb-4"
+          className="relative h-5 cursor-pointer mb-4"
           onClick={() => showAddressModal()}
         >
           <div className="w-4 h-3.5 left-0 top-[3px] absolute overflow-hidden">

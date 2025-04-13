@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { trpc } from '@/lib/trpc/client';
 import { useAuthStore } from '@/lib/store/auth-store';
 import { Form, Input, Button, Avatar, ImageUploader } from 'antd-mobile';
@@ -30,7 +30,7 @@ interface ProfileFormValues {
 
 export default function ProfileForm() {
   const router = useRouter();
-  const { loginUser } = useAuthStore();
+  const { loginUser, refreshUser, isLoading } = useAuthStore();
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [tempAvatar, setTempAvatar] = useState<string | null>(null);
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
@@ -42,36 +42,38 @@ export default function ProfileForm() {
   const [form] = Form.useForm();
   const [shouldResetForm, setShouldResetForm] = useState(true);
   
-  // 获取当前用户信息
-  const { isLoading: isLoadingUser } = trpc.user.getCurrentUser.useQuery(undefined, {
-    enabled: !!loginUser?.id,
-    // 当获取到用户信息后，设置表单初始值
-    onSuccess: (data) => {
-      // 只在组件初始化或明确需要重置表单时才设置表单值
-      if (data && shouldResetForm) {
-        const avatar = data.user_metadata?.avatar || '';
-        // console.log('data.user_metadata🌻🌻🌻', data.user_metadata);
-        form.setFieldsValue({
-          firstName: data.user_metadata?.firstName || '',
-          lastName: data.user_metadata?.lastName || '',
-          address: data.user_metadata?.address || '',
-          phone: data.user_metadata?.phone || '',
-          avatar: avatar,
-          schoolEmail: data.user_metadata?.schoolEmail || '',
-        });
-        // 同时设置临时头像，确保界面显示
-        if (avatar) {
-          setTempAvatar(avatar);
-        }
-        // 设置完成后，将标志设为 false
-        setShouldResetForm(false);
-      }
-    }
-  });
+  // 页面加载时刷新用户信息
+  useEffect(() => {
+    refreshUser();
+  }, [refreshUser]);
+
+  if(loginUser){
+    if (shouldResetForm) {
+            const avatar = loginUser.user_metadata?.avatar || '';
+            // console.log('data.user_metadata🌻🌻🌻', data.user_metadata);
+            form.setFieldsValue({
+              email: loginUser.email || '',
+              firstName: loginUser.user_metadata?.firstName || '',
+              lastName: loginUser.user_metadata?.lastName || '',
+              address: loginUser.user_metadata?.address || '',
+              phone: loginUser.user_metadata?.phone || '',
+              avatar: avatar,
+              schoolEmail: loginUser.user_metadata?.schoolEmail || '',
+            });
+            // 同时设置临时头像，确保界面显示
+            if (avatar) {
+              setTempAvatar(avatar);
+            }
+            // 设置完成后，将标志设为 false
+            setShouldResetForm(false); 
+          }
+  }
   
   // 更新用户资料mutation
   const updateProfile = trpc.user.updateProfile.useMutation({
     onSuccess: () => {
+      // 更新成功后刷新用户信息
+      refreshUser();
       // 更新成功后，将标志设为 true，允许重新加载表单数据
       setShouldResetForm(true);
       setTempAvatar(null);
@@ -164,7 +166,7 @@ export default function ProfileForm() {
 
   const verifyEmailMutation = trpc.user.verifySchoolEmail.useMutation();
 
-  if (isLoadingUser || !loginUser) {
+  if (isLoading || !loginUser) {
     return (
       <div className="flex justify-center items-center h-full">
         <SpinLoading color="primary" />
@@ -209,6 +211,14 @@ export default function ProfileForm() {
         }
       >
         <Form.Item
+          name="email"
+          label="Email"
+          disabled={true}
+          rules={[{ message: 'Please enter email' }]}
+        >
+          <Input placeholder="Please enter email" />
+        </Form.Item>
+        <Form.Item
           name="firstName"
           label="First name"
           rules={[{ required: true, message: 'Please enter first name' }]}
@@ -223,7 +233,7 @@ export default function ProfileForm() {
         >
           <Input placeholder="Please enter last name" />
         </Form.Item>
-
+        
         <Form.Item
             name="schoolEmail"
             label='School email'

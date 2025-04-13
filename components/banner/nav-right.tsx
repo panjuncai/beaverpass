@@ -45,17 +45,17 @@ export default function NavRight() {
               <li className="w-full">
                 <button
                   className="w-full px-4 py-2 text-left text-stone-600 hover:bg-stone-100 rounded-lg"
-                  onClick={handleLogout}
+                  onClick={() => router.push("/profile")}
                 >
-                  Logout
+                  Profile
                 </button>
               </li>
               <li className="w-full">
                 <button
                   className="w-full px-4 py-2 text-left text-stone-600 hover:bg-stone-100 rounded-lg"
-                  onClick={() => router.push("/profile")}
+                  onClick={handleLogout}
                 >
-                  Profile
+                  Logout
                 </button>
               </li>
             </>
