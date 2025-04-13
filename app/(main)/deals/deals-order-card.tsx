@@ -8,7 +8,7 @@ import { Button} from "antd-mobile";
 import PaymentForm from "@/app/(detail)/order-preview/[id]/payment-form";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-
+import getOrderStatus from "@/utils/tools/getOrderStatus";
 
 const stripePromise = loadStripe(
     process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string
@@ -109,27 +109,7 @@ export default function DealsOrderCard({ order }: { order: SerializedOrder }) {
         return null;
     }
 
-    // 根据订单状态返回对应的样式类
-    const getStatusBadgeClass = (status: string) => {
-        switch (status) {
-            case OrderStatus.PENDING_PAYMENT:
-                return "bg-yellow-100 text-yellow-800";
-            case OrderStatus.PAID:
-                return "bg-blue-100 text-blue-800";
-            case OrderStatus.SHIPPED:
-                return "bg-indigo-100 text-indigo-800";
-            case OrderStatus.DELIVERED:
-                return "bg-green-100 text-green-800";
-            case OrderStatus.COMPLETED:
-                return "bg-green-100 text-green-800";
-            case OrderStatus.CANCELLED:
-                return "bg-red-100 text-red-800";
-            case OrderStatus.REFUNDED:
-                return "bg-red-100 text-red-800";
-            default:
-                return "bg-gray-100 text-gray-800";
-        }
-    };
+    
 
     // 处理重新支付
     const handleReenterPayment = () => {
@@ -179,7 +159,7 @@ export default function DealsOrderCard({ order }: { order: SerializedOrder }) {
                     <div className="flex-1">
                         <h3 className="card-title">{order.post.title}</h3>
                         <div className="flex items-center">
-                          <div className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadgeClass(order.status || '')}`}>
+                          <div className={`px-2 py-1 rounded-full text-xs font-medium ${getOrderStatus(order.status || '')}`}>
                               {order.status}
                           </div>
                           

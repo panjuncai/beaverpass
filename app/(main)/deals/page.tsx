@@ -123,41 +123,6 @@ export default function DealsPage() {
     );
   };
 
-  // const mapPosts = (
-  //   loginUserPosts: SerializedPost[] | undefined,
-  //   activeSubTab: string
-  // ): SerializedPost[] => {
-  //   if (!loginUserPosts) return [];
-  //   return loginUserPosts
-  //     .filter(
-  //       (post) =>
-  //         post.status &&
-  //         (activeSubTab === "active"
-  //           ? post.status === "ACTIVE"
-  //           : activeSubTab === "inactive"
-  //           ? post.status === "INACTIVE"
-  //           : post.status === "SOLD")
-  //     )
-  //     .map((post) => {
-  //       const mappedPost: SerializedPost = {
-  //         ...post,
-  //         amount: post.amount ? Number(post.amount) : 0,
-  //         poster: post.poster
-  //           ? {
-  //               id: post.poster.id,
-  //               email: post.poster.email,
-  //               firstName: post.poster.firstName || null,
-  //               lastName: post.poster.lastName || null,
-  //               avatar: post.poster.avatar,
-  //               phone: post.poster.phone,
-  //               address: post.poster.address
-  //             }
-  //           : null,
-  //       };
-  //       return mappedPost;
-  //     });
-  // };
-
   return (
     <div className="flex flex-col items-center w-full max-w-screen-md mx-auto px-4 pt-4">
       {/* Buy/Sell Tabs */}
