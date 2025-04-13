@@ -8,6 +8,8 @@ interface ImageUploadProps {
   onImageUpload: (viewType: string, file: string) => Promise<void> | void;
   onImageDelete: (viewType: string) => void;
   showError?: boolean;
+  uploading?: boolean; // 外部控制的上传状态
+  setUploadingState?: (isUploading: boolean) => void; // 更新上传状态的回调
 }
 
 // 添加压缩选项
@@ -24,11 +26,16 @@ export default function ImageUpload({
   onImageUpload,
   onImageDelete,
   showError = false,
+  uploading = false, // 外部传入的上传状态
+  setUploadingState, // 更新外部上传状态的方法
 }: ImageUploadProps) {
-  const [isUploading, setIsUploading] = useState(false);
+  const [internalUploading, setInternalUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   // Hidden file input reference
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // 计算实际的上传状态 - 优先使用外部状态
+  const isUploading = uploading || internalUploading;
 
   // Handle file selection
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,7 +43,10 @@ export default function ImageUpload({
       const file = event.target.files?.[0];
       if (file) {
         try {
-          setIsUploading(true);
+          // 更新内部和外部上传状态
+          setInternalUploading(true);
+          if (setUploadingState) setUploadingState(true);
+          
           setUploadError(null);
           
           const compressedFile = await imageCompression(
@@ -50,18 +60,27 @@ export default function ImageUpload({
               const base64String = reader.result as string;
               // 处理异步上传
               await Promise.resolve(onImageUpload(viewType, base64String));
-              setIsUploading(false);
+              
+              // 完成后重置上传状态
+              setInternalUploading(false);
+              if (setUploadingState) setUploadingState(false);
             } catch (error) {
               console.error("Error uploading image:", error);
               setUploadError("Upload failed, please try again");
-              setIsUploading(false);
+              
+              // 错误时也重置上传状态
+              setInternalUploading(false);
+              if (setUploadingState) setUploadingState(false);
             }
           };
           reader.readAsDataURL(compressedFile);
         } catch (error) {
           console.error("Error compressing image:", error);
           setUploadError("Image compression failed");
-          setIsUploading(false);
+          
+          // 错误时重置上传状态
+          setInternalUploading(false);
+          if (setUploadingState) setUploadingState(false);
         }
       }
     })();

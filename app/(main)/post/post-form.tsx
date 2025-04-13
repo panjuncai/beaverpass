@@ -45,6 +45,21 @@ export default function PostForm() {
   const [formError, setFormError] = useState<string | null>(null);
   const { uploadBase64Image } = useFileUpload();
   const { loginUser } = useAuthStore();
+  // 为每个视图添加单独的上传状态
+  const [uploadingStates, setUploadingStates] = useState<{[key: string]: boolean}>({
+    FRONT: false,
+    SIDE: false,
+    BACK: false,
+    DAMAGE: false
+  });
+
+  // 更新单个视图的上传状态
+  const setViewUploadingState = (viewType: string, isUploading: boolean) => {
+    setUploadingStates(prev => ({
+      ...prev,
+      [viewType]: isUploading
+    }));
+  };
 
   // 使用useForm进行表单管理和验证
   const {
@@ -78,8 +93,10 @@ export default function PostForm() {
   const isNegotiable = watch("isNegotiable");
 
   // 处理图片上传
-  const handleImageUpload = async (viewType: string, base64String: string) => {
+  const handleImageUpload = async (viewType: string, base64String: string): Promise<void> => {
     try {
+      // 不需要手动设置上传状态，由ImageUpload组件通过setUploadingState回调管理
+      
       const fileName = `post_${
         loginUser?.id || new Date().getTime()
       }_${viewType}.jpg`;
@@ -107,6 +124,7 @@ export default function PostForm() {
     } catch (error) {
       console.error("Error uploading image to S3:", error);
       setFormError("Failed to upload image");
+      throw error;
     }
   };
 
@@ -487,18 +505,24 @@ E.g., Solid wood dining table with minor scratches on the top surface. Dimension
               !images.some((img) => img.imageType === "FRONT") &&
               formError?.includes("Front image")
             }
+            uploading={uploadingStates.FRONT}
+            setUploadingState={(isUploading: boolean) => setViewUploadingState("FRONT", isUploading)}
           />
           <ImageUpload
             viewType="SIDE"
             imageUrl={images.find((img) => img.imageType === "SIDE")?.imageUrl}
             onImageUpload={handleImageUpload}
             onImageDelete={handleImageDelete}
+            uploading={uploadingStates.SIDE}
+            setUploadingState={(isUploading: boolean) => setViewUploadingState("SIDE", isUploading)}
           />
           <ImageUpload
             viewType="BACK"
             imageUrl={images.find((img) => img.imageType === "BACK")?.imageUrl}
             onImageUpload={handleImageUpload}
             onImageDelete={handleImageDelete}
+            uploading={uploadingStates.BACK}
+            setUploadingState={(isUploading: boolean) => setViewUploadingState("BACK", isUploading)}
           />
           <ImageUpload
             viewType="DAMAGE"
@@ -507,6 +531,8 @@ E.g., Solid wood dining table with minor scratches on the top surface. Dimension
             }
             onImageUpload={handleImageUpload}
             onImageDelete={handleImageDelete}
+            uploading={uploadingStates.DAMAGE}
+            setUploadingState={(isUploading: boolean) => setViewUploadingState("DAMAGE", isUploading)}
           />
         </div>
       </div>
