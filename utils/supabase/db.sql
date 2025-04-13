@@ -119,6 +119,8 @@ CREATE TABLE orders (
 
   post_id UUID NOT NULL REFERENCES posts(id),
 
+  delivery_type TEXT NOT NULL DEFAULT 'PICKUP',
+
   -- 收货信息
   shipping_address TEXT NOT NULL,
   shipping_receiver TEXT NOT NULL,

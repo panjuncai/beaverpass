@@ -32,7 +32,7 @@ export default function OrderPage() {
   const [form] = Form.useForm<CreateOrderInput>();
 
   // 根据预览商品的配送类型设置初始配送方式
-  const [selectedDelivery, setSelectedDelivery] = useState<string>(
+  const [selectedDelivery, setSelectedDelivery] = useState<keyof typeof DeliveryType>(
     previewPost?.deliveryType === "HOME_DELIVERY"
       ? DeliveryType.HOME_DELIVERY
       : DeliveryType.PICKUP
@@ -62,12 +62,12 @@ export default function OrderPage() {
   }, [loginUser]);
 
   // 处理配送方式变更
-  const handleDeliveryChange = (value: string) => {
+  const handleDeliveryChange = (value: keyof typeof DeliveryType) => {
     // 如果商品只支持配送，则不允许更改配送方式
     if (previewPost?.deliveryType === "HOME_DELIVERY") {
       return;
     }
-    console.log("🌻🌻🌻value", value);
+    // console.log("🌻🌻🌻value", value);
     setSelectedDelivery(value);
   };
 
@@ -221,6 +221,7 @@ export default function OrderPage() {
         tax: fees.tax,
         paymentFee: fees.paymentFee,
         paymentMethod: PaymentMethod.STRIPE,
+        deliveryType: DeliveryType[selectedDelivery],
       };
 
       console.log("Submitting order with data:", orderData);
@@ -316,7 +317,7 @@ export default function OrderPage() {
               <Form.Item label="" required>
                 <Radio.Group
                   value={selectedDelivery}
-                  onChange={(val) => handleDeliveryChange(val as string)}
+                  onChange={(val) => handleDeliveryChange(val as keyof typeof DeliveryType)}
                 >
                   <div className="space-y-3">
                     {/* In person option - 只在配送类型为PICKUP或BOTH时显示 */}
@@ -434,6 +435,7 @@ export default function OrderPage() {
                 )}
               </Form.Item>
               <Form.Item hidden initialValue={address} />
+              <Form.Item hidden name="deliveryType" initialValue={selectedDelivery} />
             </div>
           </div>
 

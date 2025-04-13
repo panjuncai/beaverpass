@@ -74,9 +74,10 @@ model Order {
   buyerId              String     @map("buyer_id") @db.Uuid
   sellerId             String     @map("seller_id") @db.Uuid
   postId               String     @map("post_id") @db.Uuid
-  shippingAddress      String     @map("shipping_address")
-  shippingReceiver     String     @map("shipping_receiver")
-  shippingPhone        String     @map("shipping_phone")
+  deliveryType         String     @map("delivery_type")
+  shippingAddress      String?     @map("shipping_address")
+  shippingReceiver     String?     @map("shipping_receiver")
+  shippingPhone        String?     @map("shipping_phone")
   paymentMethod        String     @map("payment_method")
   paymentTransactionId String?    @map("payment_transaction_id")
   paymentFee           Decimal?   @default(0) @map("payment_fee") @db.Decimal(12, 2)
@@ -84,7 +85,7 @@ model Order {
   serviceFee           Decimal?   @default(0) @map("service_fee") @db.Decimal(12, 2)
   tax                  Decimal?   @default(0) @map("tax") @db.Decimal(12, 2)
   total                Decimal    @map("total") @db.Decimal(12, 2)
-  status               String?    @default("PENDING_PAYMENT")
+  status               String     @default("PENDING_PAYMENT")
   createdAt            DateTime?  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt            DateTime?  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   buyer                User       @relation("BuyerOrders", fields: [buyerId], references: [id], onDelete: Restrict, onUpdate: Restrict)

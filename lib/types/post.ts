@@ -1,6 +1,7 @@
 import type { inferRouterOutputs } from '@trpc/server';
 import type { AppRouter } from '@/lib/trpc/routers/_app';
 import { Decimal } from '@prisma/client/runtime/library';
+import { DeliveryType } from './enum';
 
 // tRPC 输出类型
 type RouterOutput = inferRouterOutputs<AppRouter>;
@@ -37,6 +38,16 @@ export interface SerializedPost {
     address: string | null;
     schoolEmail: string | null;
     schoolEmailVerified: boolean | null;
+  } | null;
+  order: {
+    id: string;
+    shipping_address: string | null;
+    shipping_receiver: string | null;
+    shipping_phone: string | null;
+    total: number | null;
+    delivery_type: keyof typeof DeliveryType | null;
+    status: string;
+    createdAt: Date | null;
   } | null;
 }
 

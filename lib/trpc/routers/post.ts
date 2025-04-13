@@ -2,7 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { protectedProcedure, publicProcedure, router } from "..";
 import { createPostSchema, getPostByIdSchema, getPostsSchema, updatePostSchema } from "@/lib/validations/post";
 import { z } from 'zod';
-import { PostStatus } from '@/lib/types/enum';
+import { PostStatus, OrderStatus } from '@/lib/types/enum';
 
 // interface User {
 //   id: string;
@@ -19,25 +19,13 @@ export const postRouter = router({
   getPostById: publicProcedure
     .input(getPostByIdSchema)
     .query(async ({ input, ctx }) => {
-      try {
-        // const mapUser = (user: User | null) => {
-        //   if (!user) return null;
-        //   return {
-        //     id: user.id,
-        //     email: user.email,
-        //     firstName: user.firstName || "",
-        //     lastName: user.lastName || "",
-        //     avatar: user.avatar || null,
-        //     phone: user.phone || null,
-        //     address: user.address || null
-        //   };
-        // };
-        
+      try {        
         const post = await ctx.prisma.post.findUnique({
           where: { id: input.id },
           include: {
             images: true,
             poster: true,
+            orders: true
           },
         });
         
@@ -49,12 +37,29 @@ export const postRouter = router({
           });
         }
         
-        // const mappedPost = {
-        //   ...post,
-        //   poster: mapUser(post.poster)
-        // };
+        // 格式化返回数据，包含最新的order
+        const orderTmp = post.orders.filter(order => 
+          order.status === OrderStatus.PAID || 
+          order.status === OrderStatus.COMPLETED || 
+          order.status === OrderStatus.SHIPPED || 
+          order.status === OrderStatus.DELIVERED
+        )[0];
+
+        const formattedPost = {
+          ...post,
+          order: orderTmp ? {
+            id: orderTmp.id,
+            shipping_address: orderTmp.shippingAddress,
+            shipping_receiver: orderTmp.shippingReceiver,
+            shipping_phone: orderTmp.shippingPhone,
+            total: orderTmp.total ? Number(orderTmp.total) : null,
+            delivery_type: orderTmp.deliveryType,
+            status: orderTmp.status || '',
+            createdAt: orderTmp.createdAt
+          } : null
+        };
         
-        return post;
+        return formattedPost;
       } catch (error) {
         console.error('🙀🙀🙀Failed to get post:', error);
         throw new TRPCError({
@@ -94,8 +99,10 @@ export const postRouter = router({
           include: {
             images: true,
             poster: true,
+            orders: true
           },
         });
+        
         
         // 获取下一页的游标
         let nextCursor: string | undefined = undefined;
@@ -103,8 +110,31 @@ export const postRouter = router({
           nextCursor = posts[posts.length - 1].id;
         }
         
+        // 格式化posts数据，添加order信息
+        const formattedPosts = posts.map(post => {
+          const orderTmp = post.orders.filter(order => 
+            order.status === OrderStatus.PAID || 
+            order.status === OrderStatus.COMPLETED || 
+            order.status === OrderStatus.SHIPPED || 
+            order.status === OrderStatus.DELIVERED
+          )[0];
+          return {
+            ...post,
+            order: orderTmp ? {
+              id: orderTmp.id,
+              shipping_address: orderTmp.shippingAddress,
+              shipping_receiver: orderTmp.shippingReceiver,
+              shipping_phone: orderTmp.shippingPhone,
+              total: orderTmp.total ? Number(orderTmp.total) : null,
+              delivery_type: orderTmp.deliveryType,
+              status: orderTmp.status || '',
+              createdAt: orderTmp.createdAt
+            } : null
+          };
+        });
+        // console.log("🌻🌻🌻formattedPosts", formattedPosts);
         return {
-          items: posts,
+          items: formattedPosts,
           nextCursor: nextCursor ? { id: nextCursor } : undefined,
         };
       } catch (error) {

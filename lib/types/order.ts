@@ -8,7 +8,7 @@
 // 序列化后的 Order 类型（用于前端展示）
 export type SerializedOrder = {
   id: string;
-  status: string | null;
+  status: string;
   createdAt: Date | null;
   updatedAt: Date | null;
   buyerId: string;

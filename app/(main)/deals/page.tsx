@@ -8,6 +8,8 @@ import DealsOrderCard from "./deals-order-card";
 import NoDeal from "@/components/utils/no-deal";
 import PostCard from "./post-card";
 import { Skeleton } from "antd-mobile";
+import { SerializedOrder } from '@/lib/types/order';
+import { SerializedPost } from '@/lib/types/post';
 
 export default function DealsPage() {
   const { loginUser, isLoading } = useAuthStore();
@@ -38,6 +40,7 @@ export default function DealsPage() {
   useEffect(() => {
     console.log('Auth State:', { loginUser, isLoading });
   }, [loginUser, isLoading]);
+
 
   // 监听标签变化，重置子标签
   useEffect(() => {
@@ -264,7 +267,7 @@ export default function DealsPage() {
                   loginUserOrders
                     ?.filter((order) => isActiveOrder(order.status))
                     .map((order) => (
-                      <DealsOrderCard key={order.id} order={order} />
+                      <DealsOrderCard key={order.id} order={order as SerializedOrder} />
                     ))
                 )}
               </div>
@@ -280,7 +283,7 @@ export default function DealsPage() {
                   loginUserOrders
                     ?.filter((order) => isHistoryOrder(order.status))
                     .map((order) => (
-                      <DealsOrderCard key={order.id} order={order} />
+                      <DealsOrderCard key={order.id} order={order as SerializedOrder} />
                     ))
                 )}
               </div>
@@ -298,7 +301,7 @@ export default function DealsPage() {
                   loginUserPosts?.items
                     ?.filter((post) => post.status === PostStatus.ACTIVE)
                     .map((post) => (
-                      <PostCard key={post.id} post={post} />
+                      <PostCard key={post.id} post={post as SerializedPost} />
                     ))
                 )}
               </div>
@@ -313,7 +316,7 @@ export default function DealsPage() {
                   loginUserPosts?.items
                     ?.filter((post) => post.status === PostStatus.INACTIVE)
                     .map((post) => (
-                      <PostCard key={post.id} post={post} />
+                      <PostCard key={post.id} post={post as SerializedPost} />
                     ))
                 )}
               </div>
@@ -328,7 +331,7 @@ export default function DealsPage() {
                   loginUserPosts?.items
                     ?.filter((post) => post.status === PostStatus.SOLD)
                     .map((post) => (
-                      <PostCard key={post.id} post={post} />
+                      <PostCard key={post.id} post={post as SerializedPost} />
                     ))
                 )}
               </div>

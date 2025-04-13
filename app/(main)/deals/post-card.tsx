@@ -59,9 +59,11 @@ export default function PostCard({ post }: { post: SerializedPost }) {
               >
                 {post.status}
               </div>
-              <div className="flex-1 text-right">
-              {post.deliveryType}
-              </div>
+              {post.order && (
+                <div className="flex-1 text-right">
+                  {post.order.delivery_type}
+                </div>
+              )}
             </div>
             <p className="text-xl font-bold mt-2">
               ${post.amount === 0 ? "Free" : Number(post.amount).toFixed(2)}

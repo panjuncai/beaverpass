@@ -1,12 +1,13 @@
 import { z } from 'zod';
 import type { OrderQueryParams } from '@/lib/types/order';
-import { PaymentMethod } from '@/lib/types/enum';
+import { PaymentMethod, DeliveryType } from '@/lib/types/enum';
 
 export const createOrderSchema = z.object({
   shippingAddress: z.string().min(1, "Address is required"),
   shippingReceiver: z.string().min(1, "Receiver is required"),
   shippingPhone: z.string().optional(),
   paymentMethod: z.nativeEnum(PaymentMethod),
+  deliveryType: z.nativeEnum(DeliveryType),
   postId: z.string().uuid("Invalid post ID").optional(),
   sellerId: z.string().uuid("Invalid seller ID").optional(),
   total: z.number().positive("Total must be greater than 0").optional(),
