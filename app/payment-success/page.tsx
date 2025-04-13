@@ -41,7 +41,12 @@ function PaymentSuccessContent() {
   });
 
   useEffect(() => {
-    if (redirectStatus === "succeeded" && paymentIntent) {
+    // 添加状态标记防止重复调用
+    let hasProcessed = false;
+
+    if (redirectStatus === "succeeded" && paymentIntent && !hasProcessed) {
+      hasProcessed = true; // 标记为已处理
+      
       // 更新订单状态
       updateOrderMutation.mutateAsync({
         paymentIntentId: paymentIntent,

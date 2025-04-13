@@ -130,21 +130,32 @@ export const orderRouter = router({
               message: "Not authorized to update this order",
             });
           }
+          
+          // 检查订单当前状态，提供幂等性处理
+          if (order.status === input.status) {
+            console.log(`Order ${order.id} already has status ${input.status}, skipping update`);
+            return order; // 直接返回订单，不进行更新操作
+          }
 
           let updatedOrder;
           
           // 如果订单状态更新为已支付，同时更新post状态为已售出
           if (input.status === OrderStatus.PAID && order.post) {
-            // 更新订单状态
-            updatedOrder = await ctx.prisma.order.update({
-              where: { id: order.id },
-              data: { status: input.status },
-            });
-            
-            // 更新商品状态为已售出
-            await ctx.prisma.post.update({
-              where: { id: order.post.id },
-              data: { status: PostStatus.SOLD },
+            // 使用事务确保数据一致性
+            updatedOrder = await ctx.prisma.$transaction(async (tx) => {
+              // 更新订单状态
+              const updated = await tx.order.update({
+                where: { id: order.id },
+                data: { status: input.status },
+              });
+              
+              // 更新商品状态为已售出
+              await tx.post.update({
+                where: { id: order.post.id },
+                data: { status: PostStatus.SOLD },
+              });
+              
+              return updated;
             });
           } else {
             // 只更新订单状态
@@ -155,6 +166,7 @@ export const orderRouter = router({
           }
           
           // 操作成功，返回更新后的订单并退出函数
+          console.log(`Successfully updated order ${order.id} status to ${input.status}`);
           return updatedOrder;
         } catch (error) {
           lastError = error;
