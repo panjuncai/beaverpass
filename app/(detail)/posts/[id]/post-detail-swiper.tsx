@@ -1,12 +1,24 @@
 "use client";
 import { SerializedPost } from "@/lib/types/post";
-import { Swiper } from "antd-mobile";
+import { ImageViewer, Swiper } from "antd-mobile";
 
 import Image from "next/image";
+import { useState } from "react";
 
 export default function PostDetailMainSwiper({ post }: { post: SerializedPost | null }) {
+  const [visible, setVisible] = useState(false);
+  const fullImages=(
+    <ImageViewer.Multi
+        images={post?.images.map((image) => image.imageUrl) || []}
+        visible={visible}
+        defaultIndex={1}
+        onClose={() => {
+          setVisible(false)
+        }}
+      />
+  )
   const items = post?.images.map((image, index) => (
-    <Swiper.Item key={index}>
+    <Swiper.Item key={index} onClick={() => setVisible(true)}>
       <div className="relative w-full h-60 md:h-80 lg:h-[400px] xl:h-[500px] rounded-xl">
         <Image
           src={image.imageUrl}
@@ -23,6 +35,7 @@ export default function PostDetailMainSwiper({ post }: { post: SerializedPost | 
     </Swiper.Item>
   ));
   return (
+    <>
     <div className="carousel w-full h-60 md:h-80 lg:h-[400px] xl:h-[500px] rounded-xl">
       <Swiper loop autoplay indicatorProps={{
               color: 'white',
@@ -30,5 +43,7 @@ export default function PostDetailMainSwiper({ post }: { post: SerializedPost | 
         {items}
       </Swiper>
     </div>
+    {fullImages}
+    </>
   );
 }
