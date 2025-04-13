@@ -11,8 +11,8 @@ export default function SearchBar({ handleSearch }: { handleSearch: (value: stri
   }, [debouncedSearch]);
 
   return (
-    <div className="relative w-full">
-      <div className="w-full h-12 relative bg-white rounded-[10px] border border-neutral-300 flex items-center px-4">
+    <div className="w-full">
+      <div className="w-full h-12 bg-white rounded-[10px] border border-neutral-300 flex items-center px-4">
         {/* Search Icon */}
         <div className="flex items-center justify-center w-6 h-6">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

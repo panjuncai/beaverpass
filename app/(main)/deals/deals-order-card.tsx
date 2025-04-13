@@ -81,7 +81,7 @@ export default function DealsOrderCard({ order }: { order: SerializedOrder }) {
             const now = new Date();
             // 设置30分钟倒计时（从订单创建时间开始）
             const orderCreatedAt = order.createdAt ? new Date(order.createdAt) : now;
-            const deadline = new Date(orderCreatedAt.getTime() + 1 * 60000); // 30分钟 = 30 * 60 * 1000毫秒
+            const deadline = new Date(orderCreatedAt.getTime() + 30 * 60000); // 30分钟 = 30 * 60 * 1000毫秒
             const diffMs = deadline.getTime() - now.getTime();
             
             if (diffMs <= 0) {
