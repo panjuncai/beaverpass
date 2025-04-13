@@ -16,7 +16,6 @@ import { DeliveryType } from "@/lib/types/enum";
 import { LocationFill, UserOutline } from "antd-mobile-icons";
 import DeliveryHome from "@/components/icons/delivery-home";
 import AddressModal from "@/components/modals/address-modal";
-import isEduEmail from "@/utils/tools/isEduEmail";
 
 // 替换为您的 Stripe 公钥
 const stripePromise = loadStripe(
