@@ -6,7 +6,7 @@ export default function SearchCategory({
   setSelectedCategory: React.Dispatch<React.SetStateAction<string>>;
 }) {
   return (
-    <div className="overflow-x-auto no-scrollbar pt-2 pb-6 px-4">
+    <div className="overflow-x-auto no-scrollbar pt-2 pb-2 px-4">
       <div className="flex gap-4 min-w-max">
         <button
           className={`w-16 h-9 rounded-xl transition-colors flex items-center justify-center border border-neutral-900/20 text-sm font-semibold font-['Poppins'] ${

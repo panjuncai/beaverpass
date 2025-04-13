@@ -5,24 +5,30 @@ import SearchCategory from "@/app/(main)/search/search-category";
 import { useMemo, useState } from "react";
 import AddressModal from "@/components/modals/address-modal";
 import { useAuthStore } from "@/lib/store/auth-store";
+import { useRouter } from "next/navigation";
 export default function SearchPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [search, setSearch] = useState("");
   const { loginUser } = useAuthStore();
+  const router = useRouter();
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const memoizedProductsShow = useMemo(() => (
     <ProductsShow selectedCategory={selectedCategory} search={search} />
   ), [selectedCategory, search]);
   // 打开地址选择模态框
   const showAddressModal = () => {
+    if (!loginUser) {
+      router.push("/login");
+      return;
+    }
     setIsAddressModalOpen(true);
   };
 
   return (
     <div className="flex flex-col h-full">
-      <div className="px-4 pt-6 pb-4">
+      <div className="px-4 pt-2 pb-2">
         <div
-          className="relative h-5 cursor-pointer mb-4"
+          className="relative h-5 cursor-pointer mb-2"
           onClick={() => showAddressModal()}
         >
           <div className="w-4 h-3.5 left-0 top-[3px] absolute overflow-hidden">
