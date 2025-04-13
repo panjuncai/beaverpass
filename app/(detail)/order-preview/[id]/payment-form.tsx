@@ -4,70 +4,77 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
-import { Button, Toast } from "antd-mobile";
+import { Button } from "antd-mobile";
 import PropTypes from "prop-types";
 import { LeftOutline } from "antd-mobile-icons";
+
 interface PaymentFormProps {
-  onSuccess: () => void;
+  email: string;
   onError: (error: string) => void;
-  amount: number;
-  email:string;
   onClose: () => void;
+  amount: number;
 }
 
-const PaymentForm: React.FC<PaymentFormProps> = ({
-  onSuccess,
-  onError,
-  amount,
-  email,
-  onClose,
-}) => {
+export function PaymentForm({ email, amount, onError, onClose }: PaymentFormProps) {
   const stripe = useStripe();
   const elements = useElements();
-  const [isProcessing, setIsProcessing] = useState(false);
-
+  
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    
     if (!stripe || !elements) {
+      console.error("Stripe.js has not loaded or clientSecret is missing");
+      setErrorMessage("Payment system is not ready. Please try again later.");
       return;
     }
-
-    setIsProcessing(true);
-
+    
+    setIsLoading(true);
+    setErrorMessage(null);
+    
     try {
-      const { error } = await stripe.confirmPayment({
+      // 验证表单
+      const { error: submitError } = await elements.submit();
+      if (submitError) {
+        setErrorMessage(submitError.message || "An error occurred while validating your payment method.");
+        setIsLoading(false);
+        return;
+      }
+      
+      // 确认支付
+      const result = await stripe.confirmPayment({
         elements,
         confirmParams: {
           return_url: `${window.location.origin}/payment-success`,
         },
       });
-
-      if (error) {
-        onError(error.message || "Payment failed, please try again");
-        Toast.show({
-          icon: "fail",
-          content: error.message || "Payment failed, please try again",
-        });
+      
+      console.log("Payment result:", result);
+      
+      // 处理支付结果
+      if (result.error) {
+        if (result.error.type === "card_error" || result.error.type === "validation_error") {
+          setErrorMessage(result.error.message || "Your payment was unsuccessful, please try again.");
+        } else {
+          setErrorMessage("An unexpected error occurred."+result.error.message);
+        }
+        console.error("Payment error:", result.error);
+        onError(result.error.message || "Payment failed, please try again");
       } else {
-        onSuccess();
-        Toast.show({
-          icon: "success",
-          content: "Payment successful!",
-        });
+        console.log("No error returned, assuming redirect will happen");
       }
-    } catch (err) {
-      console.error("Payment processing error:", err);
+    } catch (e) {
+      console.error("Error during payment confirmation:", e);
+      setErrorMessage("An error occurred while processing your payment. Please try again.");
       onError("Payment processing error");
-      Toast.show({
-        icon: "fail",
-        content: "Payment processing error",
-      });
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsProcessing(false);
   };
-
+  
   return (
     <>
       <div className="fixed inset-0 bg-gray-50 bg-opacity-50 flex items-center justify-center z-50">
@@ -81,7 +88,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               <div className="text-xl font-bold ml-2">BeaverPass</div>
             </div>
           
-          <form onSubmit={(e) => void handleSubmit(e)} className="space-y-2">
+          <form id="payment-form" onSubmit={handleSubmit} className="space-y-2">
             <div className="pt-4 rounded-lg">
               <div className="text-4xl font-semibold text-left">
                 ${amount.toFixed(2)}
@@ -94,37 +101,50 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             </div>
 
             <PaymentElement className="mb-6" />
-
-            <Button
-              disabled={!stripe || isProcessing}
-              block
-              color="success"
-              size="large"
-              className="flex-1 rounded-full"
-            >
-              {isProcessing ? (
-                <span className="flex items-center">
-                  <span className="loading loading-spinner"></span>
-                  Processing...
-                </span>
-              ) : (
-                "Pay"
-              )}
-            </Button>
+            
+            {errorMessage && (
+              <div className="text-error text-sm p-2 bg-red-50 rounded">
+                {errorMessage}
+              </div>
+            )}
+            
+            <div className="h-12"></div>
+            <div className="fixed bottom-4 left-4 right-4 p-2">
+              <Button
+                block
+                color="success"
+                size="large"
+                className="flex-1 rounded-full"
+                loading={isLoading}
+                disabled={isLoading || !stripe || !elements}
+                type="submit"
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center">
+                    <span className="loading loading-spinner mr-2"></span>
+                    Processing...
+                  </span>
+                ) : (
+                  "Pay Now"
+                )}
+              </Button>
+            </div>
           </form>
+          <div className="fixed bottom-18 left-4 right-4 p-2">
           <span className="flex mt-4">
             <span className="flex-1 text-right">
               Powered by <span className="font-bold text-lg text-blue-500">Stripe</span>
             </span>
           </span>
+          </div>
         </div>
       </div>
     </>
   );
-};
+}
 
 PaymentForm.propTypes = {
-  onSuccess: PropTypes.func.isRequired,
+  email: PropTypes.string.isRequired,
   onError: PropTypes.func.isRequired,
   amount: PropTypes.number.isRequired,
   onClose: PropTypes.func.isRequired,

@@ -3,7 +3,6 @@ import { useAuthStore } from "@/lib/store/auth-store";
 import Image from "next/image";
 import { OrderStatus } from "@/lib/types/enum";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import { Button} from "antd-mobile";
 import PaymentForm from "@/app/(detail)/order-preview/[id]/payment-form";
@@ -16,15 +15,11 @@ const stripePromise = loadStripe(
   );
 export default function DealsOrderCard({ order }: { order: SerializedOrder }) {
     const { loginUser } = useAuthStore();
-    const router = useRouter();
     const [remainingTime, setRemainingTime] = useState<string>("");
     const [isExpired, setIsExpired] = useState(false);
     const [clientSecret, setClientSecret] = useState<string>("");
     const [error, setError] = useState<string | null>(null);
 
-    const handlePaymentSuccess = () => {
-        router.push("/deals");
-      };
 
       const handlePaymentError = (error: string) => {
         setError(error);
@@ -235,7 +230,6 @@ export default function DealsOrderCard({ order }: { order: SerializedOrder }) {
         <Elements stripe={stripePromise} options={{ clientSecret }}>
           <PaymentForm
             amount={order.total}
-            onSuccess={handlePaymentSuccess}
             onError={handlePaymentError}
             onClose={handleClosePayment}
             email={loginUser?.email || ""}

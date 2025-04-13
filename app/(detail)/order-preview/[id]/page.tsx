@@ -16,6 +16,7 @@ import { DeliveryType } from "@/lib/types/enum";
 import { LocationFill, UserOutline } from "antd-mobile-icons";
 import DeliveryHome from "@/components/icons/delivery-home";
 import AddressModal from "@/components/modals/address-modal";
+import { createClient } from "@/utils/supabase/client";
 
 // 替换为您的 Stripe 公钥
 const stripePromise = loadStripe(
@@ -37,12 +38,13 @@ export default function OrderPage() {
       : DeliveryType.PICKUP
   );
 
-  const { loginUser } = useAuthStore();
+  const { loginUser, setLoginUser, setSession } = useAuthStore();
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [address, setAddress] = useState<string | undefined>(
     loginUser?.user_metadata?.address
   );
   const [deliveryFee, setDeliveryFee] = useState<number>(0);
+  const [isRefreshingAuth, setIsRefreshingAuth] = useState(false);
 
   // 初始化时根据预览商品和选择的配送方式设置配送费
   useEffect(() => {
@@ -102,6 +104,33 @@ export default function OrderPage() {
     }
   }, [previewPost, router]);
 
+  // 初始加载时刷新用户登录状态
+  useEffect(() => {
+    const refreshAuth = async () => {
+      try {
+        setIsRefreshingAuth(true);
+        const supabase = createClient();
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Error refreshing auth:", error);
+          return;
+        }
+        
+        if (session) {
+          setSession(session);
+          setLoginUser(session.user);
+        }
+      } catch (err) {
+        console.error("Failed to refresh auth:", err);
+      } finally {
+        setIsRefreshingAuth(false);
+      }
+    };
+    
+    void refreshAuth();
+  }, [setLoginUser, setSession]);
+
   if (!previewPost) {
     return null;
   }
@@ -136,6 +165,33 @@ export default function OrderPage() {
     fees.paymentFee;
 
   const onSubmit = async (values: CreateOrderInput) => {
+    // 检查登录状态
+    if (!loginUser?.id) {
+      try {
+        // 尝试刷新session
+        setIsRefreshingAuth(true);
+        const supabase = createClient();
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error || !session) {
+          // 仍未登录，显示登录对话框
+          dialogRef.current?.showModal();
+          return;
+        }
+        
+        // 更新认证状态
+        setSession(session);
+        setLoginUser(session.user);
+      } catch (err) {
+        console.error("Failed to refresh auth:", err);
+        dialogRef.current?.showModal();
+        return;
+      } finally {
+        setIsRefreshingAuth(false);
+      }
+    }
+    
+    // 再次检查登录状态，以防刷新失败
     if (!loginUser?.id) {
       dialogRef.current?.showModal();
       return;
@@ -182,10 +238,12 @@ export default function OrderPage() {
         const errorData = await response.text();
         console.error("Payment intent creation failed:", errorData);
         setError(JSON.stringify(errorData));
+        return;
       }
 
       const { data: paymentData } = await response.json();
       setClientSecret(paymentData.clientSecret);
+      console.log("Payment intent created successfully, clientSecret set");
     } catch (error) {
       console.error("Error creating order:", error);
       setError(
@@ -194,9 +252,10 @@ export default function OrderPage() {
     }
   };
 
-  const handlePaymentSuccess = () => {
-    router.push("/deals");
-  };
+  // const handlePaymentSuccess = () => {
+  //   console.log("🌻🌻🌻payment success - this will not be called due to redirect");
+  //   // 成功后会由Stripe直接重定向到return_url，不会执行这个函数
+  // };
 
   const handlePaymentError = (error: string) => {
     setError(error);
@@ -209,8 +268,8 @@ export default function OrderPage() {
   return (
     <>
       <MessageModal
-        title="Please login first"
-        content="You need to login to buy the product"
+        title="Login Required"
+        content="Your session may have expired. Please login again to continue with your purchase."
         dialogRef={dialogRef}
         redirectUrl="/login"
       />
@@ -226,11 +285,11 @@ export default function OrderPage() {
               color="primary"
               size="large"
               type="submit"
-              loading={createOrderMutation.isLoading}
-              disabled={createOrderMutation.isLoading}
+              loading={createOrderMutation.isLoading || isRefreshingAuth}
+              disabled={createOrderMutation.isLoading || isRefreshingAuth}
               className="rounded-full"
             >
-              {createOrderMutation.isLoading
+              {createOrderMutation.isLoading || isRefreshingAuth
                 ? "Processing..."
                 : "Confirm Order"}
             </Button>
@@ -446,11 +505,10 @@ export default function OrderPage() {
       {clientSecret && (
         <Elements stripe={stripePromise} options={{ clientSecret }}>
           <PaymentForm
+            email={loginUser?.email || ""}
             amount={fees.total}
-            onSuccess={handlePaymentSuccess}
             onError={handlePaymentError}
             onClose={handleClosePayment}
-            email={loginUser?.email || ""}
           />
         </Elements>
       )}

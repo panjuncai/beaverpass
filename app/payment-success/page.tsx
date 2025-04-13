@@ -20,7 +20,10 @@ function PaymentSuccessContent() {
       //   content: 'Payment successful!',
       // });
       // 成功后跳转到订单列表页
-      router.push("/deals");
+      console.log("🌻🌻🌻payment success - redirecting to deals page");
+      setTimeout(() => {
+        router.push("/deals");
+      }, 2000); // 延迟2秒跳转，让用户看到成功信息
     },
     onError: (error) => {
       setIsProcessing(false);
@@ -30,7 +33,10 @@ function PaymentSuccessContent() {
       //   content: 'Failed to update order status. Please contact support.',
       // });
       // 即使更新失败也跳转到订单列表页
-      router.push("/deals");
+      console.log("🌻🌻🌻payment status update failed: "+error.message);
+      setTimeout(() => {
+        router.push("/deals");
+      }, 2000); // 延迟2秒跳转
     },
   });
 
@@ -42,11 +48,17 @@ function PaymentSuccessContent() {
         status: OrderStatus.PAID
       }).catch(error => {
         console.error("Error updating order status:", error);
+        setTimeout(() => {
+          router.push("/deals");
+        }, 2000); // 出错时也要跳转
       });
     } else {
       // 如果状态不是成功，直接跳转
       setIsProcessing(false);
-      router.push("/deals");
+      console.log("🌻🌻🌻payment redirect status is not succeeded:", redirectStatus);
+      setTimeout(() => {
+        router.push("/deals");
+      }, 2000);
     }
   }, [paymentIntent, redirectStatus, router, updateOrderMutation]);
 
