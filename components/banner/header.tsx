@@ -59,7 +59,7 @@ export default function Header() {
   };
   
   return (
-    <header className="sticky top-0 z-10 pt-safe navbar shadow-sm border-b border-gray-200">
+    <header className="sticky top-0 z-50 pt-safe navbar shadow-sm border-b border-gray-200">
       <div className="flex-none w-[24px]">
         {shouldShowBackButton() && (
           <LeftOutline 
