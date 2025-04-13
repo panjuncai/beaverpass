@@ -30,39 +30,52 @@ export default function OrderPage() {
   const [error, setError] = useState<string | null>(null);
   const [form] = Form.useForm<CreateOrderInput>();
 
-  const [selectedDelivery, setSelectedDelivery] = useState<string | number>(
-    DeliveryType.PICKUP
+  // 根据预览商品的配送类型设置初始配送方式
+  const [selectedDelivery, setSelectedDelivery] = useState<string>(
+    previewPost?.deliveryType === "HOME_DELIVERY" 
+    ? DeliveryType.HOME_DELIVERY 
+    : DeliveryType.PICKUP
   );
+  
   const { loginUser } = useAuthStore();
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [address, setAddress] = useState<string | undefined>(
     loginUser?.user_metadata?.address
   );
-  const [deliveryFee, setDeliveryFee] = useState<number>(
-    previewPost?.deliveryType === "BOTH" ? 10 : 0
-  );
+  const [deliveryFee, setDeliveryFee] = useState<number>(0);
 
-  // 添加一个useEffect来在配送方式改变时重新计算费用
+  // 初始化时根据预览商品和选择的配送方式设置配送费
   useEffect(() => {
-    // 当选择HOME_DELIVERY时更新配送费
+    if (!previewPost) return;
+    
     if (selectedDelivery === DeliveryType.HOME_DELIVERY) {
       setDeliveryFee(50);
     } else {
-      setDeliveryFee(previewPost?.deliveryType === "BOTH" ? 10 : 0);
+      setDeliveryFee(0);
     }
+
   }, [selectedDelivery, previewPost]);
 
   useEffect(() => {
     setAddress(loginUser?.user_metadata?.address);
   }, [loginUser]);
 
-  const handleDeliveryChange = (value: string | number) => {
+  // 处理配送方式变更
+  const handleDeliveryChange = (value: string) => {
+    // 如果商品只支持配送，则不允许更改配送方式
+    if (previewPost?.deliveryType === "HOME_DELIVERY") {
+      return;
+    }
+    console.log('🌻🌻🌻value',value);
     setSelectedDelivery(value);
-    // 更新表单中的值
-    // if (form) {
-    //   form.setFieldsValue({ delivery: value });
-    // }
   };
+
+  // 监听selectedDelivery变化，如果选择配送方式需要更新地址
+  useEffect(() => {
+    if (selectedDelivery === DeliveryType.HOME_DELIVERY && address) {
+      form.setFieldsValue({ shippingAddress: address });
+    }
+  }, [selectedDelivery, address, form]);
 
   const showAddressModal = () => {
     setIsAddressModalOpen(true);
@@ -224,64 +237,63 @@ export default function OrderPage() {
           <span className="text-sm text-gray-500 mb-4">
             Shipping has a cost that will be added to the price of the product.
           </span>
-          <Form.Item name="delivery" label="" required>
+          <Form.Item label="" required>
             <Radio.Group
               value={selectedDelivery}
-              onChange={handleDeliveryChange}
+              onChange={(val) => handleDeliveryChange(val as string)}
             >
               <div className="space-y-3">
-                {/* In person option */}
-                <label
-                  className={`flex items-center justify-between rounded-xl p-4 cursor-pointer transition-all border ${
-                    selectedDelivery === DeliveryType.PICKUP
-                      ? "bg-white border-slate-300 shadow-sm"
-                      : "bg-gray-50 border-transparent"
-                  }`}
-                  onClick={() => handleDeliveryChange(DeliveryType.PICKUP)}
-                >
-                  <div className="flex items-center gap-3">
-
-                      <UserOutline fontSize={24} />
-                    <div>
-                      <p className="font-medium">In person</p>
-                      <p className="text-sm text-gray-500">
-                        Meet the seller and pick up by yourself.
-                      </p>
+                {/* In person option - 只在配送类型为PICKUP或BOTH时显示 */}
+                {(previewPost.deliveryType === DeliveryType.PICKUP || previewPost.deliveryType === DeliveryType.BOTH) && (
+                  <label
+                    className={`flex items-center justify-between rounded-xl p-4 cursor-pointer transition-all border ${
+                      selectedDelivery === DeliveryType.PICKUP
+                        ? "bg-white border-slate-300 shadow-sm"
+                        : "bg-gray-50 border-transparent"
+                    }`}
+                    onClick={() => handleDeliveryChange(DeliveryType.PICKUP)}
+                  >
+                    <div className="flex items-center gap-3">
+                        <UserOutline fontSize={24} />
+                      <div>
+                        <p className="font-medium">In person</p>
+                        <p className="text-sm text-gray-500">
+                          Meet the seller and pick up by yourself.
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <Radio
-                    value={DeliveryType.PICKUP}
-                    className="adm-radio"
-                    defaultChecked={true}
-                  />
-                </label>
+                    <Radio
+                      value={DeliveryType.PICKUP}
+                      className="adm-radio"
+                    />
+                  </label>
+                )}
 
-                {/* Home delivery option */}
-                <label
-                  className={`flex items-center justify-between rounded-xl p-4 cursor-pointer transition-all border ${
-                    selectedDelivery === DeliveryType.HOME_DELIVERY
-                      ? "bg-white border-slate-300 shadow-sm"
-                      : "bg-gray-50 border-transparent"
-                  }`}
-                  onClick={() =>
-                    handleDeliveryChange(DeliveryType.HOME_DELIVERY)
-                  }
-                >
-                  <div className="flex items-center gap-3">
-                    <DeliveryHome />
-                    <div>
-                      <p className="font-medium">Send to my address for $50</p>
-                      <p className="text-sm text-gray-500">
-                        1 to 3 days delivery.
-                      </p>
+                {/* Home delivery option - 只在配送类型为HOME_DELIVERY或BOTH时显示 */}
+                {(previewPost.deliveryType === DeliveryType.HOME_DELIVERY || previewPost.deliveryType === DeliveryType.BOTH) && (
+                  <label
+                    className={`flex items-center justify-between rounded-xl p-4 cursor-pointer transition-all border ${
+                      selectedDelivery === DeliveryType.HOME_DELIVERY
+                        ? "bg-white border-slate-300 shadow-sm"
+                        : "bg-gray-50 border-transparent"
+                    }`}
+                    onClick={() => handleDeliveryChange(DeliveryType.HOME_DELIVERY)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <DeliveryHome />
+                      <div>
+                        <p className="font-medium">Send to my address for $50</p>
+                        <p className="text-sm text-gray-500">
+                          1 to 3 days delivery.
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <Radio
-                    value={DeliveryType.HOME_DELIVERY}
-                    className="adm-radio"
-                    checked={selectedDelivery === DeliveryType.HOME_DELIVERY}
-                  />
-                </label>
+                    <Radio
+                      value={DeliveryType.HOME_DELIVERY}
+                      className="adm-radio"
+                    />
+                  </label>
+                )}
               </div>
             </Radio.Group>
 
@@ -289,20 +301,6 @@ export default function OrderPage() {
               <>
                 <div className="mt-3 bg-gray-30 rounded-xl">
                   <div className="flex gap-1">
-                    {/* <div className="w-5 h-5 rounded-full bg-amber-900 flex items-center justify-center flex-shrink-0">
-                      <svg
-                        width="13"
-                        height="12"
-                        viewBox="0 0 13 12"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M6.52564 0.125C9.80496 0.125 12.4631 2.3075 12.4631 5C12.4631 7.06 10.7002 9.305 7.21987 11.759C7.02635 11.8955 6.77961 11.9705 6.5245 11.9703C6.26938 11.9701 6.0228 11.8948 5.82958 11.758L5.59939 11.594C2.27317 9.204 0.588135 7.014 0.588135 5C0.588135 2.3075 3.24631 0.125 6.52564 0.125ZM6.52564 3.125C5.91997 3.125 5.33912 3.32254 4.91085 3.67417C4.48258 4.02581 4.24198 4.50272 4.24198 5C4.24198 5.49728 4.48258 5.97419 4.91085 6.32583C5.33912 6.67746 5.91997 6.875 6.52564 6.875C7.1313 6.875 7.71215 6.67746 8.14042 6.32583C8.56869 5.97419 8.80929 5.49728 8.80929 5C8.80929 4.50272 8.56869 4.02581 8.14042 3.67417C7.71215 3.32254 7.1313 3.125 6.52564 3.125Z"
-                          fill="white"
-                        />
-                      </svg>
-                    </div> */}
                     <LocationFill fontSize={24} color='var(--adm-color-primary)'/>
                     <div className="flex-1">
                       <p className="font-semibold text-sm text-yellow-950">
@@ -348,7 +346,7 @@ export default function OrderPage() {
               </>
             )}
           </Form.Item>
-          <Form.Item name="shippingAddress" hidden initialValue={address} />
+          <Form.Item hidden initialValue={address} />
         </div>
       </div>
 

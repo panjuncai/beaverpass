@@ -15,7 +15,7 @@ export default function PostDetail() {
       <PostDetailMainPostDetail post={currentPost} />
       <PostDetailMainSeller post={currentPost} />
       <PostDetailMainPostAbout />
-      <PostDetailMainDelivery />
+      <PostDetailMainDelivery post={currentPost} />
     </div>
     <PostDetailBuy />
     </>
