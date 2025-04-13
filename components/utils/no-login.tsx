@@ -10,7 +10,7 @@ export default function NoLogin() {
           <div className="flex flex-col items-center justify-center">
             {/* 主按钮区域 */}
             <button
-              className="btn btn-primary btn-xl w-full text-white rounded-full shadow-md"
+              className="w-1/2 h-12 relative bg-yellow-900 rounded-3xl text-center text-white text-base font-semibold font-['Poppins'] transition-all duration-300 hover:bg-yellow-800"
               onClick={() =>void router.push("/login")}
             >
               Log in
