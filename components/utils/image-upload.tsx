@@ -14,7 +14,7 @@ interface ImageUploadProps {
 
 // 添加压缩选项
 const compressionOptions = {
-  maxSizeMB: 0.1, // 最大文件大小
+  maxSizeMB: 1, // 最大文件大小
   maxWidthOrHeight: 1280, // 最大宽度/高度
   useWebWorker: true, // 使用 Web Worker 提高性能
   preserveExif: false, // 保留 EXIF 数据
