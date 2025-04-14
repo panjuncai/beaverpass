@@ -109,7 +109,7 @@ export function PaymentForm({ email, amount, onError, onClose }: PaymentFormProp
             )}
             
             <div className="h-12"></div>
-            <div className="fixed bottom-4 left-4 right-4 p-2">
+            <div className="fixed bottom-8 left-4 right-4 p-2">
               <Button
                 block
                 color="success"
@@ -125,12 +125,12 @@ export function PaymentForm({ email, amount, onError, onClose }: PaymentFormProp
                     Processing...
                   </span>
                 ) : (
-                  "Pay Now"
+                  "Pay"
                 )}
               </Button>
             </div>
           </form>
-          <div className="fixed bottom-18 left-4 right-4 p-2">
+          <div className="fixed bottom-0 left-4 right-4 p-2">
           <span className="flex mt-4">
             <span className="flex-1 text-right">
               Powered by <span className="font-bold text-lg text-blue-500">Stripe</span>

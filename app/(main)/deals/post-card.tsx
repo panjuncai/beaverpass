@@ -4,6 +4,7 @@ import { trpc } from "@/lib/trpc/client";
 import Image from "next/image";
 import { useState } from "react";
 import getPostStatus from "@/utils/tools/getPostStatus";
+import RightArrow from "@/components/icons/right-arrow";
 // import Loading from "@/components/utils/loading";
 export default function PostCard({ post }: { post: SerializedPost }) {
   const utils = trpc.useUtils();
@@ -129,6 +130,14 @@ export default function PostCard({ post }: { post: SerializedPost }) {
                   )}
                 </button>
               </>
+            ) : post.status===PostStatus.SOLD? (<div className="flex items-center gap-2">
+              <div className="animate-pulse-right">
+                <RightArrow color="var(--adm-color-primary)"/>
+              </div>
+              <button className="btn btn-sm btn-primary">
+                Schedule Pickup
+              </button>
+            </div>
             ) : null}
           </div>
         </div>

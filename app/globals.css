@@ -197,3 +197,19 @@ footer::-webkit-scrollbar {
 ::-webkit-scrollbar-thumb {
   background: transparent !important;
 }
+
+/* 添加右箭头动画效果 */
+@keyframes pulse-right {
+  0%, 100% {
+    transform: translateX(0);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateX(10px);
+    opacity: 1;
+  }
+}
+
+.animate-pulse-right {
+  animation: pulse-right 1.5s infinite ease-in-out;
+}
