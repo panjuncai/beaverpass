@@ -330,8 +330,7 @@ export default function PostCard({ post }: { post: SerializedPost }) {
           onSelect={handleDaySelect}
           startMonth={new Date()}
           showOutsideDays
-          // disabled={isPastDay}
-          hidden={isPastDay}
+          disabled={isPastDay}
           // fromDate={today}
         />
         
