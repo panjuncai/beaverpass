@@ -2,15 +2,53 @@ import { PostStatus } from "@/lib/types/enum";
 import { SerializedPost } from "@/lib/types/post";
 import { trpc } from "@/lib/trpc/client";
 import Image from "next/image";
-import { useState } from "react";
+import { ChangeEventHandler, useMemo, useState } from "react";
 import getPostStatus from "@/utils/tools/getPostStatus";
 import RightArrow from "@/components/icons/right-arrow";
+import {CenterPopup} from 'antd-mobile'
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/style.css";
 // import Loading from "@/components/utils/loading";
 export default function PostCard({ post }: { post: SerializedPost }) {
   const utils = trpc.useUtils();
   const [activeAction, setActiveAction] = useState<
     "activate" | "deactivate" | "delete" | null
   >(null);
+  const [visible, setVisible] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date|undefined>(undefined);
+  const [startTimeValue, setStartTimeValue] = useState<string>("10:00");
+  const [endTimeValue, setEndTimeValue] = useState<string>("12:00");
+  const startDateTime=useMemo(()=>{
+    if(!selectedDate) return null
+    if(!startTimeValue) return null
+    const [hours, minutes] = startTimeValue
+      .split(":")
+      .map((str) => parseInt(str, 10));
+    const newStartDate = new Date(
+      selectedDate.getFullYear(),
+      selectedDate.getMonth(),
+      selectedDate.getDate(),
+      hours,
+      minutes
+    );
+    return newStartDate
+  },[selectedDate,startTimeValue])
+
+  const endDateTime=useMemo(()=>{
+    if(!selectedDate) return null
+    if(!endTimeValue) return null
+    const [hours, minutes] = endTimeValue
+      .split(":")
+      .map((str) => parseInt(str, 10));
+    const newEndDate = new Date(
+      selectedDate.getFullYear(),
+      selectedDate.getMonth(),
+      selectedDate.getDate(),
+      hours,
+      minutes
+    );
+    return newEndDate
+  },[selectedDate,endTimeValue])
 
   const updatePostMutation = trpc.post.updatePost.useMutation({
     onSuccess: () => {
@@ -39,7 +77,39 @@ export default function PostCard({ post }: { post: SerializedPost }) {
     }
   };
 
+  const handleStartTimeChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    const time = e.target.value;
+    // const [hours, minutes] = time.split(":").map((str) => parseInt(str, 10));
+    // const newSelectedDate = setHours(setMinutes(selectedDate, minutes), hours);
+    // setSelectedDate(newSelectedDate);
+    setStartTimeValue(time);
+  };
+
+  const handleEndTimeChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    const time = e.target.value;
+    setEndTimeValue(time);
+  };
+
+  const handleDaySelect = (date: Date | undefined) => {
+    if (!date) {
+      setSelectedDate(date);
+      return;
+    }
+    const [hours, minutes] = startTimeValue
+      .split(":")
+      .map((str) => parseInt(str, 10));
+    const newDate = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      hours,
+      minutes
+    );
+    setSelectedDate(newDate);
+  };
+
   return (
+    <>
     <div className="card bg-base-100 shadow-md mb-4">
       <div className="card-body">
         <div className="flex items-center gap-4">
@@ -134,7 +204,10 @@ export default function PostCard({ post }: { post: SerializedPost }) {
               <div className="animate-pulse-right">
                 <RightArrow color="var(--adm-color-primary)"/>
               </div>
-              <button className="btn btn-sm btn-primary">
+              <button 
+                className="btn btn-sm btn-primary"
+                onClick={() => setVisible(true)}
+              >
                 Schedule Pickup
               </button>
             </div>
@@ -143,5 +216,32 @@ export default function PostCard({ post }: { post: SerializedPost }) {
         </div>
       </div>
     </div>
+    <CenterPopup
+    visible={visible}
+    onMaskClick={() => {
+      setVisible(false)
+    }}
+  >
+   <div>
+      <DayPicker
+        mode="single"
+        selected={selectedDate}
+        onSelect={handleDaySelect}
+        footer={`${startDateTime?.toLocaleString()} - ${endDateTime?.toLocaleString()}`}
+      />
+      <form style={{ marginBlockEnd: "1em" }}>
+        <label>
+          Start time:{" "}
+          <input type="time" value={startTimeValue} onChange={handleStartTimeChange} />
+        </label>
+        -
+        <label>
+          End time:{" "}
+          <input type="time" value={endTimeValue} onChange={handleEndTimeChange} />
+        </label>
+      </form>
+    </div>
+  </CenterPopup>
+    </>
   );
 }
