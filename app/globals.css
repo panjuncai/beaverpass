@@ -36,7 +36,9 @@
   }
 } 
 
-
+.rdp-root {
+  --rdp-accent-color: #733e0a;
+}
 
 
 /* Link styles */

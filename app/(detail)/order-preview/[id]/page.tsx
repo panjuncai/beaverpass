@@ -288,7 +288,7 @@ export default function OrderPage() {
               type="submit"
               loading={createOrderMutation.isLoading || isRefreshingAuth}
               disabled={createOrderMutation.isLoading || isRefreshingAuth}
-              className="rounded-full"
+              shape='rounded'
             >
               {createOrderMutation.isLoading || isRefreshingAuth
                 ? "Processing..."

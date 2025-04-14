@@ -84,7 +84,7 @@ export default function PostDetailMainSeller({
           <Button
             color='primary'
             size='mini'
-            className='rounded-full'
+            shape='rounded'
             loading={createChatRoomMutation.isLoading}
             disabled={loginUser?.id === post?.poster?.id || createChatRoomMutation.isLoading}
             onClick={() => {

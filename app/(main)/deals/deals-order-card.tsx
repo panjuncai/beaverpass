@@ -180,6 +180,7 @@ export default function DealsOrderCard({ order }: { order: SerializedOrder }) {
                             <Button 
                               color="primary" 
                               size="small"
+                              shape='rounded'
                               loading={reenterPaymentMutation.isLoading}
                               onClick={handleReenterPayment}
                             >

@@ -114,10 +114,11 @@ export function PaymentForm({ email, amount, onError, onClose }: PaymentFormProp
                 block
                 color="success"
                 size="large"
-                className="flex-1 rounded-full"
+                className="flex-1"
                 loading={isLoading}
                 disabled={isLoading || !stripe || !elements}
                 type="submit"
+                shape='rounded'
               >
                 {isLoading ? (
                   <span className="flex items-center justify-center">

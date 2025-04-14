@@ -204,6 +204,7 @@ export default function ProfileForm() {
             color="primary" 
             size="large" 
             type="submit"
+            shape='rounded'
             loading={updateProfile.isLoading}
           >
             Save changes
@@ -241,8 +242,8 @@ export default function ProfileForm() {
               <div className="flex items-center gap-2">
                 <Button 
                   color={loginUser?.user_metadata?.schoolEmailVerified ? 'success' : 'primary'} 
-                  className='rounded-full' 
                   size='mini'
+                  shape='rounded'
                   loading={verifyEmailMutation.isLoading}
                   disabled={!form.getFieldValue('schoolEmail') || verifyEmailMutation.isLoading}
                   onClick={() => {

@@ -385,7 +385,8 @@ export default function ChatDetailPage() {
             color="primary"
             disabled={!message.trim()}
             onClick={handleSendMessage}
-            className="h-10 w-20 rounded-xl"
+            className="h-10 w-20"
+            shape='rounded'
             style={{ 
               '--background-color': message.trim() ? '#65a30d' : '#d1d5db',
               '--text-color': '#ffffff',

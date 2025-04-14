@@ -31,7 +31,8 @@ export default function PostDetailBuy() {
           block
           color='primary'
           size='large'
-          className='flex-1 rounded-full'
+          className='flex-1'
+          shape='rounded'
           disabled={loginUser?.id === post?.posterId}
           onClick={() => {
             if (!loginUser?.id) {
