@@ -82,6 +82,20 @@ export default function PostCard({ post }: { post: SerializedPost }) {
   const [endTimeValue, setEndTimeValue] = useState<string>("12:00");
   const [isSubmitting, setIsSubmitting] = useState(false);
   
+  // 定义今天的日期用于禁用过去的日期
+  const today = useMemo(() => {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    return date;
+  }, []);
+  
+  // 过滤函数，禁用今天之前的日期
+  const isPastDay = useMemo(() => {
+    return (date: Date) => {
+      return date < today;
+    };
+  }, [today]);
+  
   // 以下计算可以在提交时使用
   const startDateTime=useMemo(()=>{
     if(!selectedDate) return null
@@ -157,6 +171,12 @@ export default function PostCard({ post }: { post: SerializedPost }) {
       setSelectedDate(date);
       return;
     }
+    
+    // 确保不能选择过去的日期
+    if (date < today) {
+      return;
+    }
+    
     setSelectedDate(date);
   };
   
@@ -310,7 +330,9 @@ export default function PostCard({ post }: { post: SerializedPost }) {
           onSelect={handleDaySelect}
           startMonth={new Date()}
           showOutsideDays
-          captionLayout="dropdown"
+          // disabled={isPastDay}
+          hidden={isPastDay}
+          // fromDate={today}
         />
         
         <div className="time-selector-container">
