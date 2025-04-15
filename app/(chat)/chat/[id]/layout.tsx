@@ -2,7 +2,7 @@
 
 import { Suspense } from 'react';
 import CenteredLoading from '@/components/utils/loading';
-import ChatHeader from '@/components/banner/chat-header';
+import DetailHeader from '@/components/banner/detail-header';
 
 export default function ChatLayout({
   children,
@@ -11,7 +11,7 @@ export default function ChatLayout({
 }) {
   return (
     <div className="flex flex-col h-screen">
-      <ChatHeader />
+      <DetailHeader isShowBack={true} pageTitle="Chat" isShowRight={false} />
       <main className="flex-1 overflow-y-auto scroll-behavior-smooth -webkit-overflow-scrolling-touch">
         <Suspense fallback={<CenteredLoading />}>
           {children}

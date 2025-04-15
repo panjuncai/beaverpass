@@ -14,4 +14,7 @@ export type MessageOutput = RouterOutput['chat']['getMessages'][number];
 export type ChatRoomsOutput = RouterOutput['chat']['getChatRooms'];
 export type ChatRoomOutput = RouterOutput['chat']['getChatRooms'][number];
 export type GetMessagesByTemporaryIdOutput = RouterOutput['chat']['getMessagesByTemporaryId'];
-  
+export type GetChatRoomParticipantsOutput = RouterOutput['chat']['getChatRoomParticipants'];
+export type GetOtherParticipantOutput = RouterOutput['chat']['getOtherParticipant'];
+// 用户相关类型
+export type GetDBUserOutput = RouterOutput['user']['getDBUser'];

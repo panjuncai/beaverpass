@@ -30,6 +30,24 @@ export const userRouter = router({
     return ctx.loginUser;
   }),
 
+  // 获取数据库用户
+  getDBUser: protectedProcedure.query(async ({ ctx }) => {
+    if (!ctx.loginUser) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "User not logged in",
+      });
+    }
+
+    const user = await ctx.prisma.user.findUnique({
+      where: {
+        id: ctx.loginUser.id,
+      },
+    });
+
+    return user;
+  }),
+
   // 更新用户资料
   updateProfile: protectedProcedure
     .input(updateProfileSchema)

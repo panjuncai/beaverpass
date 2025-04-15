@@ -3,16 +3,22 @@ import { useEffect, useState, useRef, useCallback, KeyboardEvent } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { trpc } from '@/lib/trpc/client';
 import { useAuthStore } from '@/lib/store/auth-store';
-import {Button, Image, Skeleton, TextArea } from 'antd-mobile';
+import {Avatar, Button, Image, ImageViewer, Rate, Skeleton, TextArea } from 'antd-mobile';
 import { MessageStatus, MessageType } from '@/lib/types/enum';
 import { format } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import { useSupabaseChat } from '@/lib/hooks/useSupabaseChat';
+import { HeartOutline } from 'antd-mobile-icons';
+import { useChatStore } from '@/lib/store/chat-store';
+import Verified from '@/components/icons/verified';
+import isEduEmail from '@/utils/tools/isEduEmail';
+
 export default function ChatDetailPage() {
   const router = useRouter();
   const { id: chatRoomId } = useParams<{ id: string }>();
   const { loginUser } = useAuthStore();
   const [message, setMessage] = useState('');
+  const [visible, setVisible] = useState(false);
   // const [isTyping, setIsTyping] = useState(false);
   // const [otherUserTyping, setOtherUserTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -39,24 +45,40 @@ export default function ChatDetailPage() {
     // setTypingStatus,
   } = useSupabaseChat(loginUser?.id || '', chatRoomId);
 
+  const { getOtherParticipant, setActiveChatRoomId, setChatRoom } = useChatStore();
   
+  // 在组件挂载时设置当前聊天室ID
+  useEffect(() => {
+    setActiveChatRoomId(chatRoomId);
+    
+    // 组件卸载时清除当前聊天室ID
+    return () => {
+      setActiveChatRoomId(null);
+    };
+  }, [chatRoomId, setActiveChatRoomId]);
   
-  // 获取聊天室信息
-  // const { data: chatRoom } = trpc.chat.getChatRoomById.useQuery(
-  //   { chatRoomId },
-  //   { enabled: !!chatRoomId && !!loginUser?.id }
-  // );
+  // 获取参与者信息
+  const otherParticipant = getOtherParticipant(chatRoomId, loginUser?.id || '');
+  
+  // 如果本地存储中没有参与者信息，可以从服务器获取
+   trpc.chat.getChatRoomById.useQuery(
+    { chatRoomId },
+    { 
+      enabled: !otherParticipant,
+      onSuccess: (data) => {
+        if (data) {
+          // 保存到store中 - 直接传递 ChatRoomOutput 数据
+          setChatRoom(data);
+        }
+      }
+    }
+  );
   
   // 获取聊天消息
   const { data: messages, isLoading: isLoadingMessages } = trpc.chat.getMessages.useQuery(
     { chatRoomId, limit: 50 },
     { enabled: !!chatRoomId && !!loginUser?.id }
   );
-  
-  // 获取聊天对象信息
-  // const otherParticipant = chatRoom?.participants?.find(
-  //   p => p.userId !== loginUser?.id
-  // )?.user;
   
   // 监听消息输入
   // const handleInputChange = useCallback((val: string) => {
@@ -227,19 +249,63 @@ export default function ChatDetailPage() {
   //     clearAllPendingMessages();
   //   };
   // }, [clearAllPendingMessages]);
-  
+
+  const fullAvatar=(
+    <ImageViewer
+        image={otherParticipant?.user?.avatar || "/default-avatar.png"}
+        visible={visible}
+        onClose={() => {
+          setVisible(false)
+        }}
+      />
+  )
+
   return (
     <div className="flex flex-col h-full">
       {renderConnectionStatus()}
       
       <div className="flex-1 overflow-y-auto p-3">
-        {isLoadingMessages ? (
+        {isLoadingMessages? (
           <div className="p-4 space-y-4">
             <Skeleton.Title animated />
             <Skeleton.Paragraph lineCount={5} animated />
           </div>
         ) : (
           <>
+          {/* 聊天室标题 */}
+            <div className="flex gap-4 bg-base-100 p-4 border-b border-gray-200">
+              <Avatar
+                src={otherParticipant?.user?.avatar || "/default-avatar.png"}
+                style={{ "--size": "64px" }}
+                onClick={() => {
+                  setVisible(true)
+                }}
+              />
+              <div className="flex-1 flex flex-col">
+                <div className="flex gap-2 items-center">
+                  <span className="text-lg font-bold">
+                    {otherParticipant?.user?.firstName}
+                  </span>
+                  <span className="text-sm text-gray-500"> </span>
+                  <span className="text-lg font-bold">
+                    {otherParticipant?.user?.lastName}
+                  </span>
+                  {otherParticipant?.user?.email && (isEduEmail(otherParticipant?.user?.email) || otherParticipant?.user?.schoolEmailVerified) ? (
+                    <span className="flex items-center">
+                      <Verified verified={true} />
+                      <span className="text-sm text-green-600">Verified</span>
+                    </span>
+                  ) : null}
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Rate allowHalf readOnly defaultValue={4} />
+                    <span className="text-lg">4.0</span>
+                  </div>
+                  <HeartOutline fontSize={36} className="hover:cursor-pointer" />
+                </div>
+              </div>
+            </div>
             {/* 消息列表 */}
             <div className="space-y-3">
               {messages?.map((msg, index) => {
@@ -397,6 +463,7 @@ export default function ChatDetailPage() {
           </Button>
         </div>
       </div>
+      {fullAvatar}
     </div>
   );
 } 

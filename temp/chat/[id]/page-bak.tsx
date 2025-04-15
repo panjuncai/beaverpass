@@ -22,7 +22,7 @@ export default function ChatRoomPage({ params }: PageProps) {
   const [messageText, setMessageText] = useState("");
   const [messages, setMessages] = useState<MessageOutput[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
+
   // 直接使用 params.id，保留兼容性
   // 注意: 未来版本的 Next.js 将要求使用 React.use() 解包 params
   // 例如: const unwrappedParams = React.use(params as any); const chatRoomId = unwrappedParams.id;
@@ -64,7 +64,7 @@ export default function ChatRoomPage({ params }: PageProps) {
     },
     onError: (error) => {
       console.error("发送消息失败:", error);
-    }
+    },
   });
 
   // 滚动到最新消息
@@ -107,26 +107,33 @@ export default function ChatRoomPage({ params }: PageProps) {
     <div className="flex flex-col h-full">
       {/* 聊天室标题 */}
       <div className="flex gap-4 bg-base-100 p-4 border-b border-gray-200">
-      <Avatar src={otherParticipant?.user?.avatar || '/default-avatar.png'} style={{ '--size': '64px' }}  />
-      <div className="flex-1 flex flex-col">
-        <div className="flex gap-2 items-center">
-          <span className="text-lg font-bold">{otherParticipant?.user?.firstName}</span>
-          <span className="text-sm text-gray-500"> </span>
-          <span className="text-lg font-bold">{otherParticipant?.user?.lastName}</span>
-          <span className="flex items-center">
-            <Verified verified={true}/>
-            <span className="text-sm text-green-600">Verified</span>
-          </span>
-        </div>
-        <div className="text-sx text-gray-700">from Algonquin College</div>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Rate allowHalf readOnly defaultValue={4} />
-            <span className="text-lg">4.0</span>
+        <Avatar
+          src={otherParticipant?.user?.avatar || "/default-avatar.png"}
+          style={{ "--size": "64px" }}
+        />
+        <div className="flex-1 flex flex-col">
+          <div className="flex gap-2 items-center">
+            <span className="text-lg font-bold">
+              {otherParticipant?.user?.firstName}
+            </span>
+            <span className="text-sm text-gray-500"> </span>
+            <span className="text-lg font-bold">
+              {otherParticipant?.user?.lastName}
+            </span>
+            <span className="flex items-center">
+              <Verified verified={true} />
+              <span className="text-sm text-green-600">Verified</span>
+            </span>
           </div>
-          <HeartOutline fontSize={36} className="hover:cursor-pointer" />
+          <div className="text-sx text-gray-700">from Algonquin College</div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Rate allowHalf readOnly defaultValue={4} />
+              <span className="text-lg">4.0</span>
+            </div>
+            <HeartOutline fontSize={36} className="hover:cursor-pointer" />
+          </div>
         </div>
-      </div>
       </div>
 
       {/* 消息区域 */}
@@ -145,7 +152,9 @@ export default function ChatRoomPage({ params }: PageProps) {
 
         {!loading && messages.length === 0 && (
           <div className="text-center py-10">
-            <p className="text-gray-500">No messages yet. Start a conversation!</p>
+            <p className="text-gray-500">
+              No messages yet. Start a conversation!
+            </p>
           </div>
         )}
 
@@ -192,4 +201,4 @@ export default function ChatRoomPage({ params }: PageProps) {
       </div>
     </div>
   );
-} 
+}

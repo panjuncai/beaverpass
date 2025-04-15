@@ -11,6 +11,7 @@ import {
   leaveChatRoomSchema,
   setTypingStatusSchema,
   getMessagesByTemporaryIdSchema,
+  getChatRoomParticipantsSchema,
 } from "@/lib/validations/chat";
 import { MessageStatus, MessageType } from "@/lib/types/enum";
 import {createClient} from '@/utils/supabase/server'
@@ -265,7 +266,48 @@ export const chatRouter = router({
         });
       }
     }),
-
+  // 获取聊天室参与者
+  getChatRoomParticipants: protectedProcedure
+    .input(getChatRoomParticipantsSchema)
+    .query(async ({ input, ctx }) => {
+      try {
+        const { chatRoomId } = input;
+        const participants = await ctx.prisma.chatRoomParticipant.findMany({
+          where: { chatRoomId },
+          include: {
+            user: true,
+          },
+        });
+        return participants;
+      } catch (error) {
+        console.error("🙀🙀🙀Failed to get chat room participants:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to get chat room participants",
+        });
+      }
+    }),
+  // 获取其他参与者
+  getOtherParticipant: protectedProcedure
+    .input(getChatRoomParticipantsSchema)
+    .query(async ({ input, ctx }) => {
+      try {
+        const { chatRoomId } = input;  
+        const participants = await ctx.prisma.chatRoomParticipant.findMany({
+          where: { chatRoomId },
+          include: {
+            user: true,
+          },
+        });
+        return participants.find(p => p.userId !== ctx.loginUser.id);
+      } catch (error) {
+        console.error("🙀🙀🙀Failed to get other participant:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to get other participant",
+        });
+      }
+    }),
   // 获取聊天室消息
   getMessages: protectedProcedure
     .input(getMessagesSchema)

@@ -13,6 +13,10 @@ export default function NavRight() {
 
   const handleLogout = async () => {
     try {
+      // 清除所有本地存储数据
+      if (typeof window !== 'undefined') {
+        localStorage.clear();
+      }
       await logoutMutation.mutateAsync();
     } catch (error) {
       console.error("Logout failed:", error);

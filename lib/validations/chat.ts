@@ -67,6 +67,10 @@ export const setTypingStatusSchema = z.object({
   isTyping: z.boolean(),
 });
 
+export const getChatRoomParticipantsSchema = z.object({
+  chatRoomId: z.string().uuid(),
+});
+
 export type CreateChatRoomInput = z.infer<typeof createChatRoomSchema>;
 export type SendMessageInput = z.infer<typeof sendMessageSchema>;
 export type GetChatRoomsInput = z.infer<typeof getChatRoomsSchema>;
@@ -76,3 +80,4 @@ export type MarkMessageReadInput = z.infer<typeof markMessageReadSchema>;
 export type JoinChatRoomInput = z.infer<typeof joinChatRoomSchema>;
 export type LeaveChatRoomInput = z.infer<typeof leaveChatRoomSchema>;
 export type SetTypingStatusInput = z.infer<typeof setTypingStatusSchema>; 
+export type GetChatRoomParticipantsInput = z.infer<typeof getChatRoomParticipantsSchema>;
