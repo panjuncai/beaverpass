@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useUpload } from '@/hooks/useUpload'; // 你现有的 GraphQL 上传 Hook
+import { useUpload } from '@/lib/hooks/useUpload'; // 你现有的 GraphQL 上传 Hook
 import { ALLOWED_FILE_TYPES } from '@/lib/validations/upload';
 
 export const useFileUpload = () => {

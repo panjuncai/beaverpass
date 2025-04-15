@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import { CreatePostInput, createPostSchema } from "@/lib/validations/post";
 import ImageUpload from "@/components/utils/image-upload";
-import { useFileUpload } from "@/hooks/useFileUpload";
+import { useFileUpload } from "@/lib/hooks/useFileUpload";
 import { PostCategory, PostCondition, DeliveryType } from "@/lib/types/enum";
 
 import { useAuthStore } from "@/lib/store/auth-store";

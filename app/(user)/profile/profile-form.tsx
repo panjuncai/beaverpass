@@ -8,7 +8,7 @@ import { SpinLoading } from 'antd-mobile';
 import AddressModal from '@/components/modals/address-modal';
 import { CameraOutline, LocationFill } from 'antd-mobile-icons';
 import type { ImageUploadItem } from 'antd-mobile/es/components/image-uploader';
-import { useFileUpload } from '@/hooks/useFileUpload';
+import { useFileUpload } from '@/lib/hooks/useFileUpload';
 import { useRouter } from 'next/navigation';
 import isEduEmail from '@/utils/tools/isEduEmail';
 
