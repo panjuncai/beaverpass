@@ -6,7 +6,8 @@ export const OrderStatus = {
     DELIVERED: "DELIVERED",               // 已送达
     COMPLETED: "COMPLETED",               // 已完成
     CANCELLED: "CANCELLED",               // 已取消
-    REFUNDED: "REFUNDED"                  // 已退款
+    REFUNDED: "REFUNDED",                  // 已退款
+    FAILED: "FAILED"                      // 支付失败
   } as const;
   
   // 支付方式枚举
