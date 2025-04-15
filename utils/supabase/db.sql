@@ -25,6 +25,7 @@ CREATE TABLE users (
   phone TEXT,
   school_email TEXT,
   school_email_verified BOOLEAN DEFAULT FALSE,
+  stripe_account_id TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -140,6 +141,10 @@ CREATE TABLE orders (
   -- 订单状态
   status TEXT NOT NULL DEFAULT 'PENDING_PAYMENT',
 
+  -- 结算状态
+  settlement_status TEXT NOT NULL DEFAULT 'PENDING',
+  settlement_id TEXT,
+
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -225,6 +230,7 @@ BEGIN
     avatar = (NEW.raw_user_meta_data->>'avatar'),
     school_email = (NEW.raw_user_meta_data->>'schoolEmail'),
     school_email_verified = (NEW.raw_user_meta_data->>'schoolEmailVerified')::boolean,
+    stripe_account_id = (NEW.raw_user_meta_data->>'stripeAccountId'),
     updated_at = NOW()
   WHERE id = NEW.id;
   

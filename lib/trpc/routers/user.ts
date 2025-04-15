@@ -14,6 +14,7 @@ const updateProfileSchema = z.object({
   searchRange: z.number().optional(),
   schoolEmail: z.string().optional(),
   schoolEmailVerified: z.boolean().optional(),
+  stripeAccountId: z.string().optional(),
 });
 
 export const userRouter = router({
