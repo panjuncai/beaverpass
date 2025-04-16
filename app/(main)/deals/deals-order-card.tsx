@@ -10,6 +10,7 @@ import PaymentForm from "@/app/(detail)/order-preview/[id]/payment-form";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import getOrderStatus from "@/utils/tools/getOrderStatus";
+import { formatDateTime, formatSimpleTime } from "@/utils/tools/format-time";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string
@@ -208,6 +209,13 @@ export default function DealsOrderCard({ order }: { order: GetOrderOutput }) {
               }
             >
               {order.buyerId === loginUser?.id ? "Buying" : "Selling"}
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <span>The items will be picked up at</span>
+            <span>
+              {formatDateTime(new Date(order.pickupStartTime || ""))} -{" "}
+              {formatSimpleTime(new Date(order.pickupEndTime || ""))}
             </span>
           </div>
         </div>
