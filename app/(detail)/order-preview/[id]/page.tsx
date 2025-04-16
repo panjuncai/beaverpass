@@ -138,10 +138,7 @@ export default function OrderPage() {
   const fees = {
     amount: Number(previewPost.amount) || 0,
     deliveryFee: deliveryFee,
-    serviceFee:
-      Number(previewPost.amount) * 0.1 < 1
-        ? 1
-        : Number(previewPost.amount) * 0.1,
+    serviceFee: 0,
     tax:
       (Number(previewPost.amount) || 0 + Number(previewPost.amount) * 0.1 < 1
         ? 1
@@ -217,7 +214,7 @@ export default function OrderPage() {
         shippingPhone: loginUser.user_metadata.phone,
         total: fees.total,
         deliveryFee: deliveryFee,
-        serviceFee: fees.serviceFee,
+        serviceFee: 0,
         tax: fees.tax,
         paymentFee: fees.paymentFee,
         paymentMethod: PaymentMethod.STRIPE,
@@ -472,10 +469,10 @@ export default function OrderPage() {
                   <span>Delivery Fee:</span>
                   <span>${fees.deliveryFee.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between">
+                {/* <div className="flex justify-between">
                   <span>Service Fee:</span>
                   <span>${fees.serviceFee.toFixed(2)}</span>
-                </div>
+                </div> */}
                 <div className="flex justify-between">
                   <span>Tax (HST 13%):</span>
                   <span>${fees.tax.toFixed(2)}</span>

@@ -270,7 +270,9 @@ export default function AddressModal({
       }
     };
 
-    initMap();
+    if (mapRef.current && !mapRef.current.children.length) {
+      initMap();
+    }
   }, [isOpen, initialAddress, searchRange]);
 
   // 更新搜索范围
