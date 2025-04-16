@@ -211,13 +211,15 @@ export default function DealsOrderCard({ order }: { order: GetOrderOutput }) {
               {order.buyerId === loginUser?.id ? "Buying" : "Selling"}
             </span>
           </div>
-          <div className="flex flex-col">
-            <span>The items will be picked up at</span>
-            <span>
+          {!!order.pickupStartTime && (
+            <div className="flex flex-col">
+              <span>The items will be picked up at</span>
+              <span>
               {formatDateTime(new Date(order.pickupStartTime || ""))} -{" "}
               {formatSimpleTime(new Date(order.pickupEndTime || ""))}
-            </span>
-          </div>
+              </span>
+            </div>
+          )}
         </div>
       </div>
       {clientSecret && (
