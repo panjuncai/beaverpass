@@ -88,6 +88,7 @@ export default function PostCard({ post }: { post: GetPostOutput }) {
     trpc.order.updateOrderPickupTime.useMutation({
       onSuccess: () => {
         utils.order.getOrders.invalidate();
+        utils.post.getPosts.invalidate();
         setVisible(false);
         setIsSubmitting(false);
       },
@@ -307,7 +308,8 @@ export default function PostCard({ post }: { post: GetPostOutput }) {
                     )}
                   </button>
                 </>
-              ) : post.status === PostStatus.SOLD ? (
+              ) : post.status === PostStatus.SOLD &&
+                !post.orders[0]?.pickupStartTime ? (
                 <>
                   <div className="flex items-center gap-2">
                     <div className="animate-pulse-right">
@@ -321,19 +323,32 @@ export default function PostCard({ post }: { post: GetPostOutput }) {
                       color="primary"
                       onClick={() => setVisible(true)}
                     >
-                      Schedule Pickup
+                      Schedule
                     </Button>
                   </div>
                 </>
               ) : null}
             </div>
           </div>
-          <div className="flex">
-                  <div className="">
-                    Pickup Time: 
-                  </div>
-                  <div className="flex-1 text-right">{formatDateTime(new Date(post.orders[0]?.pickupStartTime || ""))} - {formatSimpleTime(new Date(post.orders[0]?.pickupEndTime || ""))}</div>
-                  </div>
+          {!!post.orders[0]?.pickupStartTime && (
+          <div className="flex items-center gap-1">
+            <div>Pickup Time:</div>
+            <span className="flex-1">
+              {formatDateTime(new Date(post.orders[0]?.pickupStartTime || ""))}{" "}
+              -{" "}
+              {formatSimpleTime(new Date(post.orders[0]?.pickupEndTime || ""))}
+            </span>
+            <Button
+              className="flex-0"
+              block
+              size="small"
+              shape="rounded"
+              color="primary"
+              onClick={() => setVisible(true)}
+            >
+              Change
+            </Button>
+          </div>)}
         </div>
       </div>
       <CenterPopup

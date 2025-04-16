@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import { OrderStatus, PostStatus } from "@/lib/types/enum";
 import NoLogin from "@/components/utils/no-login";
 import { useAuthStore } from "@/lib/store/auth-store";
@@ -11,25 +11,32 @@ import { Skeleton } from "antd-mobile";
 
 export default function DealsPage() {
   const { loginUser, isLoading } = useAuthStore();
-  const {data:loginUserOrders,isLoading:isLoadingOrders} = trpc.order.getOrders.useQuery({
-    buyerId: loginUser?.id
-  }, {
-    enabled: !!loginUser?.id
-  });
+  const { data: loginUserOrders, isLoading: isLoadingOrders } =
+    trpc.order.getOrders.useQuery(
+      {
+        buyerId: loginUser?.id,
+      },
+      {
+        enabled: !!loginUser?.id,
+      }
+    );
 
-  const {data:loginUserPosts,isLoading:isLoadingPosts} = trpc.post.getPosts.useQuery({
-    posterId: loginUser?.id
-  }, {
-    enabled: !!loginUser?.id
-  });
-  
-  const [activeTab, setActiveTab] = useState('buy');
-  const [activeSubTab, setActiveSubTab] = useState('active');
+  const { data: loginUserPosts, isLoading: isLoadingPosts } =
+    trpc.post.getPosts.useQuery(
+      {
+        posterId: loginUser?.id,
+      },
+      {
+        enabled: !!loginUser?.id,
+      }
+    );
 
+  const [activeTab, setActiveTab] = useState("buy");
+  const [activeSubTab, setActiveSubTab] = useState("active");
 
   // 监听标签变化，重置子标签
   useEffect(() => {
-    setActiveSubTab('active');
+    setActiveSubTab("active");
   }, [activeTab]);
 
   if (!loginUser) {
@@ -44,31 +51,34 @@ export default function DealsPage() {
   const renderSkeleton = () => {
     return (
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 p-4">
-        {[1, 2, 3, 4 ].map((index) => (
+        {[1, 2, 3, 4].map((index) => (
           <div key={index} className="card bg-base-100 shadow-md">
             <figure className="h-[200px] w-full">
               <Skeleton
                 animated
                 style={{
-                  '--width': '100%',
-                  '--height': '200px',
+                  "--width": "100%",
+                  "--height": "200px",
                 }}
               />
             </figure>
-            <div className="card-body" style={{ "--padding-card": "0.5rem" } as React.CSSProperties}>
+            <div
+              className="card-body"
+              style={{ "--padding-card": "0.5rem" } as React.CSSProperties}
+            >
               <Skeleton
                 animated
                 style={{
-                  '--width': '80%',
-                  '--height': '20px',
+                  "--width": "80%",
+                  "--height": "20px",
                 }}
                 className="mb-2"
               />
               <Skeleton
                 animated
                 style={{
-                  '--width': '60%',
-                  '--height': '16px',
+                  "--width": "60%",
+                  "--height": "16px",
                 }}
               />
             </div>
@@ -78,7 +88,7 @@ export default function DealsPage() {
     );
   };
 
-  if (isLoading || isLoadingPosts||isLoadingOrders) {
+  if (isLoading || isLoadingPosts || isLoadingOrders) {
     return renderSkeleton();
   }
 
@@ -115,39 +125,43 @@ export default function DealsPage() {
     <div className="flex flex-col items-center w-full max-w-screen-md mx-auto px-4 pt-4">
       {/* Buy/Sell Tabs */}
       <div className="w-full flex justify-center mb-4 relative">
-        <button 
-          onClick={() => setActiveTab('buy')}
+        <button
+          onClick={() => setActiveTab("buy")}
           className="flex-1 max-w-[384px] rounded-[10px] relative"
         >
           <div className="h-9 text-center">
-            <span className={`text-base font-bold font-poppins leading-10 ${
-              activeTab === 'buy' ? 'text-yellow-950' : 'text-zinc-400'
-            }`}>
+            <span
+              className={`text-base font-bold font-poppins leading-10 ${
+                activeTab === "buy" ? "text-yellow-950" : "text-zinc-400"
+              }`}
+            >
               Buy
             </span>
           </div>
-          {activeTab === 'buy' && (
+          {activeTab === "buy" && (
             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-950"></div>
           )}
-          {activeTab !== 'buy' && (
+          {activeTab !== "buy" && (
             <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-zinc-200"></div>
           )}
         </button>
-        <button 
-          onClick={() => setActiveTab('sell')}
+        <button
+          onClick={() => setActiveTab("sell")}
           className="flex-1 max-w-[384px] rounded-[10px] relative"
         >
           <div className="h-9 text-center">
-            <span className={`text-base font-bold font-poppins leading-10 ${
-              activeTab === 'sell' ? 'text-yellow-950' : 'text-zinc-400'
-            }`}>
+            <span
+              className={`text-base font-bold font-poppins leading-10 ${
+                activeTab === "sell" ? "text-yellow-950" : "text-zinc-400"
+              }`}
+            >
               Sell
             </span>
           </div>
-          {activeTab === 'sell' && (
+          {activeTab === "sell" && (
             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-950"></div>
           )}
-          {activeTab !== 'sell' && (
+          {activeTab !== "sell" && (
             <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-zinc-200"></div>
           )}
         </button>
@@ -155,34 +169,38 @@ export default function DealsPage() {
 
       {/* Sub Tabs */}
       <div className="w-full flex">
-        {activeTab === 'buy' ? (
+        {activeTab === "buy" ? (
           // Buy sub-tabs
           <>
-            <button 
-              onClick={() => setActiveSubTab('active')}
+            <button
+              onClick={() => setActiveSubTab("active")}
               className={`flex-1 h-10 relative ${
-                activeSubTab === 'active' 
-                  ? 'bg-[#89C149] rounded-tl-[10px] rounded-tr-[10px]' 
-                  : 'bg-white border border-zinc-100 rounded-tl-[10px] rounded-tr-[10px] rounded-bl-[0px] rounded-br-[0px]'
+                activeSubTab === "active"
+                  ? "bg-[#89C149] rounded-tl-[10px] rounded-tr-[10px]"
+                  : "bg-white border border-zinc-100 rounded-tl-[10px] rounded-tr-[10px] rounded-bl-[0px] rounded-br-[0px]"
               }`}
             >
-              <span className={`w-full h-10 flex items-center justify-center text-sm font-medium font-poppins tracking-wide ${
-                activeSubTab === 'active' ? 'text-white' : 'text-zinc-400'
-              }`}>
+              <span
+                className={`w-full h-10 flex items-center justify-center text-sm font-medium font-poppins tracking-wide ${
+                  activeSubTab === "active" ? "text-white" : "text-zinc-400"
+                }`}
+              >
                 Active Orders
               </span>
             </button>
-            <button 
-              onClick={() => setActiveSubTab('history')}
+            <button
+              onClick={() => setActiveSubTab("history")}
               className={`flex-1 h-10 relative ml-2 ${
-                activeSubTab === 'history' 
-                  ? 'bg-[#89C149] rounded-tl-[10px] rounded-tr-[10px]' 
-                  : 'bg-white border border-zinc-100 rounded-tl-[10px] rounded-tr-[10px] rounded-bl-[0px] rounded-br-[0px]'
+                activeSubTab === "history"
+                  ? "bg-[#89C149] rounded-tl-[10px] rounded-tr-[10px]"
+                  : "bg-white border border-zinc-100 rounded-tl-[10px] rounded-tr-[10px] rounded-bl-[0px] rounded-br-[0px]"
               }`}
             >
-              <span className={`w-full h-10 flex items-center justify-center text-sm font-medium font-poppins tracking-wide ${
-                activeSubTab === 'history' ? 'text-white' : 'text-zinc-400'
-              }`}>
+              <span
+                className={`w-full h-10 flex items-center justify-center text-sm font-medium font-poppins tracking-wide ${
+                  activeSubTab === "history" ? "text-white" : "text-zinc-400"
+                }`}
+              >
                 History
               </span>
             </button>
@@ -190,45 +208,51 @@ export default function DealsPage() {
         ) : (
           // Sell sub-tabs
           <>
-            <button 
-              onClick={() => setActiveSubTab('active')}
+            <button
+              onClick={() => setActiveSubTab("active")}
               className={`flex-1 h-10 relative ${
-                activeSubTab === 'active' 
-                  ? 'bg-[#89C149] rounded-tl-[10px] rounded-tr-[10px]' 
-                  : 'bg-white border border-zinc-100 rounded-tl-[10px] rounded-tr-[10px] rounded-bl-[0px] rounded-br-[0px]'
+                activeSubTab === "active"
+                  ? "bg-[#89C149] rounded-tl-[10px] rounded-tr-[10px]"
+                  : "bg-white border border-zinc-100 rounded-tl-[10px] rounded-tr-[10px] rounded-bl-[0px] rounded-br-[0px]"
               }`}
             >
-              <span className={`w-full h-10 flex items-center justify-center text-sm font-medium font-poppins tracking-wide ${
-                activeSubTab === 'active' ? 'text-white' : 'text-zinc-400'
-              }`}>
+              <span
+                className={`w-full h-10 flex items-center justify-center text-sm font-medium font-poppins tracking-wide ${
+                  activeSubTab === "active" ? "text-white" : "text-zinc-400"
+                }`}
+              >
                 Active
               </span>
             </button>
-            <button 
-              onClick={() => setActiveSubTab('inactive')}
+            <button
+              onClick={() => setActiveSubTab("inactive")}
               className={`flex-1 h-10 relative mx-2 ${
-                activeSubTab === 'inactive' 
-                  ? 'bg-[#89C149] rounded-tl-[10px] rounded-tr-[10px]' 
-                  : 'bg-white border border-zinc-100 rounded-tl-[10px] rounded-tr-[10px] rounded-bl-[0px] rounded-br-[0px]'
+                activeSubTab === "inactive"
+                  ? "bg-[#89C149] rounded-tl-[10px] rounded-tr-[10px]"
+                  : "bg-white border border-zinc-100 rounded-tl-[10px] rounded-tr-[10px] rounded-bl-[0px] rounded-br-[0px]"
               }`}
             >
-              <span className={`w-full h-10 flex items-center justify-center text-sm font-medium font-poppins tracking-wide ${
-                activeSubTab === 'inactive' ? 'text-white' : 'text-zinc-400'
-              }`}>
+              <span
+                className={`w-full h-10 flex items-center justify-center text-sm font-medium font-poppins tracking-wide ${
+                  activeSubTab === "inactive" ? "text-white" : "text-zinc-400"
+                }`}
+              >
                 Inactive
               </span>
             </button>
-            <button 
-              onClick={() => setActiveSubTab('sold')}
+            <button
+              onClick={() => setActiveSubTab("sold")}
               className={`flex-1 h-10 relative ${
-                activeSubTab === 'sold' 
-                  ? 'bg-[#89C149] rounded-tl-[10px] rounded-tr-[10px]' 
-                  : 'bg-white border border-zinc-100 rounded-tl-[10px] rounded-tr-[10px] rounded-bl-[0px] rounded-br-[0px]'
+                activeSubTab === "sold"
+                  ? "bg-[#89C149] rounded-tl-[10px] rounded-tr-[10px]"
+                  : "bg-white border border-zinc-100 rounded-tl-[10px] rounded-tr-[10px] rounded-bl-[0px] rounded-br-[0px]"
               }`}
             >
-              <span className={`w-full h-10 flex items-center justify-center text-sm font-medium font-poppins tracking-wide ${
-                activeSubTab === 'sold' ? 'text-white' : 'text-zinc-400'
-              }`}>
+              <span
+                className={`w-full h-10 flex items-center justify-center text-sm font-medium font-poppins tracking-wide ${
+                  activeSubTab === "sold" ? "text-white" : "text-zinc-400"
+                }`}
+              >
                 Sold
               </span>
             </button>
@@ -238,9 +262,9 @@ export default function DealsPage() {
 
       {/* Content Area */}
       <div className="w-full mt-4">
-        {activeTab === 'buy' ? (
+        {activeTab === "buy" ? (
           <div>
-            {activeSubTab === 'active' ? (
+            {activeSubTab === "active" ? (
               <div>
                 {loginUserOrders?.filter((order) =>
                   isActiveOrder(order?.status)
@@ -276,53 +300,54 @@ export default function DealsPage() {
           </div>
         ) : (
           <div>
-            {activeSubTab === 'active' && (
+            {activeSubTab === "active" && (
               <div>
-                {loginUserPosts?.items.filter((post) => post.status === PostStatus.ACTIVE).length === 0 ? (
+                {loginUserPosts?.items.filter(
+                  (post) => post.status === PostStatus.ACTIVE
+                ).length === 0 ? (
                   <div className="text-center text-gray-500 mt-8">
                     <NoDeal />
                   </div>
                 ) : (
                   loginUserPosts?.items
                     ?.filter((post) => post.status === PostStatus.ACTIVE)
-                    .map((post) => (
-                      <PostCard key={post.id} post={post} />
-                    ))
+                    .map((post) => <PostCard key={post.id} post={post} />)
                 )}
               </div>
             )}
-            {activeSubTab === 'inactive' && (
+            {activeSubTab === "inactive" && (
               <div>
-                {loginUserPosts?.items.filter((post) => post.status === PostStatus.INACTIVE).length === 0 ? (
+                {loginUserPosts?.items.filter(
+                  (post) => post.status === PostStatus.INACTIVE
+                ).length === 0 ? (
                   <div className="text-center text-gray-500 mt-8">
                     <NoDeal />
                   </div>
                 ) : (
                   loginUserPosts?.items
                     ?.filter((post) => post.status === PostStatus.INACTIVE)
-                    .map((post) => (
-                      <PostCard key={post.id} post={post} />
-                    ))
+                    .map((post) => <PostCard key={post.id} post={post} />)
                 )}
               </div>
             )}
-            {activeSubTab === 'sold' && (
+            {activeSubTab === "sold" && (
               <div>
-                {loginUserPosts?.items.filter((post) => post.status === PostStatus.SOLD).length === 0 ? (
+                {loginUserPosts?.items.filter(
+                  (post) => post.status === PostStatus.SOLD
+                ).length === 0 ? (
                   <div className="text-center text-gray-500 mt-8">
                     <NoDeal />
                   </div>
                 ) : (
                   loginUserPosts?.items
                     ?.filter((post) => post.status === PostStatus.SOLD)
-                    .map((post) => (
-                      <PostCard key={post.id} post={post} />
-                    ))
+                    .map((post) => <PostCard key={post.id} post={post} />)
                 )}
               </div>
             )}
           </div>
         )}
+        <div className="w-full h-32"></div>
       </div>
     </div>
   );

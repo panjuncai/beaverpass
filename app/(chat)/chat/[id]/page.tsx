@@ -252,7 +252,7 @@ export default function ChatDetailPage() {
 
   const fullAvatar=(
     <ImageViewer
-        image={otherParticipant?.user?.avatar || "/default-avatar.png"}
+        image={otherParticipant?.user?.avatar || "1"}
         visible={visible}
         onClose={() => {
           setVisible(false)

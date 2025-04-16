@@ -1,12 +1,12 @@
-'use client';
+"use client";
 import { SerializedPost } from "@/lib/types/post";
 import Verified from "@/components/icons/verified";
-import { Avatar, Rate, Button } from "antd-mobile";
+import { Avatar, Rate, Button, ImageViewer } from "antd-mobile";
 import { useAuthStore } from "@/lib/store/auth-store";
 import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import MessageModal from "@/components/modals/message-modal";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import isEduEmail from "@/utils/tools/isEduEmail";
 
 export default function PostDetailMainSeller({
@@ -17,7 +17,8 @@ export default function PostDetailMainSeller({
   const router = useRouter();
   const { loginUser } = useAuthStore();
   const utils = trpc.useUtils();
-  const dialogRef = useRef<HTMLDialogElement>(null)
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const [visible, setVisible] = useState(false);
   // 创建聊天室的 mutation
   const createChatRoomMutation = trpc.chat.createChatRoom.useMutation({
     onSuccess: (chatRoom) => {
@@ -30,6 +31,16 @@ export default function PostDetailMainSeller({
       console.log("Failed to create chat");
     },
   });
+
+  const fullAvatar = (
+    <ImageViewer
+      image={post?.poster?.avatar || "1"}
+      visible={visible}
+      onClose={() => {
+        setVisible(false);
+      }}
+    />
+  );
 
   const handleChatClick = async () => {
     if (!loginUser || !post?.poster?.id) {
@@ -55,51 +66,64 @@ export default function PostDetailMainSeller({
   };
 
   return (
-    <><MessageModal 
-    title="Please login first"
-    content="You need to login to buy the product"
-    dialogRef={dialogRef}
-    redirectUrl="/login"
-  />
-    <div className="mt-4 flex gap-4 shadow-sm p-2">
-      <Avatar src={post?.poster?.avatar || '1'} style={{ '--size': '64px' }}  />
-      <div className="flex-1 flex flex-col">
-        <div className="flex gap-2 items-center">
-          <span className="text-lg font-bold">{post?.poster?.firstName}</span>
-          <span className="text-sm text-gray-500"> </span>
-          <span className="text-lg font-bold">{post?.poster?.lastName}</span>
-          {post?.poster?.email && (isEduEmail(post?.poster?.email) || post?.poster?.schoolEmailVerified) ? (
-            <span className="flex items-center">
-              <Verified verified={true} />
-              <span className="text-sm text-green-600">Verified</span>
-            </span>
-          ) : null}
-        </div>
-        <div className="text-sx text-gray-700"></div>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Rate allowHalf readOnly defaultValue={4} />
-            <span className="text-lg">4.0</span>
+    <>
+      <MessageModal
+        title="Please login first"
+        content="You need to login to buy the product"
+        dialogRef={dialogRef}
+        redirectUrl="/login"
+      />
+      <div className="mt-4 flex gap-4 shadow-sm p-2">
+        <Avatar
+          src={post?.poster?.avatar || "1"}
+          style={{ "--size": "64px" }}
+          onClick={() => {
+            setVisible(true);
+          }}
+        />
+        <div className="flex-1 flex flex-col">
+          <div className="flex gap-2 items-center">
+            <span className="text-lg font-bold">{post?.poster?.firstName}</span>
+            <span className="text-sm text-gray-500"> </span>
+            <span className="text-lg font-bold">{post?.poster?.lastName}</span>
+            {post?.poster?.email &&
+            (isEduEmail(post?.poster?.email) ||
+              post?.poster?.schoolEmailVerified) ? (
+              <span className="flex items-center">
+                <Verified verified={true} />
+                <span className="text-sm text-green-600">Verified</span>
+              </span>
+            ) : null}
           </div>
-          <Button
-            color='primary'
-            size='mini'
-            shape='rounded'
-            loading={createChatRoomMutation.isLoading}
-            disabled={loginUser?.id === post?.poster?.id || createChatRoomMutation.isLoading}
-            onClick={() => {
-              if (!loginUser?.id) {
-                dialogRef.current?.showModal()
-                return;
+          <div className="text-sx text-gray-700"></div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Rate allowHalf readOnly defaultValue={4} />
+              <span className="text-lg">4.0</span>
+            </div>
+            <Button
+              color="primary"
+              size="mini"
+              shape="rounded"
+              loading={createChatRoomMutation.isLoading}
+              disabled={
+                loginUser?.id === post?.poster?.id ||
+                createChatRoomMutation.isLoading
               }
-              void handleChatClick()
-            }}
-          >
-            Chat
-          </Button>
+              onClick={() => {
+                if (!loginUser?.id) {
+                  dialogRef.current?.showModal();
+                  return;
+                }
+                void handleChatClick();
+              }}
+            >
+              Chat
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+      {fullAvatar}
     </>
   );
 }
