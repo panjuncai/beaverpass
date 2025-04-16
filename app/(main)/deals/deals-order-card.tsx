@@ -186,7 +186,7 @@ export default function DealsOrderCard({ order }: { order: GetOrderOutput }) {
               {order.status === OrderStatus.PENDING_PAYMENT && !isExpired && (
                 <div className="mt-2">
                   <Button
-                    color="primary"
+                    color="success"
                     size="small"
                     shape="rounded"
                     loading={reenterPaymentMutation.isLoading}
