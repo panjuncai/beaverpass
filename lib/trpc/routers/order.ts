@@ -85,7 +85,7 @@ export const orderRouter = router({
     }
   }),
   // 更新订单状态
-  updateOrderStatus: protectedProcedure
+  updateOrderStatus: publicProcedure
     .input(
       z.object({
         paymentIntentId: z.string(),
@@ -116,12 +116,12 @@ export const orderRouter = router({
           }
 
           // 验证订单所有者
-          if (order.buyerId !== ctx.loginUser.id) {
-            throw new TRPCError({
-              code: "UNAUTHORIZED",
-              message: "Not authorized to update this order",
-            });
-          }
+          // if (order.buyerId !== ctx.loginUser.id) {
+          //   throw new TRPCError({
+          //     code: "UNAUTHORIZED",
+          //     message: "Not authorized to update this order",
+          //   });
+          // }
           
           // 检查订单当前状态，提供幂等性处理
           if (order.status === input.status) {
@@ -186,7 +186,7 @@ export const orderRouter = router({
       throw lastError;
     }),
     // 更新订单预约时间
-  updateOrderPickupTime: protectedProcedure
+  updateOrderPickupTime:publicProcedure
   .input(
     z.object({
       orderId: z.string(),
@@ -210,12 +210,12 @@ export const orderRouter = router({
         }
 
         // 验证订单必须是卖家才能更新预约时间
-        if (order.sellerId !== ctx.loginUser.id) {
-          throw new TRPCError({
-            code: "UNAUTHORIZED",
-            message: "Not authorized to update this order",
-          });
-        }
+        // if (order.sellerId !== ctx.loginUser.id) {
+        //   throw new TRPCError({
+        //     code: "UNAUTHORIZED",
+        //     message: "Not authorized to update this order",
+        //   });
+        // }
         
         // 只更新订单预约时间
         const updatedOrder = await ctx.prisma.order.update({
