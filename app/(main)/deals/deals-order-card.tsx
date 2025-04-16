@@ -1,4 +1,5 @@
-import { SerializedOrder } from "@/lib/types/order";
+// import { SerializedOrder } from "@/lib/types/order";
+import { GetOrderOutput } from "@/lib/trpc/client";
 import { useAuthStore } from "@/lib/store/auth-store";
 import Image from "next/image";
 import { OrderStatus } from "@/lib/types/enum";
@@ -13,7 +14,7 @@ import getOrderStatus from "@/utils/tools/getOrderStatus";
 const stripePromise = loadStripe(
     process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string
   );
-export default function DealsOrderCard({ order }: { order: SerializedOrder }) {
+export default function DealsOrderCard({ order }: { order: GetOrderOutput }) {
     const { loginUser } = useAuthStore();
     const [remainingTime, setRemainingTime] = useState<string>("");
     const [isExpired, setIsExpired] = useState(false);
@@ -65,7 +66,7 @@ export default function DealsOrderCard({ order }: { order: SerializedOrder }) {
 
     // 计算剩余时间
     useEffect(() => {
-        if (order.status !== OrderStatus.PENDING_PAYMENT) {
+        if (order?.status !== OrderStatus.PENDING_PAYMENT) {
             return;
         }
 
@@ -103,9 +104,9 @@ export default function DealsOrderCard({ order }: { order: SerializedOrder }) {
         const interval = setInterval(updateRemainingTime, 1000);
         
         return () => clearInterval(interval);
-    }, [order.status, order.id, order.createdAt]);
+    }, [order?.status, order?.id, order?.createdAt]);
 
-    if (!order.post) {
+    if (!order?.post) {
         return null;
     }
 
@@ -151,20 +152,20 @@ export default function DealsOrderCard({ order }: { order: SerializedOrder }) {
             <div className="card-body">
                 <div className="flex items-center gap-4">
                     <Image
-                        src={order.post.images[0].imageUrl}
-                        alt={order.post.title}
+                        src={order?.post?.images?.[0]?.imageUrl || ''}
+                        alt={order?.post?.title || ''}
                         width={100}
                         height={100}
                     />
                     <div className="flex-1">
-                        <h3 className="card-title">{order.post.title}</h3>
+                        <h3 className="card-title">{order?.post?.title || ''}</h3>
                         <div className="flex items-center">
-                          <div className={`px-2 py-1 rounded-full text-xs font-medium ${getOrderStatus(order.status || '')}`}>
-                              {order.status}
+                          <div className={`px-2 py-1 rounded-full text-xs font-medium ${getOrderStatus(order?.status || '')}`}>
+                              {order?.status}
                           </div>
                           
                           {/* 显示待支付倒计时 */}
-                          {order.status === OrderStatus.PENDING_PAYMENT && (
+                          {order?.status === OrderStatus.PENDING_PAYMENT && (
                             <div className="ml-2 text-xl font-medium">
                               {isExpired ? 'Expired' : `${remainingTime}`}
                             </div>
@@ -172,7 +173,7 @@ export default function DealsOrderCard({ order }: { order: SerializedOrder }) {
                           
                           <div className="flex-1"></div>
                         </div>
-                        <p className="text-xl font-bold mt-2">${order.total.toFixed(2)}</p>
+                        <p className="text-xl font-bold mt-2">${Number(order?.total)?.toFixed(2)}</p>
                         
                         {/* 待支付状态显示重新支付按钮 */}
                         {order.status === OrderStatus.PENDING_PAYMENT && !isExpired && (
@@ -210,7 +211,7 @@ export default function DealsOrderCard({ order }: { order: SerializedOrder }) {
         {clientSecret && (
         <Elements stripe={stripePromise} options={{ clientSecret }}>
           <PaymentForm
-            amount={order.total}
+            amount={Number(order?.total)}
             onError={handlePaymentError}
             onClose={handleClosePayment}
             email={loginUser?.email || ""}

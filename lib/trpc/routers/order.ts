@@ -2,33 +2,9 @@ import { TRPCError } from "@trpc/server";
 import { protectedProcedure, publicProcedure, router } from "..";
 import { createOrderSchema, getOrdersSchema } from "@/lib/validations/order";
 import { z } from "zod";
-import { Prisma } from "@prisma/client";
+// import { Prisma } from "@prisma/client";
 import { OrderStatus, PostStatus } from "@/lib/types/enum";
 
-type OrderWithRelations = Prisma.OrderGetPayload<{
-  include: {
-    post: {
-      include: {
-        images: true;
-      };
-    };
-    buyer: true;
-    seller: true;
-  };
-}>;
-
-const serializeOrder = (order: OrderWithRelations) => ({
-  ...order,
-  paymentFee: order.paymentFee ? Number(order.paymentFee) : 0,
-  deliveryFee: order.deliveryFee ? Number(order.deliveryFee) : 0,
-  serviceFee: order.serviceFee ? Number(order.serviceFee) : 0,
-  tax: order.tax ? Number(order.tax) : 0,
-  total: order.total ? Number(order.total) : 0,
-  post: order.post ? {
-    ...order.post,
-    amount: order.post.amount ? Number(order.post.amount) : 0
-  } : null
-});
 
 export const orderRouter = router({
   // 获取订单列表
@@ -51,17 +27,33 @@ export const orderRouter = router({
         [input.sortBy]: input.sortOrder,
       },
       include: {
+        buyer: true,
+        seller: true,
         post: {
           include: {
             images: true
           }
         },
-        buyer: true,
-        seller: true,
       },
       ...(input.cursor && { cursor: { id: input.cursor }, skip: 1 }),
     });
-    return orders.map(serializeOrder);
+    return orders;
+  }),
+  // 获取订单详情
+  getOrder: publicProcedure.input(z.object({ id: z.string() })).query(async ({ ctx, input }) => {
+    const order = await ctx.prisma.order.findUnique({
+      where: { id: input.id },
+      include: {
+        buyer: true,
+        seller: true,
+        post: {
+          include: {
+            images: true,
+          },
+        },
+      },
+    });
+    return order;
   }),
   // 创建订单
   createOrder: protectedProcedure.input(createOrderSchema).mutation(async ({ ctx, input }) => {
@@ -186,12 +178,61 @@ export const orderRouter = router({
           console.error("Failed to update order status after retries:", error);
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
-            message: "Failed to update order status after multiple attempts",
+            message: error instanceof Error ? error.message : "Failed to update order status after multiple attempts",
           });
         }
       }
 
       throw lastError;
+    }),
+    // 更新订单预约时间
+  updateOrderPickupTime: protectedProcedure
+  .input(
+    z.object({
+      orderId: z.string(),
+      pickupStartTime: z.string(),
+      pickupEndTime: z.string(),
+    })
+  )
+  .mutation(async ({ ctx, input }) => {
+    try {
+      const order = await ctx.prisma.order.findFirst({
+          where: {
+            id: input.orderId,
+          }, 
+        });
+
+        if (!order) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Order not found",
+          });
+        }
+
+        // 验证订单必须是卖家才能更新预约时间
+        if (order.sellerId !== ctx.loginUser.id) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Not authorized to update this order",
+          });
+        }
+        
+        // 只更新订单预约时间
+        const updatedOrder = await ctx.prisma.order.update({
+          where: { id: order.id },
+          data: { pickupStartTime: input.pickupStartTime, pickupEndTime: input.pickupEndTime },
+        });
+        
+        // 操作成功，返回更新后的订单并退出函数
+        console.log(`Successfully updated order ${order.id} pickup time to ${input.pickupStartTime} - ${input.pickupEndTime}`);
+        return updatedOrder;
+      } catch (error) {
+        console.error('update order pickup time error:', error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error instanceof Error ? error.message : "Failed to update order pickup time",
+        });
+      }
     }),
   // 重新进入支付界面
   reenterPayment: protectedProcedure

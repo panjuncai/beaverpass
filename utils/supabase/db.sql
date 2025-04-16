@@ -145,6 +145,10 @@ CREATE TABLE orders (
   settlement_status TEXT NOT NULL DEFAULT 'PENDING',
   settlement_id TEXT,
 
+  -- 预约时间
+  pickup_start_time TEXT,
+  pickup_end_time TEXT,
+
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );

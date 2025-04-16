@@ -18,3 +18,9 @@ export type GetChatRoomParticipantsOutput = RouterOutput['chat']['getChatRoomPar
 export type GetOtherParticipantOutput = RouterOutput['chat']['getOtherParticipant'];
 // 用户相关类型
 export type GetDBUserOutput = RouterOutput['user']['getDBUser'];
+// 帖子相关类型
+export type GetPostsOutput = RouterOutput['post']['getPosts'];
+export type GetPostOutput = RouterOutput['post']['getPostById'];
+// 订单相关类型
+export type GetOrdersOutput = RouterOutput['order']['getOrders'];
+export type GetOrderOutput = RouterOutput['order']['getOrder'];

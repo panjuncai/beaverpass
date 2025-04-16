@@ -91,6 +91,8 @@ model Order {
   updatedAt            DateTime?  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   settlementStatus     String    @default("PENDING") @map("settlement_status")
   settlementId         String?    @map("settlement_id")
+  pickupStartTime      String?    @map("pickup_start_time")
+  pickupEndTime        String?    @map("pickup_end_time")
   buyer                User       @relation("BuyerOrders", fields: [buyerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   post                 Post       @relation(fields: [postId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   seller               User       @relation("SellerOrders", fields: [sellerId], references: [id], onDelete: Restrict, onUpdate: Restrict)

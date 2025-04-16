@@ -8,22 +8,11 @@ import DealsOrderCard from "./deals-order-card";
 import NoDeal from "@/components/utils/no-deal";
 import PostCard from "./post-card";
 import { Skeleton } from "antd-mobile";
-import { SerializedOrder } from '@/lib/types/order';
-import { SerializedPost } from '@/lib/types/post';
 
 export default function DealsPage() {
   const { loginUser, isLoading } = useAuthStore();
   const {data:loginUserOrders,isLoading:isLoadingOrders} = trpc.order.getOrders.useQuery({
-    buyerId: loginUser?.id,
-    include: {
-      post: {
-        include: {
-          images: true
-        }
-      },
-      buyer: true,
-      seller: true
-    }
+    buyerId: loginUser?.id
   }, {
     enabled: !!loginUser?.id
   });
@@ -33,13 +22,9 @@ export default function DealsPage() {
   }, {
     enabled: !!loginUser?.id
   });
-
+  
   const [activeTab, setActiveTab] = useState('buy');
   const [activeSubTab, setActiveSubTab] = useState('active');
-
-  useEffect(() => {
-    console.log('Auth State:', { loginUser, isLoading });
-  }, [loginUser, isLoading]);
 
 
   // 监听标签变化，重置子标签
@@ -93,7 +78,7 @@ export default function DealsPage() {
     );
   };
 
-  if (isLoading || isLoadingOrders || isLoadingPosts) {
+  if (isLoading || isLoadingPosts||isLoadingOrders) {
     return renderSkeleton();
   }
 
@@ -108,7 +93,7 @@ export default function DealsPage() {
     OrderStatus.REFUNDED,
   ] as const;
 
-  const isActiveOrder = (status: string | null) => {
+  const isActiveOrder = (status: string | null | undefined) => {
     return (
       status &&
       activeOrderStatuses.includes(
@@ -117,7 +102,7 @@ export default function DealsPage() {
     );
   };
 
-  const isHistoryOrder = (status: string | null) => {
+  const isHistoryOrder = (status: string | null | undefined) => {
     return (
       status &&
       historyOrderStatuses.includes(
@@ -258,32 +243,32 @@ export default function DealsPage() {
             {activeSubTab === 'active' ? (
               <div>
                 {loginUserOrders?.filter((order) =>
-                  isActiveOrder(order.status)
+                  isActiveOrder(order?.status)
                 ).length === 0 ? (
                   <div className="text-center text-gray-500 mt-8">
                     <NoDeal />
                   </div>
                 ) : (
                   loginUserOrders
-                    ?.filter((order) => isActiveOrder(order.status))
+                    ?.filter((order) => isActiveOrder(order?.status))
                     .map((order) => (
-                      <DealsOrderCard key={order.id} order={order as SerializedOrder} />
+                      <DealsOrderCard key={order?.id} order={order} />
                     ))
                 )}
               </div>
             ) : (
               <div>
                 {loginUserOrders?.filter((order) =>
-                  isHistoryOrder(order.status)
+                  isHistoryOrder(order?.status)
                 ).length === 0 ? (
                   <div className="text-center text-gray-500 mt-8">
                     <NoDeal />
                   </div>
                 ) : (
                   loginUserOrders
-                    ?.filter((order) => isHistoryOrder(order.status))
+                    ?.filter((order) => isHistoryOrder(order?.status))
                     .map((order) => (
-                      <DealsOrderCard key={order.id} order={order as SerializedOrder} />
+                      <DealsOrderCard key={order?.id} order={order} />
                     ))
                 )}
               </div>
@@ -301,7 +286,7 @@ export default function DealsPage() {
                   loginUserPosts?.items
                     ?.filter((post) => post.status === PostStatus.ACTIVE)
                     .map((post) => (
-                      <PostCard key={post.id} post={post as SerializedPost} />
+                      <PostCard key={post.id} post={post} />
                     ))
                 )}
               </div>
@@ -316,7 +301,7 @@ export default function DealsPage() {
                   loginUserPosts?.items
                     ?.filter((post) => post.status === PostStatus.INACTIVE)
                     .map((post) => (
-                      <PostCard key={post.id} post={post as SerializedPost} />
+                      <PostCard key={post.id} post={post} />
                     ))
                 )}
               </div>
@@ -331,7 +316,7 @@ export default function DealsPage() {
                   loginUserPosts?.items
                     ?.filter((post) => post.status === PostStatus.SOLD)
                     .map((post) => (
-                      <PostCard key={post.id} post={post as SerializedPost} />
+                      <PostCard key={post.id} post={post} />
                     ))
                 )}
               </div>

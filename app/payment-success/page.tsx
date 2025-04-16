@@ -51,12 +51,7 @@ function PaymentSuccessContent() {
       updateOrderMutation.mutateAsync({
         paymentIntentId: paymentIntent,
         status: OrderStatus.PAID
-      }).catch(error => {
-        console.error("Error updating order status:", error);
-        setTimeout(() => {
-          router.push("/deals");
-        }, 2000); // 出错时也要跳转
-      });
+      })
     } else {
       // 如果状态不是成功，直接跳转
       setIsProcessing(false);

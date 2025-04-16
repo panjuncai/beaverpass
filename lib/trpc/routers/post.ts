@@ -1,18 +1,8 @@
 import { TRPCError } from "@trpc/server";
 import { protectedProcedure, publicProcedure, router } from "..";
 import { createPostSchema, getPostByIdSchema, getPostsSchema, updatePostSchema } from "@/lib/validations/post";
-import { z } from 'zod';
-import { PostStatus, OrderStatus } from '@/lib/types/enum';
+import { OrderStatus } from "@/lib/types/enum";
 
-// interface User {
-//   id: string;
-//   email: string;
-//   firstName: string | null;
-//   lastName: string | null;
-//   avatar: string | null;
-//   phone: string | null;
-//   address: string | null;
-// }
 
 export const postRouter = router({
   // 获取单个帖子
@@ -25,43 +15,25 @@ export const postRouter = router({
           include: {
             images: true,
             poster: true,
-            orders: true
+            orders: {
+              where: {
+                status: {
+                  in: [OrderStatus.PAID, OrderStatus.SHIPPED, OrderStatus.DELIVERED, OrderStatus.COMPLETED],
+                },
+              },
+            },
           },
         });
         
         if (!post) {
-          console.error('🙀🙀🙀Post not found');
           throw new TRPCError({
             code: 'NOT_FOUND',
             message: 'Post not found',
           });
         }
         
-        // 格式化返回数据，包含最新的order
-        const orderTmp = post.orders.filter(order => 
-          order.status === OrderStatus.PAID || 
-          order.status === OrderStatus.COMPLETED || 
-          order.status === OrderStatus.SHIPPED || 
-          order.status === OrderStatus.DELIVERED
-        )[0];
-
-        const formattedPost = {
-          ...post,
-          order: orderTmp ? {
-            id: orderTmp.id,
-            shipping_address: orderTmp.shippingAddress,
-            shipping_receiver: orderTmp.shippingReceiver,
-            shipping_phone: orderTmp.shippingPhone,
-            total: orderTmp.total ? Number(orderTmp.total) : null,
-            delivery_type: orderTmp.deliveryType,
-            status: orderTmp.status || '',
-            createdAt: orderTmp.createdAt
-          } : null
-        };
-        
-        return formattedPost;
+        return post;
       } catch (error) {
-        console.error('🙀🙀🙀Failed to get post:', error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: error instanceof Error ? error.message : "Failed to get post",
@@ -99,7 +71,13 @@ export const postRouter = router({
           include: {
             images: true,
             poster: true,
-            orders: true
+            orders: {
+              where: {
+                status: {
+                  in: [OrderStatus.PAID, OrderStatus.SHIPPED, OrderStatus.DELIVERED, OrderStatus.COMPLETED],
+                },
+              },
+            },
           },
         });
         
@@ -110,35 +88,11 @@ export const postRouter = router({
           nextCursor = posts[posts.length - 1].id;
         }
         
-        // 格式化posts数据，添加order信息
-        const formattedPosts = posts.map(post => {
-          const orderTmp = post.orders.filter(order => 
-            order.status === OrderStatus.PAID || 
-            order.status === OrderStatus.COMPLETED || 
-            order.status === OrderStatus.SHIPPED || 
-            order.status === OrderStatus.DELIVERED
-          )[0];
-          return {
-            ...post,
-            order: orderTmp ? {
-              id: orderTmp.id,
-              shipping_address: orderTmp.shippingAddress,
-              shipping_receiver: orderTmp.shippingReceiver,
-              shipping_phone: orderTmp.shippingPhone,
-              total: orderTmp.total ? Number(orderTmp.total) : null,
-              delivery_type: orderTmp.deliveryType,
-              status: orderTmp.status || '',
-              createdAt: orderTmp.createdAt
-            } : null
-          };
-        });
-        // console.log("🌻🌻🌻formattedPosts", formattedPosts);
         return {
-          items: formattedPosts,
+          items: posts,
           nextCursor: nextCursor ? { id: nextCursor } : undefined,
         };
       } catch (error) {
-        console.error('🙀🙀🙀Failed to get posts:', error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: error instanceof Error ? error.message : "Failed to get posts",
@@ -169,10 +123,9 @@ export const postRouter = router({
         });
         return post;
       } catch (error) {
-        console.error("Error creating post:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to create post",
+          message: error instanceof Error ? error.message : "Failed to create post",
         });
       }
     }),
@@ -187,79 +140,9 @@ export const postRouter = router({
       });
       return updatedPost;
       } catch (error) {
-        console.error('🙀🙀🙀Failed to update post:', error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: error instanceof Error ? error.message : "Failed to update post",
-        });
-      }
-    }),
-  update: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        title: z.string().optional(),
-        description: z.string().optional(),
-        amount: z.number().optional(),
-        category: z.string().optional(),
-        images: z.array(z.string()).optional(),
-        condition: z.string().optional(),
-        status: z.nativeEnum(PostStatus).optional(),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      try {
-        const post = await ctx.prisma.post.update({
-          where: { id: input.id },
-          data: {
-            title: input.title,
-            description: input.description,
-            amount: input.amount,
-            category: input.category,
-            images: input.images ? {
-              deleteMany: {},
-              create: input.images.map(imageUrl => ({
-                imageUrl,
-                imageType: 'image',
-              })),
-            } : undefined,
-            condition: input.condition,
-            status: input.status,
-          },
-        });
-        return post;
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          throw new TRPCError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: error.message,
-          });
-        }
-        throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'An unknown error occurred',
-        });
-      }
-    }),
-
-  delete: protectedProcedure
-    .input(z.object({ id: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      try {
-        const post = await ctx.prisma.post.delete({
-          where: { id: input.id },
-        });
-        return post;
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          throw new TRPCError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: error.message,
-          });
-        }
-        throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'An unknown error occurred',
         });
       }
     }),

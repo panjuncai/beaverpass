@@ -1,11 +1,10 @@
 import { PostStatus } from "@/lib/types/enum";
-import { SerializedPost } from "@/lib/types/post";
-import { trpc } from "@/lib/trpc/client";
+import { GetPostOutput, trpc } from "@/lib/trpc/client";
 import Image from "next/image";
 import { ChangeEventHandler, useMemo, useState } from "react";
 import getPostStatus from "@/utils/tools/getPostStatus";
 import RightArrow from "@/components/icons/right-arrow";
-import {CenterPopup, Button} from 'antd-mobile'
+import { CenterPopup, Button } from "antd-mobile";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
 // import Loading from "@/components/utils/loading";
@@ -71,35 +70,48 @@ const dayPickerStyles = `
   }
 `;
 
-export default function PostCard({ post }: { post: SerializedPost }) {
+export default function PostCard({ post }: { post: GetPostOutput }) {
   const utils = trpc.useUtils();
   const [activeAction, setActiveAction] = useState<
     "activate" | "deactivate" | "delete" | null
   >(null);
   const [visible, setVisible] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date|undefined>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    new Date()
+  );
   const [startTimeValue, setStartTimeValue] = useState<string>("10:00");
   const [endTimeValue, setEndTimeValue] = useState<string>("12:00");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+  const updateOrderPickupTimeMutation =
+    trpc.order.updateOrderPickupTime.useMutation({
+      onSuccess: () => {
+        utils.order.getOrders.invalidate();
+        setVisible(false);
+      },
+      onError: (error) => {
+        setVisible(false);
+        console.error("update order pickup time error:", error);
+      },
+    });
+
   // 定义今天的日期用于禁用过去的日期
   const today = useMemo(() => {
     const date = new Date();
     date.setHours(0, 0, 0, 0);
     return date;
   }, []);
-  
+
   // 过滤函数，禁用今天之前的日期
   const isPastDay = useMemo(() => {
     return (date: Date) => {
       return date < today;
     };
   }, [today]);
-  
+
   // 以下计算可以在提交时使用
-  const startDateTime=useMemo(()=>{
-    if(!selectedDate) return null
-    if(!startTimeValue) return null
+  const startDateTime = useMemo(() => {
+    if (!selectedDate) return null;
+    if (!startTimeValue) return null;
     const [hours, minutes] = startTimeValue
       .split(":")
       .map((str) => parseInt(str, 10));
@@ -110,12 +122,12 @@ export default function PostCard({ post }: { post: SerializedPost }) {
       hours,
       minutes
     );
-    return newStartDate
-  },[selectedDate,startTimeValue])
+    return newStartDate;
+  }, [selectedDate, startTimeValue]);
 
-  const endDateTime=useMemo(()=>{
-    if(!selectedDate) return null
-    if(!endTimeValue) return null
+  const endDateTime = useMemo(() => {
+    if (!selectedDate) return null;
+    if (!endTimeValue) return null;
     const [hours, minutes] = endTimeValue
       .split(":")
       .map((str) => parseInt(str, 10));
@@ -126,8 +138,8 @@ export default function PostCard({ post }: { post: SerializedPost }) {
       hours,
       minutes
     );
-    return newEndDate
-  },[selectedDate,endTimeValue])
+    return newEndDate;
+  }, [selectedDate, endTimeValue]);
 
   const updatePostMutation = trpc.post.updatePost.useMutation({
     onSuccess: () => {
@@ -171,40 +183,48 @@ export default function PostCard({ post }: { post: SerializedPost }) {
       setSelectedDate(date);
       return;
     }
-    
+
     // 确保不能选择过去的日期
     if (date < today) {
       return;
     }
-    
+
     setSelectedDate(date);
   };
-  
+
   const handleSubmitSchedule = () => {
     if (!selectedDate || !startTimeValue || !endTimeValue) {
       return;
     }
-    
+
     setIsSubmitting(true);
-    
-    // 这里可以添加API调用，例如：
-    console.log('预约信息:', {
-      date: selectedDate,
-      startTime: startDateTime,
-      endTime: endDateTime
-    });
-    
-    // 模拟API调用
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setVisible(false);
-      // 可以添加成功提示
-    }, 1000);
+    try {
+      updateOrderPickupTimeMutation.mutateAsync({
+        orderId:
+          post?.orders[0]?.id || "",
+        pickupStartTime: startDateTime?.toISOString() || "",
+        pickupEndTime: endDateTime?.toISOString() || "",
+      });
+    } catch (error) {
+      console.error("update order pickup time error:", error);
+    }
+    // // 这里可以添加API调用，例如：
+    // console.log('预约信息:', {
+    //   date: selectedDate,
+
+    // // 模拟API调用
+    // setTimeout(() => {
+    //   setIsSubmitting(false);
+    //   setVisible(false);
+    //   // 可以添加成功提示
+    // }, 1000);
   };
 
   return (
     <>
-      <style jsx global>{dayPickerStyles}</style>
+      <style jsx global>
+        {dayPickerStyles}
+      </style>
       <div className="card bg-base-100 shadow-md mb-4">
         <div className="card-body">
           <div className="flex items-center gap-4">
@@ -225,14 +245,17 @@ export default function PostCard({ post }: { post: SerializedPost }) {
                 >
                   {post.status}
                 </div>
-                {post.order && (
+                {post.orders[0] && (
                   <div className="flex-1 text-right">
-                    {post.order.delivery_type}
+                    {post.orders[0].deliveryType}
                   </div>
                 )}
               </div>
               <p className="text-xl font-bold mt-2">
-                ${post.amount === 0 ? "Free" : Number(post.amount).toFixed(2)}
+                $
+                {Number(post.amount) === 0
+                  ? "Free"
+                  : Number(post.amount).toFixed(2)}
                 {post.isNegotiable && (
                   <span className="text-sm ml-2">Negotiable</span>
                 )}
@@ -295,21 +318,22 @@ export default function PostCard({ post }: { post: SerializedPost }) {
                     )}
                   </button>
                 </>
-              ) : post.status===PostStatus.SOLD? (<div className="flex items-center gap-2">
-                <div className="animate-pulse-right">
-                  <RightArrow color="var(--adm-color-primary)"/>
+              ) : post.status === PostStatus.SOLD ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-pulse-right">
+                    <RightArrow color="var(--adm-color-primary)" />
+                  </div>
+                  <Button
+                    className="rounded-full"
+                    block
+                    size="small"
+                    shape="rounded"
+                    color="primary"
+                    onClick={() => setVisible(true)}
+                  >
+                    Schedule Pickup
+                  </Button>
                 </div>
-                <Button
-                  className="rounded-full"
-                  block
-                  size="small"
-                  shape='rounded'
-                  color="primary"
-                  onClick={() => setVisible(true)}
-                >
-                  Schedule Pickup
-                </Button>
-              </div>
               ) : null}
             </div>
           </div>
@@ -318,57 +342,61 @@ export default function PostCard({ post }: { post: SerializedPost }) {
       <CenterPopup
         visible={visible}
         onMaskClick={() => {
-          setVisible(false)
+          setVisible(false);
         }}
         closeOnMaskClick={true}
       >
-      <div className="p-4">
-        <h2 className="text-xl font-semibold text-center mb-4">Schedule Pickup</h2>
-        <DayPicker
-          mode="single"
-          selected={selectedDate}
-          onSelect={handleDaySelect}
-          startMonth={new Date()}
-          showOutsideDays
-          disabled={isPastDay}
-          // fromDate={today}
-        />
-        
-        <div className="time-selector-container">
-          <div className="time-selector gap-4">
-            <div className="time-control">
-              <label>Start Time</label>
-              <input 
-                type="time" 
-                value={startTimeValue} 
-                onChange={handleStartTimeChange} 
-              />
-            </div>
-            <div className="time-control">
-              <label>End Time</label>
-              <input 
-                type="time" 
-                value={endTimeValue} 
-                onChange={handleEndTimeChange} 
-              />
+        <div className="p-4">
+          <h2 className="text-xl font-semibold text-center mb-4">
+            Schedule Pickup
+          </h2>
+          <DayPicker
+            mode="single"
+            selected={selectedDate}
+            onSelect={handleDaySelect}
+            startMonth={new Date()}
+            showOutsideDays
+            disabled={isPastDay}
+            // fromDate={today}
+          />
+
+          <div className="time-selector-container">
+            <div className="time-selector gap-4">
+              <div className="time-control">
+                <label>Start Time</label>
+                <input
+                  type="time"
+                  value={startTimeValue}
+                  onChange={handleStartTimeChange}
+                />
+              </div>
+              <div className="time-control">
+                <label>End Time</label>
+                <input
+                  type="time"
+                  value={endTimeValue}
+                  onChange={handleEndTimeChange}
+                />
+              </div>
             </div>
           </div>
-        </div>
-        
+
           <Button
             className="mt-10 rounded-full"
             block
             size="large"
             color="primary"
-            shape='rounded'
+            shape="rounded"
             onClick={handleSubmitSchedule}
             loading={isSubmitting}
-            disabled={!selectedDate || !startTimeValue || !endTimeValue || isSubmitting}
+            disabled={
+              !selectedDate || !startTimeValue || !endTimeValue || isSubmitting
+            }
           >
             Confirm Time
           </Button>
         </div>
-    </CenterPopup>
+      </CenterPopup>
     </>
   );
 }
