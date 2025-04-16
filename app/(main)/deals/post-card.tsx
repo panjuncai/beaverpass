@@ -7,6 +7,8 @@ import RightArrow from "@/components/icons/right-arrow";
 import { CenterPopup, Button } from "antd-mobile";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/style.css";
+import { formatDateTime } from "@/utils/tools/format-time";
+import { formatSimpleTime } from "@/utils/tools/format-time";
 // import Loading from "@/components/utils/loading";
 
 // 自定义CSS样式
@@ -87,9 +89,11 @@ export default function PostCard({ post }: { post: GetPostOutput }) {
       onSuccess: () => {
         utils.order.getOrders.invalidate();
         setVisible(false);
+        setIsSubmitting(false);
       },
       onError: (error) => {
         setVisible(false);
+        setIsSubmitting(false);
         console.error("update order pickup time error:", error);
       },
     });
@@ -198,26 +202,11 @@ export default function PostCard({ post }: { post: GetPostOutput }) {
     }
 
     setIsSubmitting(true);
-    try {
-      updateOrderPickupTimeMutation.mutateAsync({
-        orderId:
-          post?.orders[0]?.id || "",
-        pickupStartTime: startDateTime?.toISOString() || "",
-        pickupEndTime: endDateTime?.toISOString() || "",
-      });
-    } catch (error) {
-      console.error("update order pickup time error:", error);
-    }
-    // // 这里可以添加API调用，例如：
-    // console.log('预约信息:', {
-    //   date: selectedDate,
-
-    // // 模拟API调用
-    // setTimeout(() => {
-    //   setIsSubmitting(false);
-    //   setVisible(false);
-    //   // 可以添加成功提示
-    // }, 1000);
+    updateOrderPickupTimeMutation.mutateAsync({
+      orderId: post?.orders[0]?.id || "",
+      pickupStartTime: startDateTime?.toISOString() || "",
+      pickupEndTime: endDateTime?.toISOString() || "",
+    });
   };
 
   return (
@@ -319,24 +308,32 @@ export default function PostCard({ post }: { post: GetPostOutput }) {
                   </button>
                 </>
               ) : post.status === PostStatus.SOLD ? (
-                <div className="flex items-center gap-2">
-                  <div className="animate-pulse-right">
-                    <RightArrow color="var(--adm-color-primary)" />
+                <>
+                  <div className="flex items-center gap-2">
+                    <div className="animate-pulse-right">
+                      <RightArrow color="var(--adm-color-primary)" />
+                    </div>
+                    <Button
+                      className="rounded-full"
+                      block
+                      size="small"
+                      shape="rounded"
+                      color="primary"
+                      onClick={() => setVisible(true)}
+                    >
+                      Schedule Pickup
+                    </Button>
                   </div>
-                  <Button
-                    className="rounded-full"
-                    block
-                    size="small"
-                    shape="rounded"
-                    color="primary"
-                    onClick={() => setVisible(true)}
-                  >
-                    Schedule Pickup
-                  </Button>
-                </div>
+                </>
               ) : null}
             </div>
           </div>
+          <div className="flex">
+                  <div className="">
+                    Pickup Time: 
+                  </div>
+                  <div className="flex-1 text-right">{formatDateTime(new Date(post.orders[0]?.pickupStartTime || ""))} - {formatSimpleTime(new Date(post.orders[0]?.pickupEndTime || ""))}</div>
+                  </div>
         </div>
       </div>
       <CenterPopup
@@ -389,9 +386,7 @@ export default function PostCard({ post }: { post: GetPostOutput }) {
             shape="rounded"
             onClick={handleSubmitSchedule}
             loading={isSubmitting}
-            disabled={
-              !selectedDate || !startTimeValue || !endTimeValue || isSubmitting
-            }
+            disabled={isSubmitting}
           >
             Confirm Time
           </Button>
