@@ -264,7 +264,7 @@ export default function ChatDetailPage() {
     <div className="flex flex-col h-full">
       {renderConnectionStatus()}
       
-      <div className="flex-1 overflow-y-auto p-3">
+      <div className="flex-1 overflow-y-auto pl-3 pr-3">
         {isLoadingMessages? (
           <div className="p-4 space-y-4">
             <Skeleton.Title animated />
@@ -273,7 +273,7 @@ export default function ChatDetailPage() {
         ) : (
           <>
           {/* 聊天室标题 */}
-            <div className="flex gap-4 bg-base-100 p-4 border-b border-gray-200">
+            <div className="sticky top-0 bg-base-100 p-4 border-b border-gray-200">
               <Avatar
                 src={otherParticipant?.user?.avatar || "/default-avatar.png"}
                 style={{ "--size": "64px" }}
