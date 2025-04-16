@@ -41,12 +41,12 @@ function PaymentSuccessContent() {
   });
 
   useEffect(() => {
-
+    const updateOrder = async () => {
     if (redirectStatus === "succeeded" && paymentIntent && !hasProcessedRef.current) {
       hasProcessedRef.current = true; // 标记为已处理
       
       // 更新订单状态
-      updateOrderMutation.mutateAsync({
+      await updateOrderMutation.mutateAsync({
         paymentIntentId: paymentIntent,
         status: OrderStatus.PAID
       })
@@ -55,9 +55,11 @@ function PaymentSuccessContent() {
       setIsProcessing(false);
       // console.log("🌻🌻🌻payment redirect status is not succeeded:", redirectStatus);
       setTimeout(() => {
-        router.push("/deals");
-      }, 2000);
-    }
+          router.push("/deals");
+        }, 2000);
+      }
+    };
+    updateOrder();
   }, [paymentIntent, redirectStatus, router]);
 
   return (
