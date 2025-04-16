@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, Suspense, useState } from "react";
+import { useEffect, Suspense, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import { OrderStatus } from "@/lib/types/enum";
@@ -11,7 +11,7 @@ function PaymentSuccessContent() {
   const paymentIntent = searchParams.get("payment_intent");
   const redirectStatus = searchParams.get("redirect_status");
   const [isProcessing, setIsProcessing] = useState(true);
-
+  const hasProcessedRef = useRef(false);
   const updateOrderMutation = trpc.order.updateOrderStatus.useMutation({
     onSuccess: () => {
       setIsProcessing(false);
@@ -41,11 +41,9 @@ function PaymentSuccessContent() {
   });
 
   useEffect(() => {
-    // 添加状态标记防止重复调用
-    let hasProcessed = false;
 
-    if (redirectStatus === "succeeded" && paymentIntent && !hasProcessed) {
-      hasProcessed = true; // 标记为已处理
+    if (redirectStatus === "succeeded" && paymentIntent && !hasProcessedRef.current) {
+      hasProcessedRef.current = true; // 标记为已处理
       
       // 更新订单状态
       updateOrderMutation.mutateAsync({
@@ -60,7 +58,7 @@ function PaymentSuccessContent() {
         router.push("/deals");
       }, 2000);
     }
-  }, [paymentIntent, redirectStatus, router, updateOrderMutation]);
+  }, [paymentIntent, redirectStatus, router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">
