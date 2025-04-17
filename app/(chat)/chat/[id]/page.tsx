@@ -273,7 +273,7 @@ export default function ChatDetailPage() {
         ) : (
           <>
           {/* 聊天室标题 */}
-            <div className="sticky top-0 bg-base-100 p-4 border-b border-gray-200">
+            <div className="flex gap-2 sticky top-0 bg-base-100 p-4 border-b border-gray-200">
               <Avatar
                 src={otherParticipant?.user?.avatar || "/default-avatar.png"}
                 style={{ "--size": "64px" }}
@@ -302,7 +302,7 @@ export default function ChatDetailPage() {
                     <Rate allowHalf readOnly defaultValue={4} />
                     <span className="text-lg">4.0</span>
                   </div>
-                  <HeartOutline fontSize={36} className="hover:cursor-pointer" />
+                  <HeartOutline fontSize={36} className="hover:cursor-pointer" color='#65a30d' />
                 </div>
               </div>
             </div>
